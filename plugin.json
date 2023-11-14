@@ -1,0 +1,26 @@
+{
+  "slug": "sn-vcv",
+  "name": "sn-vcv",
+  "version": "2.0.0",
+  "license": "GPL-3.0-only",
+  "brand": "sn-vcv",
+  "author": "transcriptaze",
+  "authorEmail": "transcriptaze.development@gmail.com",
+  "authorUrl": "https://github.com/transcriptaze/snyth",
+  "pluginUrl": "https://github.com/transcriptaze/sn-vcv",
+  "manualUrl": "https://github.com/transcriptaze/sn-vcv/README.md",
+  "sourceUrl": "https://github.com/transcriptaze/sn-vcv",
+  "changelogUrl": "https://github.com/transcriptaze/sn-vcv/CHANGELOG.md",
+  "donateUrl": "",
+  "modules": [
+    {
+      "slug": "sn-vcv-vco",
+      "name": "sn-vcv-vco",
+      "description": "sn experimental additive synthesizer VCO",
+      "tags": [
+        "VCO",
+        "Function generator"
+      ]
+    }
+  ]
+}

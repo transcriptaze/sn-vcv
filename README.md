@@ -1,2 +1,5 @@
 # sn-vcv
-VCV modules for sn experimental additive synthesizer
+
+A set of VCV modules for the sn experimental additive synthesizer.
+
+
