@@ -79,10 +79,56 @@ void sn_vcv_vco::process(const ProcessArgs &args) {
     update.count--;
 
     if (update.count <= 0) {
-        // settings();
-        // recompute();
+        recompute();
         update.count = KRATE[update.krate];
     }
+}
+
+void sn_vcv_vco::recompute() {
+    // ... param values
+    float e = params[ECCENTRICITY_PARAM].getValue();
+    float s = params[SENSITIVITY_PARAM].getValue();
+    float θ = params[ROTATION_PARAM].getValue();
+    float A = params[AMPLITUDE_PARAM].getValue();
+    float δx = params[DX_PARAM].getValue();
+    float δy = params[DY_PARAM].getValue();
+    float m = params[M_PARAM].getValue();
+
+    // ... override with inputs
+    if (inputs[ECCENTRICITY_INPUT].isConnected()) {
+        e = clamp(inputs[ECCENTRICITY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    }
+
+    if (inputs[SENSITIVITY_INPUT].isConnected()) {
+        s = clamp(inputs[SENSITIVITY_INPUT].getVoltage() / 2.0f, 0.0f, +5.0f);
+    }
+
+    if (inputs[ROTATION_INPUT].isConnected()) {
+        θ = clamp(90.0f * inputs[ROTATION_INPUT].getVoltage() / 5.0f, -90.0f, +90.0f);
+    }
+
+    if (inputs[AMPLITUDE_INPUT].isConnected()) {
+        A = clamp(inputs[AMPLITUDE_INPUT].getVoltage() / 10.0f, 0.0f, 1.0f);
+    }
+
+    if (inputs[DX_INPUT].isConnected()) {
+        δx = clamp(inputs[DX_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    }
+
+    if (inputs[DY_INPUT].isConnected()) {
+        δy = clamp(inputs[DY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    }
+
+    // ... set internal SN parameters
+    sn.ε = std::tanh(s * e);
+    sn.θ = clamp(θ, -89.95f, +89.95f) * M_PI / 180.0f;
+    sn.A = A;
+    sn.δx = δx;
+    sn.δy = δy;
+    sn.m = m;
+
+    // ... recalculate χ
+    sn.recompute(χ);
 }
 
 sn_vcv_vcoWidget::sn_vcv_vcoWidget(sn_vcv_vco *module) {

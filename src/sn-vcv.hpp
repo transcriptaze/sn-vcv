@@ -5,6 +5,10 @@
 
 #include "plugin.hpp"
 
+// constants
+const float TAU = 2.0f * M_PI; // 2π
+const float PI2 = M_PI / 2;    // π/2
+
 // Control rates
 extern const std::vector<unsigned> KRATE;
 extern const std::vector<std::string> KRATES;
@@ -18,6 +22,49 @@ enum AUXMODE {
     SUM,
     POLY
 };
+
+typedef struct AUX {
+    enum AUXMODE mode;
+    float phase;
+    struct {
+        float osc;
+        float sum;
+    } out;
+} AUX;
+
+// SN
+typedef struct Χ {
+    float pʼ;
+    float qʼ;
+    float rʼ;
+    float sʼ;
+    float tʼ;
+    float uʼ;
+    float φ;
+} Χ;
+
+typedef struct SN {
+    SN(float ε, float θ, float A, float δx, float δy, float Φ, float m) {
+        this->ε = ε;
+        this->θ = θ;
+        this->A = A;
+        this->δx = δx;
+        this->δy = δy;
+        this->Φ = Φ;
+        this->m = m;
+    }
+
+    float ε;
+    float θ;
+    float A;
+    float δx;
+    float δy;
+    float Φ;
+    float m;
+
+    void recompute(Χ &);
+    float phi(float, float, float, float);
+} SN;
 
 // Channels display widget
 struct ChannelsWidget : Widget {

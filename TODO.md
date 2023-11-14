@@ -1,9 +1,20 @@
 # TODO
 
-1. _sn-vcv-osc_
+- [ ] github workflow
+- [ ] README
+- [ ] Demo patches
 
-2. _sn-vcv-oscx_
-3. _sn-vcv-lfo_
-4. _sn-vcv-lfox_
-5. README
-6. Demo patches
+## _sn-vcv-osc_
+- [x] SVG resource
+- [x] Context menu
+- [x] Save/restore
+- [ ] Factory presets
+- [ ] `process`
+
+
+## _sn-vcv-oscx_
+
+## _sn-vcv-lfo_
+
+## _sn-vcv-lfox_
+

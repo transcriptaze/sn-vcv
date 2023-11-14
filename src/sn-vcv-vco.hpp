@@ -46,24 +46,31 @@ struct sn_vcv_vco : Module {
     void dataFromJson(json_t *) override;
     void process(const ProcessArgs &args) override;
 
+    void recompute();
     int channels();
     int krate();
 
     // ... instance variables
     dsp::PulseGenerator trigger;
 
-    // ... AUX state
-    struct {
-        enum AUXMODE mode;
-        float phase;
-        struct {
-            float osc;
-            float sum;
-        } out;
-    } aux = {
+    struct AUX aux = {
         .mode = POLY,
         .phase = 0.f,
         .out = {.osc = 0.f, .sum = 0.f},
+    };
+
+    struct SN sn {
+        0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f
+    };
+
+    struct Χ χ = {
+        .pʼ = 1.f,
+        .qʼ = 0.f,
+        .rʼ = 0.f,
+        .sʼ = 1.f,
+        .tʼ = 0.f,
+        .uʼ = 0.f,
+        .φ = 0.f,
     };
 
     // ... update state

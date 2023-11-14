@@ -8,6 +8,44 @@ const std::vector<std::string> KRATES = {"1", "¹⁄₆₄", "¹⁄₁₂₈", "
 const float AUX_FREQUENCY = 25.0;                                  // auxiliary output fixed frequency (Hz)
 const std::vector<std::string> AUX_MODES = {"OSC", "SUM", "POLY"}; // AUX mode labels
 
+// SN
+void SN::recompute(Χ &χ) {
+    float εʼ = std::sqrt(1.0f - ε * ε);
+    float a = (ε < 0.0f) ? εʼ : 1.0f;
+    float b = (ε > 0.0f) ? εʼ : 1.0f;
+
+    float cosθ = std::cos(θ);
+    float sinθ = std::sin(θ);
+
+    float u = std::atan(-b * std::tan(θ) / a);
+    float v = std::atan((b / std::tan(θ)) * a);
+    float tx = a * std::cos(u) * cosθ - b * std::sin(u) * sinθ;
+    float ty = b * std::sin(v) * cosθ + a * std::cos(v) * sinθ;
+    float δxʼ = tx * δx;
+    float δyʼ = ty * δy;
+
+    χ.pʼ = A * a * cosθ;
+    χ.qʼ = A * b * sinθ;
+    χ.rʼ = A * δxʼ;
+    χ.sʼ = A * a * sinθ;
+    χ.tʼ = A * b * cosθ;
+    χ.uʼ = A * δyʼ;
+    χ.φ = phi(a, b, θ, Φ);
+}
+
+float SN::phi(float a, float b, float θ, float Φ) {
+    float dθ = Φ - θ;
+    float φ = std::atan(-(a / b) * std::tan(Φ - θ));
+
+    if (dθ < -PI2) {
+        φ += M_PI;
+    } else if (dθ > PI2) {
+        φ -= M_PI;
+    }
+
+    return φ;
+}
+
 // Channels display widget
 void ChannelsWidget::draw(const DrawArgs &args) {
     // ... background
