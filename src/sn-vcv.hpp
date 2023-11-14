@@ -5,8 +5,13 @@
 
 #include "plugin.hpp"
 
-static const NVGcolor SCHEME_DARK_GREEN = nvgRGB(0x00, 0xa0, 0x00);
-static const NVGcolor SCHEME_BRIGHT_RED = nvgRGB(0xff, 0x00, 0x00);
+// Control rates
+extern const std::vector<unsigned> KRATE;
+extern const std::vector<std::string> KRATES;
+
+// AUX modes
+extern const float AUX_FREQUENCY;                // auxiliary output fixed frequency (Hz)
+extern const std::vector<std::string> AUX_MODES; // AUX mode labels
 
 enum AUXMODE {
     OSC,
@@ -14,7 +19,8 @@ enum AUXMODE {
     POLY
 };
 
-struct DigitalDisplay : Widget {
+// Channels display widget
+struct ChannelsWidget : Widget {
     void draw(const DrawArgs &args) override;
     void drawLayer(const DrawArgs &args, int layer) override;
     void prepareFont(const DrawArgs &);
@@ -27,6 +33,10 @@ struct DigitalDisplay : Widget {
     NVGcolor fgColor = SCHEME_YELLOW;
     Vec textPos;
 };
+
+// Expander LEDs
+static const NVGcolor SCHEME_DARK_GREEN = nvgRGB(0x00, 0xa0, 0x00);
+static const NVGcolor SCHEME_BRIGHT_RED = nvgRGB(0xff, 0x00, 0x00);
 
 template <typename TBase>
 struct XLeftLight : TBase {

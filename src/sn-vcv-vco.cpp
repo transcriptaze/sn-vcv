@@ -34,7 +34,7 @@ sn_vcv_vco::sn_vcv_vco() {
 json_t *sn_vcv_vco::dataToJson() {
     json_t *root = json_object();
 
-    json_object_set_new(root, "k-rate", json_integer(krate));
+    json_object_set_new(root, "k-rate", json_integer(update.krate));
     json_object_set_new(root, "aux-mode", json_integer(aux.mode));
 
     return root;
@@ -48,7 +48,7 @@ void sn_vcv_vco::dataFromJson(json_t *root) {
         int v = json_integer_value(krate);
 
         if (v >= 0 && v < 4) {
-            this->krate = json_integer_value(krate);
+            update.krate = json_integer_value(krate);
         }
     }
 
@@ -69,8 +69,20 @@ int sn_vcv_vco::channels() {
 }
 
 void sn_vcv_vco::process(const ProcessArgs &args) {
+    int channels = this->channels();
+    bool vco = outputs[VCO_OUTPUT].isConnected();
+
     lights[XLL_LIGHT].setBrightnessSmooth(1.0, args.sampleTime);
     lights[XRR_LIGHT].setBrightnessSmooth(1.0, args.sampleTime);
+
+    // ... get params and recompute transform matrix
+    update.count--;
+
+    if (update.count <= 0) {
+        // settings();
+        // recompute();
+        update.count = KRATE[update.krate];
+    }
 }
 
 sn_vcv_vcoWidget::sn_vcv_vcoWidget(sn_vcv_vco *module) {
@@ -160,6 +172,21 @@ sn_vcv_vcoWidget::sn_vcv_vcoWidget(sn_vcv_vco *module) {
     // ... expander indicators
     addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xll), module, sn_vcv_vco::XLL_LIGHT));
     addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_vcv_vco::XRR_LIGHT));
+}
+
+void sn_vcv_vcoWidget::appendContextMenu(Menu *menu) {
+    sn_vcv_vco *module = getModule<sn_vcv_vco>();
+
+    menu->addChild(new MenuSeparator);
+    menu->addChild(createMenuLabel("sn-vco settings"));
+
+    menu->addChild(createIndexPtrSubmenuItem("k-rate",
+                                             KRATES,
+                                             &module->update.krate));
+
+    menu->addChild(createIndexPtrSubmenuItem("aux-mode",
+                                             AUX_MODES,
+                                             &module->aux.mode));
 }
 
 Model *modelSn_vcv_vco = createModel<sn_vcv_vco, sn_vcv_vcoWidget>("sn-vcv-vco");

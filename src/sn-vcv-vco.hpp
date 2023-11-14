@@ -45,12 +45,14 @@ struct sn_vcv_vco : Module {
     json_t *dataToJson() override;
     void dataFromJson(json_t *) override;
     void process(const ProcessArgs &args) override;
+
     int channels();
+    int krate();
 
     // ... instance variables
     dsp::PulseGenerator trigger;
-    int krate = 0;
 
+    // ... AUX state
     struct {
         enum AUXMODE mode;
         float phase;
@@ -63,13 +65,24 @@ struct sn_vcv_vco : Module {
         .phase = 0.f,
         .out = {.osc = 0.f, .sum = 0.f},
     };
+
+    // ... update state
+    struct {
+        int krate;
+        int count;
+    } update{
+        .krate = 0,
+        .count = 0,
+    };
 };
 
 struct sn_vcv_vcoWidget : ModuleWidget {
     sn_vcv_vcoWidget(sn_vcv_vco *);
+
+    void appendContextMenu(Menu *);
 };
 
-struct sn_vcv_vco_channels : DigitalDisplay {
+struct sn_vcv_vco_channels : ChannelsWidget {
     sn_vcv_vco_channels() {
         fontPath = asset::system("res/fonts/DSEG7ClassicMini-BoldItalic.ttf");
         textPos = Vec(22, 20);
