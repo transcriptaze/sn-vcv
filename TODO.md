@@ -12,9 +12,19 @@
 - [x] Factory presets
 - [x] AUX out
 - [x] VCO out
+- [x] Dark mode
 - [ ] Expanders
 
 ## _sn-vcv-oscx_
+- [ ] SVG resource
+- [ ] Dark mode
+- [ ] Context menu
+- [ ] Save/restore
+- [ ] Factory presets
+- [ ] AUX out
+- [ ] VCO out
+- [ ] VCO-Σ out
+- [ ] Expanders
 
 ## _sn-vcv-lfo_
 
