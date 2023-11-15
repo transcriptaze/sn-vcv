@@ -3,6 +3,7 @@
 - [ ] github workflow
 - [ ] README
 - [ ] Demo patches
+      - [x] sn-vco
 
 ## _sn-vcv-osc_
 - [x] SVG resource
@@ -10,8 +11,8 @@
 - [x] Save/restore
 - [x] Factory presets
 - [x] AUX out
-- [ ] VCO out
-
+- [x] VCO out
+- [ ] Expanders
 
 ## _sn-vcv-oscx_
 

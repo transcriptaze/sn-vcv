@@ -1,5 +1,8 @@
 #include "sn-vcv-vco.hpp"
 
+const int sn_vcv_vco::CHANNELS = 1;
+const float sn_vcv_vco::VELOCITY = 1.0f;
+
 sn_vcv_vco::sn_vcv_vco() {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
@@ -65,12 +68,23 @@ void sn_vcv_vco::dataFromJson(json_t *root) {
 }
 
 int sn_vcv_vco::channels() {
-    return inputs[PITCH_INPUT].isConnected() ? inputs[PITCH_INPUT].getChannels() : 1;
+    return inputs[PITCH_INPUT].isConnected() ? inputs[PITCH_INPUT].getChannels() : CHANNELS;
+}
+
+float sn_vcv_vco::velocity(int channel) {
+    if (!inputs[VELOCITY_INPUT].isConnected()) {
+        return VELOCITY;
+    }
+
+    if (channel < inputs[VELOCITY_INPUT].getChannels()) {
+        return inputs[VELOCITY_INPUT].getPolyVoltage(channel) / 10.0f;
+    }
+
+    return inputs[VELOCITY_INPUT].getVoltage() / 10.0f;
 }
 
 void sn_vcv_vco::process(const ProcessArgs &args) {
-    int channels = this->channels();
-    bool vco = outputs[VCO_OUTPUT].isConnected();
+    bool expanded = false;
 
     lights[XLL_LIGHT].setBrightnessSmooth(1.0, args.sampleTime);
     lights[XRR_LIGHT].setBrightnessSmooth(1.0, args.sampleTime);
@@ -83,8 +97,52 @@ void sn_vcv_vco::process(const ProcessArgs &args) {
         update.count = KRATE[update.krate];
     }
 
-    // ... aux
-    processAUX(args, false);
+    // ... generate
+    processVCO(args, expanded);
+    processAUX(args, expanded);
+}
+
+void sn_vcv_vco::processVCO(const ProcessArgs &args, bool expanded) {
+    int channels = this->channels();
+    bool vco = outputs[VCO_OUTPUT].isConnected();
+
+    // ... convert pitch CV to instantaneous frequency
+    for (int ch = 0; ch < channels; ch++) {
+        float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
+        float f = dsp::FREQ_C4 * std::pow(2.f, pitch);
+
+        phase[ch] += f * args.sampleTime;
+        if (phase[ch] >= 1.f) {
+            phase[ch] -= 1.f;
+        }
+    }
+
+    // ... generate
+    if (vco || expanded) {
+        for (int ch = 0; ch < channels; ch++) {
+            float α = phase[ch] * 2.0f * M_PI;
+
+            float αʼ = sn.m * α - ζ.φ;
+
+            float x = std::cos(αʼ);
+            float y = std::sin(αʼ);
+            float xʼ = ζ.pʼ * x - ζ.qʼ * y + ζ.rʼ;
+            float yʼ = ζ.sʼ * x + ζ.tʼ * y + ζ.uʼ;
+
+            float r = std::hypot(xʼ, yʼ);
+            float υ = r > 0.0f ? sn.A * yʼ / r : 0.0f;
+
+            out[ch] = υ;
+        }
+    }
+
+    if (vco) {
+        for (int ch = 0; ch < channels; ch++) {
+            outputs[VCO_OUTPUT].setVoltage(5.f * velocity(ch) * out[ch], ch);
+        }
+
+        outputs[VCO_OUTPUT].setChannels(channels);
+    }
 }
 
 void sn_vcv_vco::processAUX(const ProcessArgs &args, bool expanded) {

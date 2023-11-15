@@ -46,11 +46,13 @@ struct sn_vcv_vco : Module {
     void dataFromJson(json_t *) override;
 
     void process(const ProcessArgs &args) override;
+    void processVCO(const ProcessArgs &args, bool);
     void processAUX(const ProcessArgs &args, bool);
     void recompute();
 
-    int channels();
     int krate();
+    int channels();
+    float velocity(int);
 
     // ... instance variables
     dsp::PulseGenerator trigger;
@@ -75,7 +77,10 @@ struct sn_vcv_vco : Module {
         .φ = 0.f,
     };
 
-    // ... update state
+    float phase[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
+    float out[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
+
+    // ... state update
     struct {
         int krate;
         int count;
@@ -83,6 +88,9 @@ struct sn_vcv_vco : Module {
         .krate = 0,
         .count = 0,
     };
+
+    static const int CHANNELS;
+    static const float VELOCITY;
 };
 
 struct sn_vcv_vcoWidget : ModuleWidget {
