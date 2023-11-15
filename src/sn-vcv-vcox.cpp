@@ -1,0 +1,315 @@
+#include "sn-vcv-vcox.hpp"
+
+sn_vcv_vcox::sn_vcv_vcox() {
+    config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
+
+    configParam(ECCENTRICITY_PARAM, -1.0f, +1.0f, 0.0f, "ε");
+    configParam(SENSITIVITY_PARAM, 0.0f, +5.0f, 2.5f, "s");
+    configParam(ROTATION_PARAM, -90.0f, +90.0f, 0.0f, "θ");
+    configParam(AMPLITUDE_PARAM, 0.0f, +1.0f, 1.0f, "a");
+    configParam(DX_PARAM, -1.0f, +1.0f, 0.0f, "δx");
+    configParam(DY_PARAM, -1.0f, +1.0f, 0.0f, "δy");
+    configSwitch(M_PARAM, 1.f, 5.f, 2.f, "m", {"1", "2", "3", "4", "5"});
+
+    getParamQuantity(M_PARAM)->randomizeEnabled = false;
+
+    configInput(ECCENTRICITY_INPUT, "±5V ε");
+    configInput(SENSITIVITY_INPUT, "0-10V s");
+    configInput(ROTATION_INPUT, "±5V Φ");
+    configInput(AMPLITUDE_INPUT, "0-10V a");
+    configInput(DX_INPUT, "±5V δx");
+    configInput(DY_INPUT, "±5V δy");
+
+    configOutput(VCO_OUTPUT, "VCO");
+    configOutput(VCO_SUM_OUTPUT, "VCO-Σ");
+    configOutput(AUX_OUTPUT, "AUX");
+}
+
+json_t *sn_vcv_vcox::dataToJson() {
+    json_t *root = json_object();
+
+    json_object_set_new(root, "k-rate", json_integer(update.krate));
+    json_object_set_new(root, "aux-mode", json_integer(aux.mode));
+
+    return root;
+}
+
+void sn_vcv_vcox::dataFromJson(json_t *root) {
+    json_t *krate = json_object_get(root, "k-rate");
+    json_t *aux_mode = json_object_get(root, "aux-mode");
+
+    if (krate) {
+        int v = json_integer_value(krate);
+
+        if (v >= 0 && v < 4) {
+            update.krate = json_integer_value(krate);
+        }
+    }
+
+    if (aux_mode) {
+        int v = json_integer_value(aux_mode);
+
+        if (v == 0) {
+            aux.mode = OSC;
+        } else if (v == 1) {
+            aux.mode = SUM;
+        } else if (v == 2)
+            aux.mode = POLY;
+    }
+}
+
+void sn_vcv_vcox::process(const ProcessArgs &args) {
+    // bool expanded = false;
+
+    // lights[XLL_LIGHT].setBrightnessSmooth(1.0, args.sampleTime);
+    // lights[XRR_LIGHT].setBrightnessSmooth(1.0, args.sampleTime);
+
+    // // ... get params and recompute transform matrix
+    // update.count--;
+
+    // if (update.count <= 0) {
+    //     recompute();
+    //     update.count = KRATE[update.krate];
+    // }
+
+    // // ... generate
+    // processVCO(args, expanded);
+    // processAUX(args, expanded);
+}
+
+void sn_vcv_vcox::processVCO(const ProcessArgs &args, bool expanded) {
+    // int channels = this->channels();
+    // bool vco = outputs[VCO_OUTPUT].isConnected();
+
+    // // ... convert pitch CV to instantaneous frequency
+    // for (int ch = 0; ch < channels; ch++) {
+    //     float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
+    //     float f = dsp::FREQ_C4 * std::pow(2.f, pitch);
+
+    //     phase[ch] += f * args.sampleTime;
+    //     if (phase[ch] >= 1.f) {
+    //         phase[ch] -= 1.f;
+    //     }
+    // }
+
+    // // ... generate
+    // if (vco || expanded) {
+    //     for (int ch = 0; ch < channels; ch++) {
+    //         float α = phase[ch] * 2.0f * M_PI;
+
+    //         float αʼ = sn.m * α - ζ.φ;
+
+    //         float x = std::cos(αʼ);
+    //         float y = std::sin(αʼ);
+    //         float xʼ = ζ.pʼ * x - ζ.qʼ * y + ζ.rʼ;
+    //         float yʼ = ζ.sʼ * x + ζ.tʼ * y + ζ.uʼ;
+
+    //         float r = std::hypot(xʼ, yʼ);
+    //         float υ = r > 0.0f ? sn.A * yʼ / r : 0.0f;
+
+    //         out[ch] = υ;
+    //     }
+    // }
+
+    // if (vco) {
+    //     for (int ch = 0; ch < channels; ch++) {
+    //         outputs[VCO_OUTPUT].setVoltage(5.f * velocity(ch) * out[ch], ch);
+    //     }
+
+    //     outputs[VCO_OUTPUT].setChannels(channels);
+    // }
+}
+
+void sn_vcv_vcox::processAUX(const ProcessArgs &args, bool expanded) {
+    // aux.phase += AUX_FREQUENCY * args.sampleTime;
+    // if (aux.phase >= 1.f) {
+    //     aux.phase -= 1.f;
+
+    //     if (outputs[AUX_TRIGGER].isConnected()) {
+    //         trigger.trigger(0.001f);
+    //     }
+    // }
+
+    // bool triggered = trigger.process(args.sampleTime);
+
+    // if (outputs[AUX_OUTPUT].isConnected() || expanded) {
+    //     float α = aux.phase * 2.0f * M_PI;
+    //     float αʼ = sn.m * α - ζ.φ;
+
+    //     float x = std::cos(αʼ);
+    //     float y = std::sin(αʼ);
+    //     float xʼ = ζ.pʼ * x - ζ.qʼ * y + ζ.rʼ;
+    //     float yʼ = ζ.sʼ * x + ζ.tʼ * y + ζ.uʼ;
+
+    //     float r = std::hypot(xʼ, yʼ);
+    //     float υ = r > 0.0f ? yʼ / r : 0.0f;
+
+    //     aux.out.osc = υ;
+    //     aux.out.sum = sn.A * υ;
+    // } else {
+    //     aux.out.osc = 0.0f;
+    //     aux.out.sum = 0.0f;
+    // }
+
+    // if (outputs[AUX_TRIGGER].isConnected()) {
+    //     outputs[AUX_TRIGGER].setVoltage(triggered ? 10.f : 0.0f);
+    // }
+
+    // if (outputs[AUX_OUTPUT].isConnected()) {
+    //     switch (aux.mode) {
+    //     case POLY:
+    //         outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.osc, 0);
+    //         outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.sum, 1);
+    //         outputs[AUX_OUTPUT].setChannels(2);
+    //         break;
+
+    //     case SUM:
+    //         outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.sum);
+    //         outputs[AUX_OUTPUT].setChannels(1);
+    //         break;
+
+    //     default:
+    //         outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.osc);
+    //         outputs[AUX_OUTPUT].setChannels(1);
+    //     }
+    // }
+}
+
+void sn_vcv_vcox::recompute() {
+    // // ... param values
+    // float e = params[ECCENTRICITY_PARAM].getValue();
+    // float s = params[SENSITIVITY_PARAM].getValue();
+    // float θ = params[ROTATION_PARAM].getValue();
+    // float A = params[AMPLITUDE_PARAM].getValue();
+    // float δx = params[DX_PARAM].getValue();
+    // float δy = params[DY_PARAM].getValue();
+    // float m = params[M_PARAM].getValue();
+
+    // // ... override with inputs
+    // if (inputs[ECCENTRICITY_INPUT].isConnected()) {
+    //     e = clamp(inputs[ECCENTRICITY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    // }
+
+    // if (inputs[SENSITIVITY_INPUT].isConnected()) {
+    //     s = clamp(inputs[SENSITIVITY_INPUT].getVoltage() / 2.0f, 0.0f, +5.0f);
+    // }
+
+    // if (inputs[ROTATION_INPUT].isConnected()) {
+    //     θ = clamp(90.0f * inputs[ROTATION_INPUT].getVoltage() / 5.0f, -90.0f, +90.0f);
+    // }
+
+    // if (inputs[AMPLITUDE_INPUT].isConnected()) {
+    //     A = clamp(inputs[AMPLITUDE_INPUT].getVoltage() / 10.0f, 0.0f, 1.0f);
+    // }
+
+    // if (inputs[DX_INPUT].isConnected()) {
+    //     δx = clamp(inputs[DX_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    // }
+
+    // if (inputs[DY_INPUT].isConnected()) {
+    //     δy = clamp(inputs[DY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    // }
+
+    // // ... set internal SN parameters
+    // sn.ε = std::tanh(s * e);
+    // sn.θ = clamp(θ, -89.95f, +89.95f) * M_PI / 180.0f;
+    // sn.A = A;
+    // sn.δx = δx;
+    // sn.δy = δy;
+    // sn.m = m;
+
+    // // ... recalculate ζ
+    // sn.recompute(ζ);
+}
+
+sn_vcv_vcoxWidget::sn_vcv_vcoxWidget(sn_vcv_vcox *module) {
+    float left = 7.331;
+    float middle = 20.351;
+    float right = 35.56;
+    float top = 21.968 + 1.27;
+    float dh = 13.014;
+
+    Vec input_e(left, top);
+    Vec input_s(left, top + dh);
+    Vec input_θ(left, top + 2 * dh);
+    Vec input_A(left, top + 3 * dh);
+    Vec input_δx(left, top + 4 * dh);
+    Vec input_δy(left, top + 5 * dh);
+
+    Vec param_e(middle, top);
+    Vec param_s(middle, top + dh);
+    Vec param_θ(middle, top + 2 * dh);
+    Vec param_A(middle, top + 3 * dh);
+    Vec param_δx(middle, top + 4 * dh);
+    Vec param_δy(middle, top + 5 * dh);
+    Vec param_m(middle, top + 6 * dh);
+
+    Vec aux(right, top + 4 * dh);
+    Vec vco(right, top + 6 * dh);
+    Vec vcox(right, top + 7 * dh);
+
+    Vec xll(2.54, 11.43 + 2.54);
+    Vec xrr(43.18, 11.43 + 2.54);
+
+    setModule(module);
+    setPanel(createPanel(asset::plugin(pluginInstance, "res/sn-vcv-vcox.svg"),
+                         asset::plugin(pluginInstance, "res/sn-vcv-vcox-dark.svg")));
+
+    addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, 0)));
+    addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+    addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+    addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+
+    // ... e
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_e), module, sn_vcv_vcox::ECCENTRICITY_INPUT));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_e), module, sn_vcv_vcox::ECCENTRICITY_PARAM));
+
+    // ... s
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_s), module, sn_vcv_vcox::SENSITIVITY_INPUT));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_s), module, sn_vcv_vcox::SENSITIVITY_PARAM));
+
+    // ... θ
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_θ), module, sn_vcv_vcox::ROTATION_INPUT));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_θ), module, sn_vcv_vcox::ROTATION_PARAM));
+
+    // ... A
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_A), module, sn_vcv_vcox::AMPLITUDE_INPUT));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_A), module, sn_vcv_vcox::AMPLITUDE_PARAM));
+
+    // ... δx
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_δx), module, sn_vcv_vcox::DX_INPUT));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_δx), module, sn_vcv_vcox::DX_PARAM));
+
+    // ... δy
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_δy), module, sn_vcv_vcox::DY_INPUT));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_δy), module, sn_vcv_vcox::DY_PARAM));
+
+    // ... m,
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_m), module, sn_vcv_vcox::M_PARAM));
+
+    // ... aux, VCO and VCO-Σ outputs
+    addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(aux), module, sn_vcv_vcox::AUX_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(vco), module, sn_vcv_vcox::VCO_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(vcox), module, sn_vcv_vcox::VCO_SUM_OUTPUT));
+
+    // ... expander indicators
+    addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xll), module, sn_vcv_vcox::XLL_LIGHT));
+    addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_vcv_vcox::XRR_LIGHT));
+}
+
+void sn_vcv_vcoxWidget::appendContextMenu(Menu *menu) {
+    sn_vcv_vcox *module = getModule<sn_vcv_vcox>();
+
+    menu->addChild(new MenuSeparator);
+    menu->addChild(createMenuLabel("sn-vcox settings"));
+
+    menu->addChild(createIndexPtrSubmenuItem("k-rate",
+                                             KRATES,
+                                             &module->update.krate));
+
+    menu->addChild(createIndexPtrSubmenuItem("aux-mode",
+                                             AUX_MODES,
+                                             &module->aux.mode));
+}
+
+Model *modelSn_vcv_vcox = createModel<sn_vcv_vcox, sn_vcv_vcoxWidget>("sn-vcv-vcox");

@@ -21,6 +21,14 @@
         "VCO",
         "Function generator"
       ]
+    },
+    {
+      "slug": "sn-vcv-vcox",
+      "name": "sn-vcv-vcox",
+      "description": "sn experimental additive synthesizer VCO expander",
+      "tags": [
+        "Expander"
+      ]
     }
   ]
 }

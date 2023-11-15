@@ -16,10 +16,10 @@
 - [ ] Expanders
 
 ## _sn-vcv-oscx_
-- [ ] SVG resource
-- [ ] Dark mode
-- [ ] Context menu
-- [ ] Save/restore
+- [x] SVG resource
+- [x] Dark mode
+- [x] Context menu
+- [x] Save/restore
 - [ ] Factory presets
 - [ ] AUX out
 - [ ] VCO out
