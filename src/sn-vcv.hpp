@@ -33,7 +33,7 @@ typedef struct AUX {
 } AUX;
 
 // SN
-typedef struct Χ {
+typedef struct Ζ {
     float pʼ;
     float qʼ;
     float rʼ;
@@ -41,7 +41,7 @@ typedef struct Χ {
     float tʼ;
     float uʼ;
     float φ;
-} Χ;
+} Ζ;
 
 typedef struct SN {
     SN(float ε, float θ, float A, float δx, float δy, float Φ, float m) {
@@ -62,7 +62,7 @@ typedef struct SN {
     float Φ;
     float m;
 
-    void recompute(Χ &);
+    void recompute(Ζ &);
     float phi(float, float, float, float);
 } SN;
 

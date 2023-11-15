@@ -44,9 +44,11 @@ struct sn_vcv_vco : Module {
 
     json_t *dataToJson() override;
     void dataFromJson(json_t *) override;
-    void process(const ProcessArgs &args) override;
 
+    void process(const ProcessArgs &args) override;
+    void processAUX(const ProcessArgs &args, bool);
     void recompute();
+
     int channels();
     int krate();
 
@@ -63,7 +65,7 @@ struct sn_vcv_vco : Module {
         0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f
     };
 
-    struct Χ χ = {
+    struct Ζ ζ = {
         .pʼ = 1.f,
         .qʼ = 0.f,
         .rʼ = 0.f,

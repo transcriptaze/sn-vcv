@@ -8,8 +8,9 @@
 - [x] SVG resource
 - [x] Context menu
 - [x] Save/restore
-- [ ] Factory presets
-- [ ] `process`
+- [x] Factory presets
+- [x] AUX out
+- [ ] VCO out
 
 
 ## _sn-vcv-oscx_

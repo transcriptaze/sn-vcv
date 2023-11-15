@@ -9,7 +9,7 @@ const float AUX_FREQUENCY = 25.0;                                  // auxiliary 
 const std::vector<std::string> AUX_MODES = {"OSC", "SUM", "POLY"}; // AUX mode labels
 
 // SN
-void SN::recompute(Χ &χ) {
+void SN::recompute(Ζ &ζ) {
     float εʼ = std::sqrt(1.0f - ε * ε);
     float a = (ε < 0.0f) ? εʼ : 1.0f;
     float b = (ε > 0.0f) ? εʼ : 1.0f;
@@ -24,13 +24,13 @@ void SN::recompute(Χ &χ) {
     float δxʼ = tx * δx;
     float δyʼ = ty * δy;
 
-    χ.pʼ = A * a * cosθ;
-    χ.qʼ = A * b * sinθ;
-    χ.rʼ = A * δxʼ;
-    χ.sʼ = A * a * sinθ;
-    χ.tʼ = A * b * cosθ;
-    χ.uʼ = A * δyʼ;
-    χ.φ = phi(a, b, θ, Φ);
+    ζ.pʼ = A * a * cosθ;
+    ζ.qʼ = A * b * sinθ;
+    ζ.rʼ = A * δxʼ;
+    ζ.sʼ = A * a * sinθ;
+    ζ.tʼ = A * b * cosθ;
+    ζ.uʼ = A * δyʼ;
+    ζ.φ = phi(a, b, θ, Φ);
 }
 
 float SN::phi(float a, float b, float θ, float Φ) {

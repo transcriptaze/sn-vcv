@@ -82,6 +82,64 @@ void sn_vcv_vco::process(const ProcessArgs &args) {
         recompute();
         update.count = KRATE[update.krate];
     }
+
+    // ... aux
+    processAUX(args, false);
+}
+
+void sn_vcv_vco::processAUX(const ProcessArgs &args, bool expanded) {
+    aux.phase += AUX_FREQUENCY * args.sampleTime;
+    if (aux.phase >= 1.f) {
+        aux.phase -= 1.f;
+
+        if (outputs[AUX_TRIGGER].isConnected()) {
+            trigger.trigger(0.001f);
+        }
+    }
+
+    bool triggered = trigger.process(args.sampleTime);
+
+    if (outputs[AUX_OUTPUT].isConnected() || expanded) {
+        float α = aux.phase * 2.0f * M_PI;
+        float αʼ = sn.m * α - ζ.φ;
+
+        float x = std::cos(αʼ);
+        float y = std::sin(αʼ);
+        float xʼ = ζ.pʼ * x - ζ.qʼ * y + ζ.rʼ;
+        float yʼ = ζ.sʼ * x + ζ.tʼ * y + ζ.uʼ;
+
+        float r = std::hypot(xʼ, yʼ);
+        float υ = r > 0.0f ? yʼ / r : 0.0f;
+
+        aux.out.osc = υ;
+        aux.out.sum = sn.A * υ;
+    } else {
+        aux.out.osc = 0.0f;
+        aux.out.sum = 0.0f;
+    }
+
+    if (outputs[AUX_TRIGGER].isConnected()) {
+        outputs[AUX_TRIGGER].setVoltage(triggered ? 10.f : 0.0f);
+    }
+
+    if (outputs[AUX_OUTPUT].isConnected()) {
+        switch (aux.mode) {
+        case POLY:
+            outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.osc, 0);
+            outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.sum, 1);
+            outputs[AUX_OUTPUT].setChannels(2);
+            break;
+
+        case SUM:
+            outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.sum);
+            outputs[AUX_OUTPUT].setChannels(1);
+            break;
+
+        default:
+            outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.osc);
+            outputs[AUX_OUTPUT].setChannels(1);
+        }
+    }
 }
 
 void sn_vcv_vco::recompute() {
@@ -127,8 +185,8 @@ void sn_vcv_vco::recompute() {
     sn.δy = δy;
     sn.m = m;
 
-    // ... recalculate χ
-    sn.recompute(χ);
+    // ... recalculate ζ
+    sn.recompute(ζ);
 }
 
 sn_vcv_vcoWidget::sn_vcv_vcoWidget(sn_vcv_vco *module) {
