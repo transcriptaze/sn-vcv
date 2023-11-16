@@ -5,15 +5,15 @@
 
 #include "plugin.hpp"
 
-// constants
+// ... constants
 const float TAU = 2.0f * M_PI; // 2π
 const float PI2 = M_PI / 2;    // π/2
 
-// Control rates
+// ... control rates
 extern const std::vector<unsigned> KRATE;
 extern const std::vector<std::string> KRATES;
 
-// AUX modes
+// ... AUX modes
 extern const float AUX_FREQUENCY;                // auxiliary output fixed frequency (Hz)
 extern const std::vector<std::string> AUX_MODES; // AUX mode labels
 
@@ -22,6 +22,15 @@ enum AUXMODE {
     SUM,
     POLY
 };
+
+typedef struct VCO {
+    float phase;
+    float velocity;
+    struct {
+        float vco;
+        float sum;
+    } out;
+} VCO;
 
 typedef struct AUX {
     enum AUXMODE mode;
@@ -66,7 +75,92 @@ typedef struct SN {
     float phi(float, float, float, float);
 } SN;
 
-// Channels display widget
+// ... expanders
+enum DIRECTION {
+    LEFT,
+    RIGHT
+};
+
+template <typename T>
+struct sn_expander {
+    sn_expander(DIRECTION direction) {
+        this->direction = direction;
+        this->module = NULL;
+    }
+
+    T *producer() {
+        if (module != NULL) {
+            switch (direction) {
+            case LEFT:
+                return (T *)module->getRightExpander().producerMessage;
+
+            case RIGHT:
+                return (T *)module->getLeftExpander().producerMessage;
+            }
+        }
+
+        return NULL;
+    }
+
+    void flip() {
+        if (module != NULL) {
+            switch (direction) {
+            case LEFT:
+                module->getRightExpander().requestMessageFlip();
+                break;
+
+            case RIGHT:
+                module->getLeftExpander().requestMessageFlip();
+                break;
+            }
+        }
+    }
+
+    DIRECTION direction;
+    Module *module;
+    bool linked;
+    T messages[2];
+};
+
+typedef struct sn_vco_message {
+    bool linked = false;
+    int channels = 1;
+
+    struct VCO {
+        float phase;
+        float velocity;
+        float out;
+    } vco[16] = {
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+    };
+
+    struct AUX {
+        float phase;
+        float velocity;
+        float out;
+    } aux = {
+        .phase = 0.f,
+        .velocity = 0.f,
+        .out = 0.f,
+    };
+} sn_vco_message;
+
+// ... channels display widget
 struct ChannelsWidget : Widget {
     void draw(const DrawArgs &args) override;
     void drawLayer(const DrawArgs &args, int layer) override;
@@ -81,7 +175,7 @@ struct ChannelsWidget : Widget {
     Vec textPos;
 };
 
-// Expander LEDs
+// ... expander LEDs
 static const NVGcolor SCHEME_DARK_GREEN = nvgRGB(0x00, 0xa0, 0x00);
 static const NVGcolor SCHEME_BRIGHT_RED = nvgRGB(0xff, 0x00, 0x00);
 

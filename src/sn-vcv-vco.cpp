@@ -1,4 +1,5 @@
 #include "sn-vcv-vco.hpp"
+#include "sn-vcv-vcox.hpp"
 
 const int sn_vcv_vco::CHANNELS = 1;
 const float sn_vcv_vco::VELOCITY = 1.0f;
@@ -67,27 +68,41 @@ void sn_vcv_vco::dataFromJson(json_t *root) {
     }
 }
 
-int sn_vcv_vco::channels() {
-    return inputs[PITCH_INPUT].isConnected() ? inputs[PITCH_INPUT].getChannels() : CHANNELS;
-}
+void sn_vcv_vco::onExpanderChange(const ExpanderChangeEvent &e) {
+    Module *left = getLeftExpander().module;
+    Module *right = getRightExpander().module;
 
-float sn_vcv_vco::velocity(int channel) {
-    if (!inputs[VELOCITY_INPUT].isConnected()) {
-        return VELOCITY;
+    if (left && left->model == modelSn_vcv_vcox) {
+        expanders.left = left;
+    } else {
+        expanders.left = NULL;
     }
 
-    if (channel < inputs[VELOCITY_INPUT].getChannels()) {
-        return inputs[VELOCITY_INPUT].getPolyVoltage(channel) / 10.0f;
+    if (right && right->model == modelSn_vcv_vcox) {
+        expanders.right = right;
+    } else {
+        expanders.right = NULL;
     }
-
-    return inputs[VELOCITY_INPUT].getVoltage() / 10.0f;
 }
 
 void sn_vcv_vco::process(const ProcessArgs &args) {
-    bool expanded = false;
+    int channels = this->channels();
+    std::array<float, 16> velocity = this->velocity(channels);
 
-    lights[XLL_LIGHT].setBrightnessSmooth(1.0, args.sampleTime);
-    lights[XRR_LIGHT].setBrightnessSmooth(1.0, args.sampleTime);
+    // ... expanders
+    bool expanded = expanders.left != NULL || expanders.right != NULL;
+    bool xll = false;
+    bool xrr = expanders.right;
+
+    if (expanders.left) {
+        sn_vcv_vcox *x = (sn_vcv_vcox *)expanders.left;
+        if (!x->isLinkedLeft()) {
+            xll = true;
+        }
+    }
+
+    lights[XLL_LIGHT].setBrightnessSmooth(xll ? 1.0 : 0.f, args.sampleTime);
+    lights[XRR_LIGHT].setBrightnessSmooth(xrr ? 1.0 : 0.f, args.sampleTime);
 
     // ... get params and recompute transform matrix
     update.count--;
@@ -98,12 +113,52 @@ void sn_vcv_vco::process(const ProcessArgs &args) {
     }
 
     // ... generate
-    processVCO(args, expanded);
+    processVCO(args, channels, velocity, expanded);
     processAUX(args, expanded);
+
+    // ... update expanders
+    if (expanders.left) {
+        sn_vco_message *msg = (sn_vco_message *)expanders.left->getRightExpander().producerMessage;
+
+        if (msg != NULL) {
+            msg->linked = true;
+            msg->channels = channels;
+
+            for (int ch = 0; ch < 16; ch++) {
+                msg->vco[ch].phase = phase[ch];
+                msg->vco[ch].velocity = velocity[ch];
+                msg->vco[ch].out = out[ch];
+            }
+
+            msg->aux.phase = aux.phase;
+            msg->aux.out = aux.out.sum;
+
+            expanders.left->getRightExpander().requestMessageFlip();
+        }
+    }
+
+    if (expanders.right) {
+        sn_vco_message *msg = (sn_vco_message *)expanders.right->getLeftExpander().producerMessage;
+
+        if (msg != NULL) {
+            msg->linked = true;
+            msg->channels = channels;
+
+            for (int ch = 0; ch < 16; ch++) {
+                msg->vco[ch].phase = phase[ch];
+                msg->vco[ch].velocity = velocity[ch];
+                msg->vco[ch].out = out[ch];
+            }
+
+            msg->aux.phase = aux.phase;
+            msg->aux.out = aux.out.sum;
+
+            expanders.right->getLeftExpander().requestMessageFlip();
+        }
+    }
 }
 
-void sn_vcv_vco::processVCO(const ProcessArgs &args, bool expanded) {
-    int channels = this->channels();
+void sn_vcv_vco::processVCO(const ProcessArgs &args, int channels, std::array<float, 16> &velocity, bool expanded) {
     bool vco = outputs[VCO_OUTPUT].isConnected();
 
     // ... convert pitch CV to instantaneous frequency
@@ -138,7 +193,7 @@ void sn_vcv_vco::processVCO(const ProcessArgs &args, bool expanded) {
 
     if (vco) {
         for (int ch = 0; ch < channels; ch++) {
-            outputs[VCO_OUTPUT].setVoltage(5.f * velocity(ch) * out[ch], ch);
+            outputs[VCO_OUTPUT].setVoltage(5.f * velocity[ch] * out[ch], ch);
         }
 
         outputs[VCO_OUTPUT].setChannels(channels);
@@ -245,6 +300,31 @@ void sn_vcv_vco::recompute() {
 
     // ... recalculate ζ
     sn.recompute(ζ);
+}
+
+int sn_vcv_vco::channels() {
+    return inputs[PITCH_INPUT].isConnected() ? inputs[PITCH_INPUT].getChannels() : CHANNELS;
+}
+
+std::array<float, 16> sn_vcv_vco::velocity(int channels) {
+    std::array<float, 16> v;
+
+    for (int ch = 0; ch < 16; ch++) {
+        v[ch] = VELOCITY;
+    }
+
+    if (inputs[VELOCITY_INPUT].isConnected()) {
+        int N = inputs[VELOCITY_INPUT].getChannels();
+        for (int ch = 0; ch < channels; ch++) {
+            if (ch < N) {
+                v[ch] = inputs[VELOCITY_INPUT].getPolyVoltage(ch) / 10.0f;
+            } else {
+                v[ch] = inputs[VELOCITY_INPUT].getVoltage() / 10.0f;
+            }
+        }
+    }
+
+    return v;
 }
 
 sn_vcv_vcoWidget::sn_vcv_vcoWidget(sn_vcv_vco *module) {

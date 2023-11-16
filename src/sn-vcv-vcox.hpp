@@ -2,6 +2,8 @@
 #include "sn-vcv.hpp"
 
 struct sn_vcv_vcox : Module {
+    static const int CHANNELS;
+
     enum ParamId {
         ECCENTRICITY_PARAM,
         SENSITIVITY_PARAM,
@@ -34,6 +36,8 @@ struct sn_vcv_vcox : Module {
 
     enum LightId {
         XLL_LIGHT,
+        XLR_LIGHT,
+        XRL_LIGHT,
         XRR_LIGHT,
         LIGHTS_LEN
     };
@@ -42,21 +46,18 @@ struct sn_vcv_vcox : Module {
 
     json_t *dataToJson() override;
     void dataFromJson(json_t *) override;
-
+    void onExpanderChange(const ExpanderChangeEvent &) override;
     void process(const ProcessArgs &args) override;
+
     void processVCO(const ProcessArgs &args, bool);
     void processAUX(const ProcessArgs &args, bool);
     void recompute();
 
     int krate();
+    bool isLinkedLeft();
+    bool isLinkedRight();
 
     // ... instance variables
-    struct AUX aux = {
-        .mode = POLY,
-        .phase = 0.f,
-        .out = {.osc = 0.f, .sum = 0.f},
-    };
-
     struct SN sn {
         0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f
     };
@@ -71,8 +72,30 @@ struct sn_vcv_vcox : Module {
         .φ = 0.f,
     };
 
-    float phase[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
-    float out[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
+    struct VCO vco[16] = {
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
+    };
+
+    struct AUX aux = {
+        .mode = POLY,
+        .phase = 0.f,
+        .out = {.osc = 0.f, .sum = 0.f},
+    };
 
     // ... state update
     struct {
@@ -81,6 +104,19 @@ struct sn_vcv_vcox : Module {
     } update{
         .krate = 0,
         .count = 0,
+    };
+
+    // ... expanders
+    struct {
+        bool linkedLeft;
+        bool linkedRight;
+        sn_expander<sn_vco_message> left;
+        sn_expander<sn_vco_message> right;
+    } expanders = {
+        .linkedLeft = false,
+        .linkedRight = false,
+        .left = sn_expander<sn_vco_message>(LEFT),
+        .right = sn_expander<sn_vco_message>(RIGHT),
     };
 };
 

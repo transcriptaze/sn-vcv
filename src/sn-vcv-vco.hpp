@@ -1,7 +1,12 @@
+#include <array>
+
 #include "plugin.hpp"
 #include "sn-vcv.hpp"
 
 struct sn_vcv_vco : Module {
+    static const int CHANNELS;
+    static const float VELOCITY;
+
     enum ParamId {
         ECCENTRICITY_PARAM,
         SENSITIVITY_PARAM,
@@ -45,14 +50,16 @@ struct sn_vcv_vco : Module {
     json_t *dataToJson() override;
     void dataFromJson(json_t *) override;
 
+    void onExpanderChange(const ExpanderChangeEvent &) override;
+
     void process(const ProcessArgs &args) override;
-    void processVCO(const ProcessArgs &args, bool);
+    void processVCO(const ProcessArgs &args, int, std::array<float, 16> &, bool);
     void processAUX(const ProcessArgs &args, bool);
     void recompute();
 
     int krate();
     int channels();
-    float velocity(int);
+    std::array<float, 16> velocity(int);
 
     // ... instance variables
     dsp::PulseGenerator trigger;
@@ -89,8 +96,14 @@ struct sn_vcv_vco : Module {
         .count = 0,
     };
 
-    static const int CHANNELS;
-    static const float VELOCITY;
+    // ... expanders
+    struct {
+        Module *left;
+        Module *right;
+    } expanders = {
+        .left = NULL,
+        .right = NULL,
+    };
 };
 
 struct sn_vcv_vcoWidget : ModuleWidget {

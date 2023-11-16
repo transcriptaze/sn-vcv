@@ -1,5 +1,7 @@
 #include "sn-vcv-vcox.hpp"
 
+const int sn_vcv_vcox::CHANNELS = 1;
+
 sn_vcv_vcox::sn_vcv_vcox() {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
@@ -23,6 +25,20 @@ sn_vcv_vcox::sn_vcv_vcox() {
     configOutput(VCO_OUTPUT, "VCO");
     configOutput(VCO_SUM_OUTPUT, "VCO-Σ");
     configOutput(AUX_OUTPUT, "AUX");
+
+    getLeftExpander().producerMessage = &expanders.left.messages[0];
+    getLeftExpander().consumerMessage = &expanders.left.messages[1];
+
+    getRightExpander().producerMessage = &expanders.right.messages[0];
+    getRightExpander().consumerMessage = &expanders.right.messages[1];
+}
+
+bool sn_vcv_vcox::isLinkedLeft() {
+    return expanders.left.linked;
+}
+
+bool sn_vcv_vcox::isLinkedRight() {
+    return expanders.right.linked;
 }
 
 json_t *sn_vcv_vcox::dataToJson() {
@@ -58,11 +74,81 @@ void sn_vcv_vcox::dataFromJson(json_t *root) {
     }
 }
 
-void sn_vcv_vcox::process(const ProcessArgs &args) {
-    // bool expanded = false;
+void sn_vcv_vcox::onExpanderChange(const ExpanderChangeEvent &e) {
+    Module *left = getLeftExpander().module;
+    Module *right = getRightExpander().module;
 
-    // lights[XLL_LIGHT].setBrightnessSmooth(1.0, args.sampleTime);
-    // lights[XRR_LIGHT].setBrightnessSmooth(1.0, args.sampleTime);
+    expanders.linkedLeft = left && left->model == modelSn_vcv_vco;
+    expanders.linkedRight = right && right->model == modelSn_vcv_vco;
+
+    if (left && left->model == modelSn_vcv_vcox) {
+        expanders.left.module = left;
+    } else {
+        expanders.left.module = NULL;
+    }
+
+    if (right && right->model == modelSn_vcv_vcox) {
+        expanders.right.module = right;
+    } else {
+        expanders.right.module = NULL;
+    }
+}
+
+void sn_vcv_vcox::process(const ProcessArgs &args) {
+    // ... expanders
+    sn_vco_message *msg = NULL;
+    sn_vco_message *msgL = NULL;
+    sn_vco_message *msgR = NULL;
+
+    if (expanders.linkedLeft || (expanders.left.module != NULL)) {
+        msgL = (sn_vco_message *)getLeftExpander().consumerMessage;
+    }
+
+    if (expanders.linkedRight || (expanders.right.module != NULL)) {
+        msgR = (sn_vco_message *)getRightExpander().consumerMessage;
+    }
+
+    if (expanders.linkedLeft) {
+        msg = msgL;
+    } else if (expanders.left.module && msgL && msgL->linked) {
+        msg = msgL;
+    } else if (expanders.linkedRight) {
+        msg = msgR;
+    } else if (expanders.right.module && msgR && msgR->linked) {
+        msg = msgR;
+    }
+
+    bool xll = false;
+    bool xlr = false;
+    bool xrl = false;
+    bool xrr = false;
+
+    if (expanders.linkedLeft) {
+        xll = true;
+    } else if (expanders.left.module && msgL && msgL->linked) {
+        xll = true;
+    } else if (expanders.linkedRight) {
+        xrr = true;
+    } else if (expanders.right.module && msgR && msgR->linked) {
+        xrr = true;
+    }
+
+    if (xll && expanders.right.module) {
+        xrl = true;
+    } else if (xrr && expanders.left.module) {
+        xlr = true;
+    }
+
+    expanders.left.linked = xll;
+    expanders.right.linked = xrr;
+
+    lights[XLL_LIGHT].setBrightnessSmooth(xll ? 1.f : 0.f, args.sampleTime);
+    lights[XLR_LIGHT].setBrightnessSmooth(xlr ? 1.f : 0.f, args.sampleTime);
+    lights[XRL_LIGHT].setBrightnessSmooth(xrl ? 1.f : 0.f, args.sampleTime);
+    lights[XRR_LIGHT].setBrightnessSmooth(xrr ? 1.f : 0.f, args.sampleTime);
+
+    bool expanded = expanders.left.module != NULL || expanders.right.module != NULL;
+    int channels = msg ? msg->channels : CHANNELS;
 
     // // ... get params and recompute transform matrix
     // update.count--;
@@ -75,6 +161,47 @@ void sn_vcv_vcox::process(const ProcessArgs &args) {
     // // ... generate
     // processVCO(args, expanded);
     // processAUX(args, expanded);
+
+    // ... update expanders
+    {
+        sn_vco_message *msg = expanders.left.producer();
+
+        if (msg != NULL) {
+            msg->linked = msgR != NULL && msgR->linked;
+            msg->channels = channels;
+
+            for (int ch = 0; ch < channels; ch++) {
+                msg->vco[ch].phase = vco[ch].phase;
+                msg->vco[ch].velocity = vco[ch].velocity;
+                msg->vco[ch].out = vco[ch].out.sum;
+            }
+
+            msg->aux.phase = aux.phase;
+            msg->aux.out = aux.out.sum;
+
+            expanders.left.flip();
+        }
+    }
+
+    {
+        sn_vco_message *msg = expanders.right.producer();
+
+        if (msg != NULL) {
+            msg->linked = msgL != NULL && msgL->linked;
+            msg->channels = channels;
+
+            for (int ch = 0; ch < channels; ch++) {
+                msg->vco[ch].phase = vco[ch].phase;
+                msg->vco[ch].velocity = vco[ch].velocity;
+                msg->vco[ch].out = vco[ch].out.sum;
+            }
+
+            msg->aux.phase = aux.phase;
+            msg->aux.out = aux.out.sum;
+
+            expanders.right.flip();
+        }
+    }
 }
 
 void sn_vcv_vcox::processVCO(const ProcessArgs &args, bool expanded) {
@@ -293,8 +420,10 @@ sn_vcv_vcoxWidget::sn_vcv_vcoxWidget(sn_vcv_vcox *module) {
     addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(vcox), module, sn_vcv_vcox::VCO_SUM_OUTPUT));
 
     // ... expander indicators
-    addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xll), module, sn_vcv_vcox::XLL_LIGHT));
-    addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_vcv_vcox::XRR_LIGHT));
+    addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xll), module, sn_vcv_vcox::XLL_LIGHT));
+    addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xll), module, sn_vcv_vcox::XLR_LIGHT));
+    addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_vcv_vcox::XRL_LIGHT));
+    addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xrr), module, sn_vcv_vcox::XRR_LIGHT));
 }
 
 void sn_vcv_vcoxWidget::appendContextMenu(Menu *menu) {
