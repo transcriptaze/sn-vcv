@@ -60,16 +60,6 @@ struct sn_vcv_vcox : Module {
     // ... instance variables
     struct SN sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 
-    struct Ζ ζ = {
-        .pʼ = 1.f,
-        .qʼ = 0.f,
-        .rʼ = 0.f,
-        .sʼ = 1.f,
-        .tʼ = 0.f,
-        .uʼ = 0.f,
-        .φ = 0.f,
-    };
-
     struct VCO vco[16] = {
         {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
         {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},

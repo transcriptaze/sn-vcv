@@ -71,7 +71,17 @@ typedef struct SN {
     float Φ;
     float m;
 
-    void recompute(Ζ &);
+    struct Ζ ζ = {
+        .pʼ = 1.f,
+        .qʼ = 0.f,
+        .rʼ = 0.f,
+        .sʼ = 1.f,
+        .tʼ = 0.f,
+        .uʼ = 0.f,
+        .φ = 0.f,
+    };
+
+    void recompute();
     float phi(float, float, float, float);
 } SN;
 

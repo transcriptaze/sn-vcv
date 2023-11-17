@@ -9,7 +9,7 @@ const float AUX_FREQUENCY = 25.0;                                  // auxiliary 
 const std::vector<std::string> AUX_MODES = {"OSC", "SUM", "POLY"}; // AUX mode labels
 
 // SN
-void SN::recompute(Ζ &ζ) {
+void SN::recompute() {
     float εʼ = std::sqrt(1.0f - ε * ε);
     float a = (ε < 0.0f) ? εʼ : 1.0f;
     float b = (ε > 0.0f) ? εʼ : 1.0f;

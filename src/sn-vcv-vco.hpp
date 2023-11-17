@@ -69,16 +69,6 @@ struct sn_vcv_vco : Module {
 
     struct SN sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 
-    struct Ζ ζ = {
-        .pʼ = 1.f,
-        .qʼ = 0.f,
-        .rʼ = 0.f,
-        .sʼ = 1.f,
-        .tʼ = 0.f,
-        .uʼ = 0.f,
-        .φ = 0.f,
-    };
-
     struct {
         float phase;
         float velocity;
