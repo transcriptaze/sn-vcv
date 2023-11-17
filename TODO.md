@@ -13,7 +13,7 @@
 - [x] AUX out
 - [x] VCO out
 - [x] Dark mode
-- [ ] Expanders
+- [x] Expanders
 
 ## _sn-vcv-oscx_
 - [x] SVG resource
@@ -24,7 +24,7 @@
 - [x] AUX out
 - [x] VCO out
 - [x] VCO-Σ out
-- [ ] Expanders
+- [x] Expanders
 
 ## _sn-vcv-lfo_
 

@@ -175,18 +175,9 @@ void sn_vcv_vco::processVCO(const ProcessArgs &args, int channels, bool expanded
     if (vco || expanded) {
         for (int ch = 0; ch < channels; ch++) {
             float α = VCO[ch].phase * 2.0f * M_PI;
+            float υ = sn.υ(α);
 
-            float αʼ = sn.m * α - sn.ζ.φ;
-
-            float x = std::cos(αʼ);
-            float y = std::sin(αʼ);
-            float xʼ = sn.ζ.pʼ * x - sn.ζ.qʼ * y + sn.ζ.rʼ;
-            float yʼ = sn.ζ.sʼ * x + sn.ζ.tʼ * y + sn.ζ.uʼ;
-
-            float r = std::hypot(xʼ, yʼ);
-            float υ = r > 0.0f ? sn.A * yʼ / r : 0.0f;
-
-            VCO[ch].out = υ;
+            VCO[ch].out = sn.A * υ;
             VCO[ch].velocity = velocity(ch);
         }
     }
@@ -214,15 +205,7 @@ void sn_vcv_vco::processAUX(const ProcessArgs &args, bool expanded) {
 
     if (outputs[AUX_OUTPUT].isConnected() || expanded) {
         float α = aux.phase * 2.0f * M_PI;
-        float αʼ = sn.m * α - sn.ζ.φ;
-
-        float x = std::cos(αʼ);
-        float y = std::sin(αʼ);
-        float xʼ = sn.ζ.pʼ * x - sn.ζ.qʼ * y + sn.ζ.rʼ;
-        float yʼ = sn.ζ.sʼ * x + sn.ζ.tʼ * y + sn.ζ.uʼ;
-
-        float r = std::hypot(xʼ, yʼ);
-        float υ = r > 0.0f ? yʼ / r : 0.0f;
+        float υ = sn.υ(α);
 
         aux.out.osc = υ;
         aux.out.sum = sn.A * υ;

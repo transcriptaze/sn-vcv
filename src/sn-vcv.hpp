@@ -82,6 +82,7 @@ typedef struct SN {
     };
 
     void recompute();
+    float υ(float);
     float phi(float, float, float, float);
 } SN;
 

@@ -33,6 +33,18 @@ void SN::recompute() {
     ζ.φ = phi(a, b, θ, Φ);
 }
 
+float SN::υ(float α) {
+    float αʼ = m * α - ζ.φ;
+
+    float x = std::cos(αʼ);
+    float y = std::sin(αʼ);
+    float xʼ = ζ.pʼ * x - ζ.qʼ * y + ζ.rʼ;
+    float yʼ = ζ.sʼ * x + ζ.tʼ * y + ζ.uʼ;
+    float r = std::hypot(xʼ, yʼ);
+
+    return r > 0.0f ? yʼ / r : 0.0f;
+}
+
 float SN::phi(float a, float b, float θ, float Φ) {
     float dθ = Φ - θ;
     float φ = std::atan(-(a / b) * std::tan(Φ - θ));
