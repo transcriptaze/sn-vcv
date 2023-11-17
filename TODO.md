@@ -20,7 +20,7 @@
 - [x] Dark mode
 - [x] Context menu
 - [x] Save/restore
-- [ ] Factory presets
+- [x] Factory presets
 - [x] AUX out
 - [x] VCO out
 - [x] VCO-Σ out
