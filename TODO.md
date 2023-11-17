@@ -21,7 +21,7 @@
 - [x] Context menu
 - [x] Save/restore
 - [ ] Factory presets
-- [ ] AUX out
+- [x] AUX out
 - [ ] VCO out
 - [ ] VCO-Σ out
 - [ ] Expanders

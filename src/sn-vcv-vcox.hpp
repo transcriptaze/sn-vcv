@@ -49,18 +49,16 @@ struct sn_vcv_vcox : Module {
     void onExpanderChange(const ExpanderChangeEvent &) override;
     void process(const ProcessArgs &args) override;
 
+    void recompute();
     void processVCO(const ProcessArgs &args, bool);
     void processAUX(const ProcessArgs &args, bool);
-    void recompute();
 
     int krate();
     bool isLinkedLeft();
     bool isLinkedRight();
 
     // ... instance variables
-    struct SN sn {
-        0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f
-    };
+    struct SN sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 
     struct Ζ ζ = {
         .pʼ = 1.f,

@@ -1,5 +1,3 @@
-#include <array>
-
 #include "plugin.hpp"
 #include "sn-vcv.hpp"
 
@@ -49,17 +47,16 @@ struct sn_vcv_vco : Module {
 
     json_t *dataToJson() override;
     void dataFromJson(json_t *) override;
-
     void onExpanderChange(const ExpanderChangeEvent &) override;
-
     void process(const ProcessArgs &args) override;
-    void processVCO(const ProcessArgs &args, int, std::array<float, 16> &, bool);
-    void processAUX(const ProcessArgs &args, bool);
+
     void recompute();
+    void processVCO(const ProcessArgs &args, int, bool);
+    void processAUX(const ProcessArgs &args, bool);
 
     int krate();
     int channels();
-    std::array<float, 16> velocity(int);
+    float velocity(int);
 
     // ... instance variables
     dsp::PulseGenerator trigger;
@@ -70,9 +67,7 @@ struct sn_vcv_vco : Module {
         .out = {.osc = 0.f, .sum = 0.f},
     };
 
-    struct SN sn {
-        0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f
-    };
+    struct SN sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 
     struct Ζ ζ = {
         .pʼ = 1.f,
@@ -84,8 +79,28 @@ struct sn_vcv_vco : Module {
         .φ = 0.f,
     };
 
-    float phase[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
-    float out[16] = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
+    struct {
+        float phase;
+        float velocity;
+        float out;
+    } VCO[16] = {
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+    };
 
     // ... state update
     struct {

@@ -95,6 +95,9 @@ void sn_vcv_vcox::onExpanderChange(const ExpanderChangeEvent &e) {
 }
 
 void sn_vcv_vcox::process(const ProcessArgs &args) {
+    int channels = CHANNELS;
+    bool expanded = expanders.left.module != NULL || expanders.right.module != NULL;
+
     // ... expanders
     sn_vco_message *msg = NULL;
     sn_vco_message *msgL = NULL;
@@ -147,20 +150,27 @@ void sn_vcv_vcox::process(const ProcessArgs &args) {
     lights[XRL_LIGHT].setBrightnessSmooth(xrl ? 1.f : 0.f, args.sampleTime);
     lights[XRR_LIGHT].setBrightnessSmooth(xrr ? 1.f : 0.f, args.sampleTime);
 
-    bool expanded = expanders.left.module != NULL || expanders.right.module != NULL;
-    int channels = msg ? msg->channels : CHANNELS;
+    // ... get params and recompute transform matrix
+    update.count--;
 
-    // // ... get params and recompute transform matrix
-    // update.count--;
+    if (update.count <= 0) {
+        recompute();
+        update.count = KRATE[update.krate];
+    }
 
-    // if (update.count <= 0) {
-    //     recompute();
-    //     update.count = KRATE[update.krate];
-    // }
+    // ... generate
+    if (msg) {
+        channels = msg->channels;
 
-    // // ... generate
+        aux.phase = msg->aux.phase;
+        aux.out.sum = msg->aux.out;
+    } else {
+        aux.phase = 0.0f;
+        aux.out.sum = 0.0f;
+    }
+
     // processVCO(args, expanded);
-    // processAUX(args, expanded);
+    processAUX(args, expanded);
 
     // ... update expanders
     {
@@ -248,105 +258,90 @@ void sn_vcv_vcox::processVCO(const ProcessArgs &args, bool expanded) {
 }
 
 void sn_vcv_vcox::processAUX(const ProcessArgs &args, bool expanded) {
-    // aux.phase += AUX_FREQUENCY * args.sampleTime;
-    // if (aux.phase >= 1.f) {
-    //     aux.phase -= 1.f;
+    if (outputs[AUX_OUTPUT].isConnected() || expanded) {
+        float α = aux.phase * 2.0f * M_PI;
+        float αʼ = sn.m * α - ζ.φ;
 
-    //     if (outputs[AUX_TRIGGER].isConnected()) {
-    //         trigger.trigger(0.001f);
-    //     }
-    // }
+        float x = std::cos(αʼ);
+        float y = std::sin(αʼ);
+        float xʼ = ζ.pʼ * x - ζ.qʼ * y + ζ.rʼ;
+        float yʼ = ζ.sʼ * x + ζ.tʼ * y + ζ.uʼ;
 
-    // bool triggered = trigger.process(args.sampleTime);
+        float r = std::hypot(xʼ, yʼ);
+        float υ = r > 0.0f ? yʼ / r : 0.0f;
 
-    // if (outputs[AUX_OUTPUT].isConnected() || expanded) {
-    //     float α = aux.phase * 2.0f * M_PI;
-    //     float αʼ = sn.m * α - ζ.φ;
+        aux.out.osc = υ;
+        aux.out.sum += sn.A * υ;
+    } else {
+        aux.out.osc = 0.0f;
+        aux.out.sum = 0.0f;
+    }
 
-    //     float x = std::cos(αʼ);
-    //     float y = std::sin(αʼ);
-    //     float xʼ = ζ.pʼ * x - ζ.qʼ * y + ζ.rʼ;
-    //     float yʼ = ζ.sʼ * x + ζ.tʼ * y + ζ.uʼ;
+    if (outputs[AUX_OUTPUT].isConnected()) {
+        switch (aux.mode) {
+        case POLY:
+            outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.osc, 0);
+            outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.sum, 1);
+            outputs[AUX_OUTPUT].setChannels(2);
+            break;
 
-    //     float r = std::hypot(xʼ, yʼ);
-    //     float υ = r > 0.0f ? yʼ / r : 0.0f;
+        case SUM:
+            outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.sum);
+            outputs[AUX_OUTPUT].setChannels(1);
+            break;
 
-    //     aux.out.osc = υ;
-    //     aux.out.sum = sn.A * υ;
-    // } else {
-    //     aux.out.osc = 0.0f;
-    //     aux.out.sum = 0.0f;
-    // }
-
-    // if (outputs[AUX_TRIGGER].isConnected()) {
-    //     outputs[AUX_TRIGGER].setVoltage(triggered ? 10.f : 0.0f);
-    // }
-
-    // if (outputs[AUX_OUTPUT].isConnected()) {
-    //     switch (aux.mode) {
-    //     case POLY:
-    //         outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.osc, 0);
-    //         outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.sum, 1);
-    //         outputs[AUX_OUTPUT].setChannels(2);
-    //         break;
-
-    //     case SUM:
-    //         outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.sum);
-    //         outputs[AUX_OUTPUT].setChannels(1);
-    //         break;
-
-    //     default:
-    //         outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.osc);
-    //         outputs[AUX_OUTPUT].setChannels(1);
-    //     }
-    // }
+        default:
+            outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.osc);
+            outputs[AUX_OUTPUT].setChannels(1);
+        }
+    }
 }
 
 void sn_vcv_vcox::recompute() {
-    // // ... param values
-    // float e = params[ECCENTRICITY_PARAM].getValue();
-    // float s = params[SENSITIVITY_PARAM].getValue();
-    // float θ = params[ROTATION_PARAM].getValue();
-    // float A = params[AMPLITUDE_PARAM].getValue();
-    // float δx = params[DX_PARAM].getValue();
-    // float δy = params[DY_PARAM].getValue();
-    // float m = params[M_PARAM].getValue();
+    // ... param values
+    float e = params[ECCENTRICITY_PARAM].getValue();
+    float s = params[SENSITIVITY_PARAM].getValue();
+    float θ = params[ROTATION_PARAM].getValue();
+    float A = params[AMPLITUDE_PARAM].getValue();
+    float δx = params[DX_PARAM].getValue();
+    float δy = params[DY_PARAM].getValue();
+    float m = params[M_PARAM].getValue();
 
-    // // ... override with inputs
-    // if (inputs[ECCENTRICITY_INPUT].isConnected()) {
-    //     e = clamp(inputs[ECCENTRICITY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
-    // }
+    // ... override with inputs
+    if (inputs[ECCENTRICITY_INPUT].isConnected()) {
+        e = clamp(inputs[ECCENTRICITY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    }
 
-    // if (inputs[SENSITIVITY_INPUT].isConnected()) {
-    //     s = clamp(inputs[SENSITIVITY_INPUT].getVoltage() / 2.0f, 0.0f, +5.0f);
-    // }
+    if (inputs[SENSITIVITY_INPUT].isConnected()) {
+        s = clamp(inputs[SENSITIVITY_INPUT].getVoltage() / 2.0f, 0.0f, +5.0f);
+    }
 
-    // if (inputs[ROTATION_INPUT].isConnected()) {
-    //     θ = clamp(90.0f * inputs[ROTATION_INPUT].getVoltage() / 5.0f, -90.0f, +90.0f);
-    // }
+    if (inputs[ROTATION_INPUT].isConnected()) {
+        θ = clamp(90.0f * inputs[ROTATION_INPUT].getVoltage() / 5.0f, -90.0f, +90.0f);
+    }
 
-    // if (inputs[AMPLITUDE_INPUT].isConnected()) {
-    //     A = clamp(inputs[AMPLITUDE_INPUT].getVoltage() / 10.0f, 0.0f, 1.0f);
-    // }
+    if (inputs[AMPLITUDE_INPUT].isConnected()) {
+        A = clamp(inputs[AMPLITUDE_INPUT].getVoltage() / 10.0f, 0.0f, 1.0f);
+    }
 
-    // if (inputs[DX_INPUT].isConnected()) {
-    //     δx = clamp(inputs[DX_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
-    // }
+    if (inputs[DX_INPUT].isConnected()) {
+        δx = clamp(inputs[DX_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    }
 
-    // if (inputs[DY_INPUT].isConnected()) {
-    //     δy = clamp(inputs[DY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
-    // }
+    if (inputs[DY_INPUT].isConnected()) {
+        δy = clamp(inputs[DY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    }
 
-    // // ... set internal SN parameters
-    // sn.ε = std::tanh(s * e);
-    // sn.θ = clamp(θ, -89.95f, +89.95f) * M_PI / 180.0f;
-    // sn.A = A;
-    // sn.δx = δx;
-    // sn.δy = δy;
-    // sn.m = m;
+    // ... set internal SN parameters
+    sn.ε = std::tanh(s * e);
+    sn.θ = clamp(θ, -89.95f, +89.95f) * M_PI / 180.0f;
+    sn.A = A;
+    sn.δx = δx;
+    sn.δy = δy;
+    sn.m = m;
 
-    // // ... recalculate ζ
-    // sn.recompute(ζ);
+    // ... recalculate ζ
+    sn.recompute(ζ);
 }
 
 sn_vcv_vcoxWidget::sn_vcv_vcoxWidget(sn_vcv_vcox *module) {
