@@ -50,7 +50,7 @@ struct sn_vcv_vcox : Module {
     void process(const ProcessArgs &args) override;
 
     void recompute();
-    void processVCO(const ProcessArgs &args, bool);
+    void processVCO(const ProcessArgs &args, int, bool);
     void processAUX(const ProcessArgs &args, bool);
 
     int krate();

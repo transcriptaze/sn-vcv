@@ -162,14 +162,25 @@ void sn_vcv_vcox::process(const ProcessArgs &args) {
     if (msg) {
         channels = msg->channels;
 
+        for (int ch = 0; ch < channels; ch++) {
+            vco[ch].phase = msg->vco[ch].phase;
+            vco[ch].velocity = msg->vco[ch].velocity;
+            vco[ch].out.sum = msg->vco[ch].out;
+        }
+
         aux.phase = msg->aux.phase;
         aux.out.sum = msg->aux.out;
     } else {
+        for (int ch = 0; ch < 16; ch++) {
+            vco[ch].phase = 0.0f;
+            vco[ch].velocity = 0.f;
+        }
+
         aux.phase = 0.0f;
         aux.out.sum = 0.0f;
     }
 
-    // processVCO(args, expanded);
+    processVCO(args, channels, expanded);
     processAUX(args, expanded);
 
     // ... update expanders
@@ -214,47 +225,43 @@ void sn_vcv_vcox::process(const ProcessArgs &args) {
     }
 }
 
-void sn_vcv_vcox::processVCO(const ProcessArgs &args, bool expanded) {
-    // int channels = this->channels();
-    // bool vco = outputs[VCO_OUTPUT].isConnected();
+void sn_vcv_vcox::processVCO(const ProcessArgs &args, int channels, bool expanded) {
+    bool connected = outputs[VCO_OUTPUT].isConnected() | outputs[VCO_SUM_OUTPUT].isConnected();
 
-    // // ... convert pitch CV to instantaneous frequency
-    // for (int ch = 0; ch < channels; ch++) {
-    //     float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
-    //     float f = dsp::FREQ_C4 * std::pow(2.f, pitch);
+    if (connected || expanded) {
+        for (int ch = 0; ch < channels; ch++) {
+            float α = vco[ch].phase * 2.0f * M_PI;
 
-    //     phase[ch] += f * args.sampleTime;
-    //     if (phase[ch] >= 1.f) {
-    //         phase[ch] -= 1.f;
-    //     }
-    // }
+            float αʼ = sn.m * α - ζ.φ;
 
-    // // ... generate
-    // if (vco || expanded) {
-    //     for (int ch = 0; ch < channels; ch++) {
-    //         float α = phase[ch] * 2.0f * M_PI;
+            float x = std::cos(αʼ);
+            float y = std::sin(αʼ);
+            float xʼ = ζ.pʼ * x - ζ.qʼ * y + ζ.rʼ;
+            float yʼ = ζ.sʼ * x + ζ.tʼ * y + ζ.uʼ;
 
-    //         float αʼ = sn.m * α - ζ.φ;
+            float r = std::hypot(xʼ, yʼ);
+            float υ = r > 0.0f ? yʼ / r : 0.0f;
 
-    //         float x = std::cos(αʼ);
-    //         float y = std::sin(αʼ);
-    //         float xʼ = ζ.pʼ * x - ζ.qʼ * y + ζ.rʼ;
-    //         float yʼ = ζ.sʼ * x + ζ.tʼ * y + ζ.uʼ;
+            vco[ch].out.vco = υ;
+            vco[ch].out.sum += sn.A * υ;
+        }
+    }
 
-    //         float r = std::hypot(xʼ, yʼ);
-    //         float υ = r > 0.0f ? sn.A * yʼ / r : 0.0f;
+    if (outputs[VCO_OUTPUT].isConnected()) {
+        for (int ch = 0; ch < channels; ch++) {
+            outputs[VCO_OUTPUT].setVoltage(5.f * vco[ch].velocity * vco[ch].out.vco, ch);
+        }
 
-    //         out[ch] = υ;
-    //     }
-    // }
+        outputs[VCO_OUTPUT].setChannels(channels);
+    }
 
-    // if (vco) {
-    //     for (int ch = 0; ch < channels; ch++) {
-    //         outputs[VCO_OUTPUT].setVoltage(5.f * velocity(ch) * out[ch], ch);
-    //     }
+    if (outputs[VCO_SUM_OUTPUT].isConnected()) {
+        for (int ch = 0; ch < channels; ch++) {
+            outputs[VCO_SUM_OUTPUT].setVoltage(5.f * vco[ch].velocity * vco[ch].out.sum, ch);
+        }
 
-    //     outputs[VCO_OUTPUT].setChannels(channels);
-    // }
+        outputs[VCO_SUM_OUTPUT].setChannels(channels);
+    }
 }
 
 void sn_vcv_vcox::processAUX(const ProcessArgs &args, bool expanded) {

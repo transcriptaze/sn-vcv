@@ -22,8 +22,8 @@
 - [x] Save/restore
 - [ ] Factory presets
 - [x] AUX out
-- [ ] VCO out
-- [ ] VCO-Σ out
+- [x] VCO out
+- [x] VCO-Σ out
 - [ ] Expanders
 
 ## _sn-vcv-lfo_
