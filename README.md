@@ -12,31 +12,31 @@ a circle is a special case of an ellipse). The _sn-vcv_ VCV modules use the _sn_
 _sine_ function to generate harmonically rich waveforms that are also continuous and differentiable.
 
 By modifying the parameters of the _sn_ function it is possible to smoothly morph between a sine wave,
-a square (well, square'ish) wave, a triangular wave and a sawtooth. 
-
-There is a [web app](https://snyth.pages.dev) which might make this a bit clearer.
+a square (well, square'ish) wave, a triangular wave and a sawtooth. There is a [web app](https://snyth.pages.dev)
+which may make this a bit clearer than this umm, very extremely brief explanation, and there is a little 
+more detail [here](https://github.com/transcriptaze/snyth) if you're really curious.
 
 ### Parameters
 
 The modules use the following parameters to determine the wave shape:
 
-| Parameter | Range | Name           | Description                                                                 |
-|-----------|-------|----------------|-----------------------------------------------------------------------------|
-| _ε_       | ±1    | _eccentricity_ | Sets the eccentricity of the generating ellipse (0 corresponds to a circle) |
-| _s_       | 0-5   | _sensitivity_  | 'Fine' adjustment for the _eccentricity_                                    |
-| _θ_       | ±90°  | _rotation_     | Rotate the ellipse around the origin                                        |
-| _a_       | 0-1   | _amplitude_    | Amplitude of the _sn_ function                                              |
-| _δx_      | ±1    | _shift-x_      | Horizontal displacement                                                     |
-| _δy_      | ±1    | _shift-y_      | Vertical displacement                                                       |
-| _Φ_       | ±90°  | _phase_        | Phase offset to adjust the phase of a harmonic                              |
-| _m_       | 1-5   | _multiplier_   | Base frequency multiplier                                                   |
+| Parameter | Range | Name           | Description                                                     |
+|-----------|-------|----------------|-----------------------------------------------------------------|
+| _ε_       | ±1    | _eccentricity_ | Sets the eccentricity of the generating ellipse                 |
+| _s_       | 0-5   | _sensitivity_  | 'Fine' adjustment for the _eccentricity_                        |
+| _θ_       | ±90°  | _rotation_     | Rotates the ellipse around the origin                           |
+| _a_       | 0-1   | _amplitude_    | Sets the amplitude of the _sn_ function                         |
+| _δx_      | ±1    | _shift-x_      | Sets the horizontal displacement                                |
+| _δy_      | ±1    | _shift-y_      | Sets the vertical displacement                                  |
+| _Φ_       | ±90°  | _phase_        | Adjust a harmonic phase offset                                  |
+| _m_       | 1-5   | _multiplier_   | Base frequency multiplier                                       |
 
 
 ## Modules
 
 ### _sn-vco_
 
-_SN VCO_ is a more-or-less standard VCO module except that it produces a _sn_ output rather than a _sine_:
+_SN VCO_ is a more or less standard VCO module except that it produces a _sn_ output rather than a _sine_:
 
 | Input      | Range | Name           | Description                                                    |
 |------------|-------|----------------|----------------------------------------------------------------|
@@ -80,7 +80,7 @@ _SN VCO_. Multiple expanders can be stacked to create a waveform using harmonics
 
 ### _sn-lfo_
 
-_SN LFO_ is a more-or-less standard LFO module except that it produces a _sn_ output rather than a _sine_:
+_SN LFO_ is a more or less standard LFO module except that it produces a _sn_ output rather than a _sine_:
 
 | Input       | Range  | Name         | Description                                                    |
 |-------------|--------|--------------|----------------------------------------------------------------|
