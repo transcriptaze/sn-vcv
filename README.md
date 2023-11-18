@@ -5,6 +5,15 @@
 A set of VCV modules for the _sn_ experimental additive synthesizer which uses the _Jacobi ellipse_ as the 
 generator function.
 
+- [Background](#background)
+- [Modules](#modules)
+   - [SN VCO](#sn_vco)
+   - [SN VCOx](#sn_vcox)
+   - [SN LFO](#sn_lfo)
+   - [SN LFOx](#sn_lfox)
+- [Patches](#patches)
+- [License](#license)
+
 ## Background
 
 Mathematically a _sine_ function is a special case of the Jacobi elliptic _sn_ function (in the same way that
@@ -146,5 +155,9 @@ wave shapes.
 _Requires_:
 1. _Fundamental_ modules
 
-## Acknowledgements
+## License
+
+[GPL-3.0](https://github.com/transcriptaze/sn-vcv/blob/master/LICENSE). 
+
+
 
