@@ -24,9 +24,9 @@
   </g>
 
   <g inkscape:groupmode="layer" inkscape:label="controls"
-     fill="none" stroke="#ebebeb" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" >
-
-    <g inkscape:label="ε" transform="translate(20.352,23.238) scale(0.225,0.225)">
+     fill="none" stroke="#ebebeb" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+     transform="translate(0.0,1.27)">
+    <g inkscape:label="ε" transform="translate(20.352,21.968) scale(0.225,0.225)">
       <line x1="-10.160" y1="17.598"  x2="-12.700" y2="21.997" />
       <line x1="-17.598" y1="10.160"  x2="-21.997" y2="12.700" />
       <line x1="-20.32"  y1="0.000"   x2="-25.4"   y2="0.000" />
@@ -46,7 +46,7 @@
       <line x1="-30.48"  y1="0.000"   x2="-40.64"   y2="0.000" />
     </g>
 
-    <g inkscape:label="s" transform="translate(20.352,36.252) scale(0.225,0.225)">
+    <g inkscape:label="s" transform="translate(20.352,34.982) scale(0.225,0.225)">
       <line x1="-10.160" y1="17.598"  x2="-12.700" y2="21.997" />
       <line x1="-17.598" y1="10.160"  x2="-21.997" y2="12.700" />
       <line x1="-20.32"  y1="0.000"   x2="-25.4"   y2="0.000" />
@@ -66,7 +66,7 @@
       <line x1="-30.48"  y1="0.000"   x2="-40.64"   y2="0.000" />
     </g>
 
-    <g inkscape:label="θ" transform="translate(20.352,49.274) scale(0.225,0.225)">
+    <g inkscape:label="θ" transform="translate(20.352,48.004) scale(0.225,0.225)">
       <line x1="-10.160" y1="17.598"  x2="-12.700" y2="21.997" />
       <line x1="-17.598" y1="10.160"  x2="-21.997" y2="12.700" />
       <line x1="-20.32"  y1="0.000"   x2="-25.4"   y2="0.000" />
@@ -86,7 +86,7 @@
       <line x1="-30.48"  y1="0.000"   x2="-40.64"   y2="0.000" />
     </g>
 
-    <g inkscape:label="a" transform="translate(20.352,62.296) scale(0.225,0.225)">
+    <g inkscape:label="a" transform="translate(20.352,61.026) scale(0.225,0.225)">
       <line x1="-10.160" y1="17.598"  x2="-12.700" y2="21.997" />
       <line x1="-17.598" y1="10.160"  x2="-21.997" y2="12.700" />
       <line x1="-20.32"  y1="0.000"   x2="-25.4"   y2="0.000" />
@@ -106,7 +106,7 @@
       <line x1="-30.48"  y1="0.000"   x2="-40.64"   y2="0.000" />
     </g>
 
-    <g inkscape:label="δx" transform="translate(20.352,75.318) scale(0.225,0.225)">
+    <g inkscape:label="δx" transform="translate(20.352,74.048) scale(0.225,0.225)">
       <line x1="-10.160" y1="17.598"  x2="-12.700" y2="21.997" />
       <line x1="-17.598" y1="10.160"  x2="-21.997" y2="12.700" />
       <line x1="-20.32"  y1="0.000"   x2="-25.4"   y2="0.000" />
@@ -126,7 +126,7 @@
       <line x1="-30.48"  y1="0.000"   x2="-40.64"   y2="0.000" />
     </g>
 
-    <g inkscape:label="δy" transform="translate(20.352,88.34) scale(0.225,0.225)">
+    <g inkscape:label="δy" transform="translate(20.352,87.070) scale(0.225,0.225)">
       <line x1="-10.160" y1="17.598"  x2="-12.700" y2="21.997" />
       <line x1="-17.598" y1="10.160"  x2="-21.997" y2="12.700" />
       <line x1="-20.32"  y1="0.000"   x2="-25.4"   y2="0.000" />
@@ -146,7 +146,7 @@
       <line x1="-30.48"  y1="0.000"   x2="-40.64"   y2="0.000" />
     </g>
 
-    <g inkscape:label="m" transform="translate(20.352,101.363) scale(0.225,0.225)">
+    <g inkscape:label="m" transform="translate(20.352,100.093) scale(0.225,0.225)">
       <line x1="-10.160" y1="17.598"  x2="-12.700" y2="21.997" />
       <line x1="-17.598" y1="10.160"  x2="-21.997" y2="12.700" />
       <line x1="-20.32"  y1="0.000"   x2="-25.4"   y2="0.000" />

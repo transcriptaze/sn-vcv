@@ -171,6 +171,41 @@ typedef struct sn_vco_message {
     };
 } sn_vco_message;
 
+typedef struct sn_lfo_message {
+    bool linked = false;
+    int channels = 1;
+
+    struct LFO {
+        float phase;
+        float out;
+    } LFO[16] = {
+        {.phase = 0.0f, .out = 0.0f},
+        {.phase = 0.0f, .out = 0.0f},
+        {.phase = 0.0f, .out = 0.0f},
+        {.phase = 0.0f, .out = 0.0f},
+        {.phase = 0.0f, .out = 0.0f},
+        {.phase = 0.0f, .out = 0.0f},
+        {.phase = 0.0f, .out = 0.0f},
+        {.phase = 0.0f, .out = 0.0f},
+        {.phase = 0.0f, .out = 0.0f},
+        {.phase = 0.0f, .out = 0.0f},
+        {.phase = 0.0f, .out = 0.0f},
+        {.phase = 0.0f, .out = 0.0f},
+        {.phase = 0.0f, .out = 0.0f},
+        {.phase = 0.0f, .out = 0.0f},
+        {.phase = 0.0f, .out = 0.0f},
+        {.phase = 0.0f, .out = 0.0f},
+    };
+
+    struct AUX {
+        float phase;
+        float out;
+    } AUX = {
+        .phase = 0.0f,
+        .out = 0.0f,
+    };
+} sn_lfo_message;
+
 // ... channels display widget
 struct ChannelsWidget : Widget {
     void draw(const DrawArgs &args) override;

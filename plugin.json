@@ -38,6 +38,14 @@
         "Function generator",
         "Low-frequency oscillator"
       ]
+    },
+    {
+      "slug": "sn-vcv-lfox",
+      "name": "sn-vcv-lfox",
+      "description": "sn experimental additive synthesizer LFO expander",
+      "tags": [
+        "Expander"
+      ]
     }
   ]
 }

@@ -10,38 +10,30 @@
       - [ ] sn-vcox
       - [x] sn-lfo
       - [ ] sn-lfox
+      - [ ] sn-vcv
 
-## _sn-vcv-osc_
-- [x] SVG resource
-- [x] Context menu
-- [x] Save/restore
-- [x] AUX out
-- [x] VCO out
-- [x] Dark mode
-- [x] Factory presets
-- [x] Expanders
+- [x] _sn-vcv-osc_
+- [x] _sn-vcv-oscx_
 
-## _sn-vcv-oscx_
-- [x] SVG resource
-- [x] Dark mode
-- [x] Context menu
-- [x] Save/restore
-- [x] AUX out
-- [x] VCO out
-- [x] VCO-Σ out
-- [x] Factory presets
-- [x] Expanders
+- [ ] _sn-vcv-lfo_
+      - [x] SVG resource
+      - [x] Context menu
+      - [x] Save/restore
+      - [x] AUX out
+      - [x] VCO out
+      - [x] Dark mode
+      - [x] k-rate for output
+      - [x] Factory presets
+      - [ ] Expanders
 
-## _sn-vcv-lfo_
-- [x] SVG resource
-- [x] Context menu
-- [x] Save/restore
-- [x] AUX out
-- [x] VCO out
-- [x] Dark mode
-- [x] k-rate for output
-- [x] Factory presets
-- [ ] Expanders
-
-## _sn-vcv-lfox_
+- [ ] _sn-vcv-lfox_
+      - [x] SVG resource
+      - [ ] Context menu
+      - [ ] Save/restore
+      - [ ] AUX out
+      - [ ] VCO out
+      - [ ] Dark mode
+      - [ ] k-rate for output
+      - [ ] Factory presets
+      - [ ] Expanders
 

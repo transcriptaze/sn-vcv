@@ -1,6 +1,7 @@
 #include <cmath>
 
 #include "sn-vcv-lfo.hpp"
+#include "sn-vcv-lfox.hpp"
 #include "sn-vcv.hpp"
 
 // clang-format off
@@ -94,21 +95,20 @@ void sn_vcv_lfo::dataFromJson(json_t *root) {
 }
 
 void sn_vcv_lfo::onExpanderChange(const ExpanderChangeEvent &e) {
-    // Module *left = getLeftExpander().module;
-    // Module *right = getRightExpander().module;
-    // float delta = 1 / 44100.0; // FIXME - set in onSampleChange
+    Module *left = getLeftExpander().module;
+    Module *right = getRightExpander().module;
 
-    // if (left && left->model == modelSn_vcv_lfox) {
-    //     expanders.left = left;
-    // } else {
-    //     expanders.left = NULL;
-    // }
+    if (left && left->model == modelSn_vcv_lfox) {
+        expanders.left = left;
+    } else {
+        expanders.left = NULL;
+    }
 
-    // if (right && right->model == modelSn_vcv_lfox) {
-    //     expanders.right = right;
-    // } else {
-    //     expanders.right = NULL;
-    // }
+    if (right && right->model == modelSn_vcv_lfox) {
+        expanders.right = right;
+    } else {
+        expanders.right = NULL;
+    }
 }
 
 void sn_vcv_lfo::process(const ProcessArgs &args) {
@@ -120,13 +120,13 @@ void sn_vcv_lfo::process(const ProcessArgs &args) {
     bool xll = false;
     bool xrr = expanders.right;
 
-    // if (expanders.left) {
-    //     sn_vcv_lfox *x = (sn_vcv_lfox *)expanders.left;
-    //
-    //     if (!x->isLinkedLeft()) {
-    //         ll = true;
-    //     }
-    // }
+    if (expanders.left) {
+        sn_vcv_lfox *x = (sn_vcv_lfox *)expanders.left;
+
+        if (!x->isLinkedLeft()) {
+            xll = true;
+        }
+    }
 
     lights[XLL_LIGHT].setBrightnessSmooth(xll ? 1.0 : 0.f, args.sampleTime);
     lights[XRR_LIGHT].setBrightnessSmooth(xrr ? 1.0 : 0.f, args.sampleTime);
@@ -146,46 +146,44 @@ void sn_vcv_lfo::process(const ProcessArgs &args) {
     processLFO(args, channels, expanded, resync, recalculate);
     processAUX(args, expanded, resync);
 
-    // // ... update expanders
-    // if (expanders.left) {
-    //     sn_lfo_message *msg = (sn_lfo_message *)expanders.left->getRightExpander().producerMessage;
-    //
-    //     if (msg != NULL) {
-    //         msg->linked = true;
-    //         msg->channels = channels;
-    //
-    //         for (int ch = 0; ch < channels; ch++) {
-    //             msg->LFO[ch].phase = LFO.phase[ch];
-    //             msg->LFO[ch].out = LFO.out[ch];
-    //         }
-    //
-    //         msg->AUX.phase = aux.phase;
-    //         msg->AUX.out = aux.out.sum;
-    //         msg->debug = debug;
-    //
-    //         expanders.left->getRightExpander().requestMessageFlip();
-    //     }
-    // }
+    // ... update expanders
+    if (expanders.left) {
+        sn_lfo_message *msg = (sn_lfo_message *)expanders.left->getRightExpander().producerMessage;
 
-    // if (expanders.right) {
-    //     sn_lfo_message *msg = (sn_lfo_message *)expanders.right->getLeftExpander().producerMessage;
-    //
-    //     if (msg != NULL) {
-    //         msg->linked = true;
-    //         msg->channels = channels;
-    //
-    //         for (int ch = 0; ch < channels; ch++) {
-    //             msg->LFO[ch].phase = LFO.phase[ch];
-    //             msg->LFO[ch].out = LFO.out[ch];
-    //         }
-    //
-    //         msg->AUX.phase = aux.phase;
-    //         msg->AUX.out = aux.out.sum;
-    //         msg->debug = debug;
-    //
-    //         expanders.right->getLeftExpander().requestMessageFlip();
-    //     }
-    // }
+        if (msg != NULL) {
+            msg->linked = true;
+            msg->channels = channels;
+
+            for (int ch = 0; ch < channels; ch++) {
+                msg->LFO[ch].phase = LFO.phase[ch];
+                msg->LFO[ch].out = LFO.out[ch];
+            }
+
+            msg->AUX.phase = aux.phase;
+            msg->AUX.out = aux.out.sum;
+
+            expanders.left->getRightExpander().requestMessageFlip();
+        }
+    }
+
+    if (expanders.right) {
+        sn_lfo_message *msg = (sn_lfo_message *)expanders.right->getLeftExpander().producerMessage;
+
+        if (msg != NULL) {
+            msg->linked = true;
+            msg->channels = channels;
+
+            for (int ch = 0; ch < channels; ch++) {
+                msg->LFO[ch].phase = LFO.phase[ch];
+                msg->LFO[ch].out = LFO.out[ch];
+            }
+
+            msg->AUX.phase = aux.phase;
+            msg->AUX.out = aux.out.sum;
+
+            expanders.right->getLeftExpander().requestMessageFlip();
+        }
+    }
 }
 
 void sn_vcv_lfo::recompute() {
@@ -339,27 +337,28 @@ void sn_vcv_lfo::setRange(int v) {
 sn_vcv_lfoWidget::sn_vcv_lfoWidget(sn_vcv_lfo *module) {
     float left = 8.89;
     float right = 27.94;
+    float top = 21.968 + 1.27;
+    float dh = 13.014;
 
-    Vec e(left, 21.968);
-    Vec s(left, 34.982);
-    Vec θ(left, 48.004);
-    Vec A(left, 61.026);
-    Vec δx(left, 74.048);
-    Vec δy(left, 87.070);
-    Vec 𝜓(left, 100.093);
-    Vec m(left, 113.115);
+    Vec e(left, top);
+    Vec s(left, top + dh);
+    Vec θ(left, top + 2 * dh);
+    Vec A(left, top + 3 * dh);
+    Vec δx(left, top + 4 * dh);
+    Vec δy(left, top + 5 * dh);
+    Vec 𝜓(left, top + 6 * dh);
+    Vec m(left, top + 7 * dh);
 
-    Vec f(26.67, 27.94 - 0.5);
-    Vec fin(26.67, 40.64 - 0.5);
-    Vec synch(26.67, 53.34);
+    Vec f(26.67, 27.94 - 0.5 + 1.27);
+    Vec fin(26.67, 40.64 - 0.5 + 1.27);
+    Vec synch(26.67, 53.34 + 1.27);
 
-    Vec lfo(right, 113.115);
-    Vec aux(right, 74.048);
-    Vec trigger(right, 87.070);
-    Vec debug(right, 48.004);
+    Vec aux(right, top + 4 * dh);
+    Vec trigger(right, top + 5 * dh);
+    Vec lfo(right, top + 7 * dh);
 
-    Vec xll(2.54, 11.43);
-    Vec xrr(33.02, 11.43);
+    Vec xll(2.54, 13.97);
+    Vec xrr(33.02, 13.97);
 
     setModule(module);
     setPanel(createPanel(asset::plugin(pluginInstance, "res/sn-vcv-lfo.svg"),
