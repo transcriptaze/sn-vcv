@@ -20,7 +20,8 @@ jobs:
     container:
       image: ghcr.io/qno/rack-plugin-toolchain-win-linux
       options: --user root
-      strategy:
+    
+    strategy:
       matrix:
         platform: [lin-x64]
 
