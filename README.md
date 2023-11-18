@@ -70,9 +70,10 @@ _sn-vco_ is a more or less standard VCO module except that it produces a _sn_ ou
 | Setting    | Parameter       | Description                                                                      |
 |------------|-----------------|----------------------------------------------------------------------------------|
 | _k-rate_   | Control rate    | Sets the rate at which the parameter values are used to recalculate the waveform |
-| _aux-mode_ | AUX output mode | _OSC_ outputs a 25Hz 'monitor' waveform                                          |
-|            |                 | _SUM_ outputs the summed 25Hz 'monitor' waveform                                 |
-|            |                 | _POLY_ outputs the monitor wave form on channel 1 and the summed monitor waveform on channel 2 |
+| _aux-mode_ | AUX output mode | 
+- _OSC_ outputs a 25Hz 'monitor' waveform                                          
+                                 - _SUM_ outputs the summed 25Hz 'monitor' waveform
+                                 _POLY_ outputs the monitor wave form on channel 1 and the summed monitor waveform on channel 2 |
 
 
 ### _sn-vcox_
