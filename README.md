@@ -7,10 +7,10 @@ generator function.
 
 - [Background](#background)
 - [Modules](#modules)
-   - [SN VCO](#sn_vco)
-   - [SN VCOx](#sn_vcox)
-   - [SN LFO](#sn_lfo)
-   - [SN LFOx](#sn_lfox)
+   - [SN VCO](#sn-vco)
+   - [SN VCOx](#sn-vcox)
+   - [SN LFO](#sn-lfo)
+   - [SN LFOx](#sn-lfox)
 - [Patches](#patches)
 - [License](#license)
 
