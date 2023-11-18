@@ -4,6 +4,7 @@
 - [ ] README
 - [ ] Demo patches
       - [x] sn-vco
+      - [x] sn-lfo
 
 ## _sn-vcv-osc_
 - [x] SVG resource
