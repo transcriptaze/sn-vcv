@@ -54,7 +54,6 @@ struct sn_vcv_vco : Module {
     void processVCO(const ProcessArgs &args, int, bool);
     void processAUX(const ProcessArgs &args, bool);
 
-    int krate();
     int channels();
     float velocity(int);
 

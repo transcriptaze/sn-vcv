@@ -1,22 +1,22 @@
 {
   "plugin": "sn-vcv",
-  "model": "sn-vcv-vcox",
+  "model": "sn-vcv-lfo",
   "version": "2.0.0",
   "params": [
     {
-      "value": -0.175,
+      "value": 5.0,
       "id": 0
     },
     {
-      "value": 5.0,
+      "value": 0.0,
       "id": 1
     },
     {
-      "value": -90.0,
+      "value": 2.5,
       "id": 2
     },
     {
-      "value": 0.4,
+      "value": 0.0,
       "id": 3
     },
     {
@@ -30,6 +30,10 @@
     {
       "value": 0.0,
       "id": 6
+    },
+    {
+      "value": 0.0,
+      "id": 7
     }
   ]
 }

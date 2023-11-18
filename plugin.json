@@ -29,6 +29,15 @@
       "tags": [
         "Expander"
       ]
+    },
+    {
+      "slug": "sn-vcv-lfo",
+      "name": "sn-vcv-lfo",
+      "description": "sn experimental additive synthesizer LFO",
+      "tags": [
+        "Function generator",
+        "Low-frequency oscillator"
+      ]
     }
   ]
 }
