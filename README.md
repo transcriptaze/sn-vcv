@@ -1,3 +1,5 @@
+![build](https://github.com/transcriptaze/sn-vcv/workflows/build/badge.svg)
+
 # sn-vcv
 
 A set of VCV modules for the _sn_ experimental additive synthesizer which uses the _Jacobi ellipse_ as the 
@@ -36,3 +38,6 @@ can be used to synchronize the scope output to the start of the waveform.
 ### _sn_lfo_
 
 ### _sn_lfox_
+
+## Acknowledgements
+

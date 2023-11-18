@@ -1,0 +1,33 @@
+name: build
+
+on:
+  workflow_dispatch:  
+
+env:
+  rack-sdk-version: latest
+  rack-plugin-toolchain-dir: /home/build/rack-plugin-toolchain
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+
+  build:
+    name: ${{ matrix.platform }}
+    runs-on: ubuntu-latest
+
+    container:
+      image: ghcr.io/qno/rack-plugin-toolchain-win-linux
+      options: --user root
+      strategy:
+      matrix:
+        platform: [lin-x64]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build plugin
+        run: |
+             export PLUGIN_DIR=$GITHUB_WORKSPACE
+             pushd ${{ env.rack-plugin-toolchain-dir }}
+             make plugin-build-${{ matrix.platform }}

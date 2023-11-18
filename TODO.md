@@ -1,10 +1,15 @@
 # TODO
 
 - [ ] github workflow
+      - https://github.com/qno/vcv-plugin-github-actions-example/blob/main/.github/workflows/build-plugin.yml
+
 - [ ] README
+- [ ] github tags
 - [ ] Demo patches
       - [x] sn-vco
+      - [ ] sn-vcox
       - [x] sn-lfo
+      - [ ] sn-lfox
 
 ## _sn-vcv-osc_
 - [x] SVG resource
