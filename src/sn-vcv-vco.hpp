@@ -113,7 +113,7 @@ struct sn_vcv_vco : Module {
 struct sn_vcv_vcoWidget : ModuleWidget {
     sn_vcv_vcoWidget(sn_vcv_vco *);
 
-    void appendContextMenu(Menu *);
+    void appendContextMenu(Menu *) override;
 };
 
 struct sn_vcv_vco_channels : ChannelsWidget {

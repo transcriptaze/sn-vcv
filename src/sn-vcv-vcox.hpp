@@ -111,5 +111,5 @@ struct sn_vcv_vcox : Module {
 struct sn_vcv_vcoxWidget : ModuleWidget {
     sn_vcv_vcoxWidget(sn_vcv_vcox *);
 
-    void appendContextMenu(Menu *);
+    void appendContextMenu(Menu *) override;
 };
