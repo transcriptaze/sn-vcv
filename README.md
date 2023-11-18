@@ -67,12 +67,10 @@ _sn-vco_ is a more or less standard VCO module except that it produces a _sn_ ou
 
 #### Context Menu
 
-1. _k-rate_   
-
+1. _k-rate_
     Sets the rate at which the parameter values are used to recalculate the waveform.
 
 2. _aux-mode_
-
     Sets the AUX output mode:
     - _OSC_ outputs a 25Hz 'monitor' waveform
     - _SUM_ outputs the summed 25Hz 'monitor' waveform
@@ -100,16 +98,14 @@ _sn-vco_. Multiple expanders can be stacked to create a waveform using harmonics
 
 #### Context Menu
 
-1. _k-rate_   
-
-Sets the rate at which the parameter values are used to recalculate the waveform.
+1. _k-rate_
+    Sets the rate at which the parameter values are used to recalculate the waveform.
 
 2. _aux-mode_
-
-Sets the AUX output mode:
-- _OSC_ outputs a 25Hz 'monitor' waveform
-- _SUM_ outputs the summed 25Hz 'monitor' waveform
-- _POLY_ outputs the monitor wave form on channel 1 and the summed monitor waveform on channel 2 |
+    Sets the AUX output mode:
+    - _OSC_ outputs a 25Hz 'monitor' waveform
+    - _SUM_ outputs the summed 25Hz 'monitor' waveform
+    - _POLY_ outputs the monitor wave form on channel 1 and the summed monitor waveform on channel 2 |
 
 
 ### _sn-lfo_
@@ -129,23 +125,20 @@ _sn-lfo_ is a more or less standard LFO module except that it produces a _sn_ ou
 
 #### Context Menu
 
-1. _k-rate_   
-
-Sets the rate at which the parameter values are used to recalculate the waveform.
+1. _k-rate_
+    Sets the rate at which the parameter values are used to recalculate the waveform.
 
 2. _aux-mode_
-
-Sets the AUX output mode:
-- _OSC_ outputs a 25Hz 'monitor' waveform
-- _SUM_ outputs the summed 25Hz 'monitor' waveform
-- _POLY_ outputs the monitor wave form on channel 1 and the summed monitor waveform on channel 2 |
+    Sets the AUX output mode:
+    - _OSC_ outputs a 25Hz 'monitor' waveform
+    - _SUM_ outputs the summed 25Hz 'monitor' waveform
+    - _POLY_ outputs the monitor wave form on channel 1 and the summed monitor waveform on channel 2 |
 
 3. _range_ 
-
-Sets the frequency range mapped to the input level:
-- 0.1-10Hz (logarithmic)
-- 0.2-2Hz (logarithmic)
-- 0.5-20Hz (linear)
+    Sets the frequency range mapped to the input level:
+    - 0.1-10Hz (logarithmic)
+    - 0.2-2Hz (logarithmic)
+    - 0.5-20Hz (linear)
 
 
 ### _sn-lfox_
@@ -170,16 +163,14 @@ _sn-lfo_. Multiple expanders can be stacked to create a waveform using harmonics
 
 #### Context Menu
 
-1. _k-rate_   
-
-Sets the rate at which the parameter values are used to recalculate the waveform.
+1. _k-rate_
+    Sets the rate at which the parameter values are used to recalculate the waveform.
 
 2. _aux-mode_
-
-Sets the AUX output mode:
-- _OSC_ outputs a 25Hz 'monitor' waveform
-- _SUM_ outputs the summed 25Hz 'monitor' waveform
-- _POLY_ outputs the monitor wave form on channel 1 and the summed monitor waveform on channel 2 |
+    Sets the AUX output mode:
+    - _OSC_ outputs a 25Hz 'monitor' waveform
+    - _SUM_ outputs the summed 25Hz 'monitor' waveform
+    - _POLY_ outputs the monitor wave form on channel 1 and the summed monitor waveform on channel 2 |
 
 
 ## Patches
