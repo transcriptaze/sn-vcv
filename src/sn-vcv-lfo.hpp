@@ -113,7 +113,7 @@ struct sn_vcv_lfo : Module {
         .count = 0,
     };
 
-    range range = {
+    struct range range = {
         .index = 0,
         .defval = 5.f,
         .base = 1.5848933f,
