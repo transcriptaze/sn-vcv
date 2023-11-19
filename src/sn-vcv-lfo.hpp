@@ -24,7 +24,6 @@ struct sn_vcv_lfo : Module {
     static const int CHANNELS;
 
     enum ParamId {
-        FREQUENCY_PARAM,
         ECCENTRICITY_PARAM,
         SENSITIVITY_PARAM,
         ROTATION_PARAM,
@@ -33,6 +32,7 @@ struct sn_vcv_lfo : Module {
         DY_PARAM,
         PHI_PARAM,
         M_PARAM,
+        FREQUENCY_PARAM,
         PARAMS_LEN
     };
 

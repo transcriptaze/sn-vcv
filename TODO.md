@@ -18,7 +18,7 @@
       - [ ] Greensleeves
       - [ ] Toccata
 
-- [ ] _sn-vcv-osc_
+- [x] _sn-vcv-osc_
       - [x] AUX gain
       - [x] Remove PSI param
       - [x] Update presets
@@ -40,7 +40,7 @@
       - [x] Factory presets
       - [x] Expanders
       - [x] AUX gain
-      - [ ] Fix param order
+      - [x] Fix param order
       - [ ] Fix phase - needs to be multipled by m
 
 - [ ] _sn-vcv-lfox_

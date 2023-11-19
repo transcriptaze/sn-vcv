@@ -17,6 +17,15 @@ const int sn_vcv_lfo::CHANNELS = 1;
 sn_vcv_lfo::sn_vcv_lfo() {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
+    configParam(ECCENTRICITY_PARAM, -1.0f, +1.0f, 0.0f, "ε");
+    configParam(SENSITIVITY_PARAM, 0.0f, +5.0f, 2.5f, "s");
+    configParam(ROTATION_PARAM, -90.0f, +90.0f, 0.0f, "θ");
+    configParam(AMPLITUDE_PARAM, 0.0f, +1.0f, 1.0f, "a");
+    configParam(DX_PARAM, -1.0f, +1.0f, 0.0f, "δx");
+    configParam(DY_PARAM, -1.0f, +1.0f, 0.0f, "δy");
+    configParam(PHI_PARAM, -90.0f, +90.0f, 0.0f, "Φ");
+    configSwitch(M_PARAM, 1.f, 5.f, 1.f, "m", {"1", "2", "3", "4", "5"});
+
     // clang-format off
     configParam(FREQUENCY_PARAM,
                 0.f,
@@ -28,15 +37,6 @@ sn_vcv_lfo::sn_vcv_lfo() {
                 range.multiplier,
                 range.offset)->displayPrecision = range.precision;
     // clang-format on
-
-    configParam(ECCENTRICITY_PARAM, -1.0f, +1.0f, 0.0f, "ε");
-    configParam(SENSITIVITY_PARAM, 0.0f, +5.0f, 2.5f, "s");
-    configParam(ROTATION_PARAM, -90.0f, +90.0f, 0.0f, "θ");
-    configParam(AMPLITUDE_PARAM, 0.0f, +1.0f, 1.0f, "a");
-    configParam(DX_PARAM, -1.0f, +1.0f, 0.0f, "δx");
-    configParam(DY_PARAM, -1.0f, +1.0f, 0.0f, "δy");
-    configParam(PHI_PARAM, -90.0f, +90.0f, 0.0f, "Φ");
-    configSwitch(M_PARAM, 1.f, 5.f, 1.f, "m", {"1", "2", "3", "4", "5"});
 
     getParamQuantity(M_PARAM)->randomizeEnabled = false;
 
