@@ -19,7 +19,13 @@
       - [ ] Toccata
 
 - [x] _sn-vcv-osc_
+      - [ ] Remove PSI param
+      - [ ] Update presets
+
 - [x] _sn-vcv-oscx_
+      - [ ] Remove PSI param
+      - [ ] Update presets
+
 - [x] _sn-vcv-lfo_
       - [x] SVG resource
       - [x] Context menu
@@ -30,6 +36,9 @@
       - [x] k-rate for output
       - [x] Factory presets
       - [x] Expanders
+      - [ ] Fix param order
+      - [ ] Fix phase - needs to be multipled by m
+      - [ ] OUT attenuator
 
 - [ ] _sn-vcv-lfox_
       - [x] SVG resource
@@ -39,6 +48,8 @@
       - [x] LFO out
       - [x] Dark mode
       - [x] k-rate for output
-      - [ ] Factory presets
-      - [ ] Expanders
+      - [x] Expanders
+      - [x] Factory presets
+      - [ ] Fix phase - needs to be multipled by m
+      - [ ] OUT attenuator
 
