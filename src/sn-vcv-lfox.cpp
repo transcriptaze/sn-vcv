@@ -137,21 +137,6 @@ void sn_vcv_lfox::process(const ProcessArgs &args) {
     lights[XRL_LIGHT].setBrightnessSmooth(xrl ? 1.f : 0.f, args.sampleTime);
     lights[XRR_LIGHT].setBrightnessSmooth(xrr ? 1.f : 0.f, args.sampleTime);
 
-    // ... audio
-    // if (msg != NULL) {
-    //     channels = msg->channels;
-
-    //     for (int ch = 0; ch < channels; ch++) {
-    //         LFO[ch].phase = msg->LFO[ch].phase;
-    //         LFO[ch].out.sum = msg->LFO[ch].out;
-    //     }
-    // } else {
-    //     for (int ch = 0; ch < channels; ch++) {
-    //         LFO[ch].phase = 0.0f;
-    //         LFO[ch].out.sum = 0.0f;
-    //     }
-    // }
-
     // ... get params and recompute transform matrix
     bool recalculate = false;
 
@@ -165,45 +150,27 @@ void sn_vcv_lfox::process(const ProcessArgs &args) {
 
     // ... generate
     if (msg != NULL) {
+        channels = msg->channels;
+
+        for (int ch = 0; ch < channels; ch++) {
+            LFO[ch].phase = msg->LFO[ch].phase;
+            LFO[ch].out.sum = msg->LFO[ch].out;
+        }
+
         aux.phase = msg->AUX.phase;
         aux.out.sum = msg->AUX.out;
     } else {
+        for (int ch = 0; ch < channels; ch++) {
+            LFO[ch].phase = 0.0f;
+            LFO[ch].out.sum = 0.0f;
+        }
+
         aux.phase = 0.0f;
         aux.out.sum = 0.0f;
     }
 
+    processLFO(args, channels, expanded, recalculate);
     processAUX(args, expanded);
-
-    // // ... LFO
-    // if ((outputs[LFO_OUTPUT].isConnected() || outputs[SUM_OUTPUT].isConnected()) && recalculate) {
-    //     for (int ch = 0; ch < channels; ch++) {
-    //         float α = 2.0f * M_PI * LFO[ch].phase;
-
-    //         float 𝜓 = 0.0f;
-    //         float αʼ = m * (α + 𝜓) - φ;
-
-    //         float x = std::cos(αʼ);
-    //         float y = std::sin(αʼ);
-    //         float xʼ = pʼ * x - qʼ * y + rʼ;
-    //         float yʼ = sʼ * x + tʼ * y + uʼ;
-
-    //         float r = std::hypot(xʼ, yʼ);
-    //         float sn = r > 0.0f ? yʼ / r : 0.0f;
-
-    //         LFO[ch].out.osc = sn;
-    //         LFO[ch].out.sum += A * sn;
-    //     }
-    // }
-
-    // if (outputs[LFO_OUTPUT].isConnected() || outputs[SUM_OUTPUT].isConnected()) {
-    //     for (int ch = 0; ch < channels; ch++) {
-    //         outputs[LFO_OUTPUT].setVoltage(5.f * LFO[ch].out.osc, ch);
-    //         outputs[SUM_OUTPUT].setVoltage(5.f * LFO[ch].out.sum, ch);
-    //     }
-
-    //     outputs[LFO_OUTPUT].setChannels(channels);
-    //     outputs[SUM_OUTPUT].setChannels(channels);
-    // }
 
     // ... update expanders
     {
@@ -266,6 +233,28 @@ void sn_vcv_lfox::recompute() {
     sn.m = m;
 
     sn.recompute();
+}
+
+void sn_vcv_lfox::processLFO(const ProcessArgs &args, int channels, bool expanded, bool recalculate) {
+    if ((outputs[LFO_OUTPUT].isConnected() || outputs[SUM_OUTPUT].isConnected() || expanded) && recalculate) {
+        for (int ch = 0; ch < channels; ch++) {
+            float α = 2.0f * M_PI * LFO[ch].phase;
+            float υ = sn.υ(α);
+
+            LFO[ch].out.osc = υ;
+            LFO[ch].out.sum += sn.A * υ;
+        }
+    }
+
+    if (outputs[LFO_OUTPUT].isConnected() || outputs[SUM_OUTPUT].isConnected()) {
+        for (int ch = 0; ch < channels; ch++) {
+            outputs[LFO_OUTPUT].setVoltage(5.f * LFO[ch].out.osc, ch);
+            outputs[SUM_OUTPUT].setVoltage(5.f * LFO[ch].out.sum, ch);
+        }
+
+        outputs[LFO_OUTPUT].setChannels(channels);
+        outputs[SUM_OUTPUT].setChannels(channels);
+    }
 }
 
 void sn_vcv_lfox::processAUX(const ProcessArgs &args, bool expanded) {

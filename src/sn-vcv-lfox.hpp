@@ -48,6 +48,7 @@ struct sn_vcv_lfox : Module {
     bool isLinkedRight();
 
     void recompute();
+    void processLFO(const ProcessArgs &, int, bool, bool);
     void processAUX(const ProcessArgs &, bool);
 
     struct SN sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);

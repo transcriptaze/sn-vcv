@@ -1,6 +1,10 @@
 # TODO
 
 - [ ] github workflow
+      - [ ] Nightlies
+            - [ ] Windows
+            - [ ] Mac
+            - [ ] Linux
       - https://github.com/qno/vcv-plugin-github-actions-example/blob/main/.github/workflows/build-plugin.yml
 
 - [ ] README
@@ -11,29 +15,30 @@
       - [x] sn-lfo
       - [ ] sn-lfox
       - [ ] sn-vcv
+      - [ ] Greensleeves
+      - [ ] Toccata
 
 - [x] _sn-vcv-osc_
 - [x] _sn-vcv-oscx_
-
-- [ ] _sn-vcv-lfo_
+- [x] _sn-vcv-lfo_
       - [x] SVG resource
       - [x] Context menu
       - [x] Save/restore
       - [x] AUX out
-      - [x] VCO out
+      - [x] LFO out
       - [x] Dark mode
       - [x] k-rate for output
       - [x] Factory presets
-      - [ ] Expanders
+      - [x] Expanders
 
 - [ ] _sn-vcv-lfox_
       - [x] SVG resource
       - [x] Context menu
       - [x] Save/restore
       - [x] AUX out
-      - [ ] VCO out
+      - [x] LFO out
       - [x] Dark mode
-      - [ ] k-rate for output
+      - [x] k-rate for output
       - [ ] Factory presets
       - [ ] Expanders
 

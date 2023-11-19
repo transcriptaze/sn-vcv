@@ -143,7 +143,7 @@ void sn_vcv_lfo::process(const ProcessArgs &args) {
     }
 
     // ... generate
-    processLFO(args, channels, expanded, resync, recalculate);
+    processLFO(args, channels, resync, expanded, recalculate);
     processAUX(args, expanded, resync);
 
     // ... update expanders
@@ -209,7 +209,7 @@ void sn_vcv_lfo::recompute() {
     sn.recompute();
 }
 
-void sn_vcv_lfo::processLFO(const ProcessArgs &args, int channels, bool expanded, bool resync, bool recalculate) {
+void sn_vcv_lfo::processLFO(const ProcessArgs &args, int channels, bool resync, bool expanded, bool recalculate) {
     // ... update instantaneous phase
     float fv = params[FREQUENCY_PARAM].getValue();
     float f = range.frequency(fv);
