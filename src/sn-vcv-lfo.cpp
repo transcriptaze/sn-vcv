@@ -70,7 +70,7 @@ void sn_vcv_lfo::dataFromJson(json_t *root) {
         int v = json_integer_value(krate);
 
         if (v >= 0 && v < 4) {
-            this->update.krate = json_integer_value(krate);
+            update.krate = json_integer_value(krate);
         }
     }
 

@@ -47,8 +47,8 @@ struct sn_vcv_lfox : Module {
     bool isLinkedLeft();
     bool isLinkedRight();
 
-    void settings(bool debug);
-    void recompute(bool debug);
+    void recompute();
+    void processAUX(const ProcessArgs &, bool);
 
     struct SN sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 
@@ -102,8 +102,13 @@ struct sn_vcv_lfox : Module {
         .right = sn_expander<sn_lfo_message>(RIGHT),
     };
 
-    int krate = 0;
-    unsigned int update = 0;
+    struct {
+        int krate;
+        int count;
+    } update{
+        .krate = 0,
+        .count = 0,
+    };
 };
 
 struct sn_vcv_lfoxWidget : ModuleWidget {

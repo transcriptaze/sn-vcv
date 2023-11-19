@@ -28,11 +28,11 @@
 
 - [ ] _sn-vcv-lfox_
       - [x] SVG resource
-      - [ ] Context menu
-      - [ ] Save/restore
-      - [ ] AUX out
+      - [x] Context menu
+      - [x] Save/restore
+      - [x] AUX out
       - [ ] VCO out
-      - [ ] Dark mode
+      - [x] Dark mode
       - [ ] k-rate for output
       - [ ] Factory presets
       - [ ] Expanders

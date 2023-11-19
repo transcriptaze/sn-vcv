@@ -30,7 +30,7 @@ sn_vcv_lfox::sn_vcv_lfox() {
 json_t *sn_vcv_lfox::dataToJson() {
     json_t *root = json_object();
 
-    json_object_set_new(root, "k-rate", json_integer(krate));
+    json_object_set_new(root, "k-rate", json_integer(update.krate));
     json_object_set_new(root, "aux-mode", json_integer(aux.mode));
 
     return root;
@@ -44,7 +44,7 @@ void sn_vcv_lfox::dataFromJson(json_t *root) {
         int v = json_integer_value(krate);
 
         if (v >= 0 && v < 4) {
-            this->krate = json_integer_value(krate);
+            update.krate = json_integer_value(krate);
         }
     }
 
@@ -82,7 +82,6 @@ void sn_vcv_lfox::onExpanderChange(const ExpanderChangeEvent &e) {
 
 void sn_vcv_lfox::process(const ProcessArgs &args) {
     int channels = CHANNELS;
-    // unsigned int krate = KRATE[this->krate];
 
     // ... expanders
     bool expanded = expanders.left.module != NULL || expanders.right.module != NULL;
@@ -138,7 +137,7 @@ void sn_vcv_lfox::process(const ProcessArgs &args) {
     lights[XRL_LIGHT].setBrightnessSmooth(xrl ? 1.f : 0.f, args.sampleTime);
     lights[XRR_LIGHT].setBrightnessSmooth(xrr ? 1.f : 0.f, args.sampleTime);
 
-    // // ... audio
+    // ... audio
     // if (msg != NULL) {
     //     channels = msg->channels;
 
@@ -146,49 +145,36 @@ void sn_vcv_lfox::process(const ProcessArgs &args) {
     //         LFO[ch].phase = msg->LFO[ch].phase;
     //         LFO[ch].out.sum = msg->LFO[ch].out;
     //     }
-
-    //     aux.phase = msg->AUX.phase;
-    //     aux.out.sum = msg->AUX.out;
-
-    //     debug = msg->debug;
     // } else {
     //     for (int ch = 0; ch < channels; ch++) {
     //         LFO[ch].phase = 0.0f;
     //         LFO[ch].out.sum = 0.0f;
     //     }
-
-    //     aux.phase = 0.0f;
-    //     aux.out.sum = 0.0f;
     // }
 
-    // if (debug) {
-    //     INFO("snyth-lfo-x  k-rate:%d", krate);
-    // }
+    // ... get params and recompute transform matrix
+    bool recalculate = false;
 
-    // // ... get params and recompute transform matrix
-    // bool recalculate = false;
+    update.count--;
 
-    // update++;
+    if (update.count <= 0) {
+        recompute();
+        recalculate = true;
+        update.count = KRATE[update.krate];
+    }
 
-    // if (update >= krate) {
-    //     settings(debug);
-    //     recompute(debug);
-    //     recalculate = true;
-    //     update = 0;
-    // }
+    // ... generate
+    if (msg != NULL) {
+        aux.phase = msg->AUX.phase;
+        aux.out.sum = msg->AUX.out;
+    } else {
+        aux.phase = 0.0f;
+        aux.out.sum = 0.0f;
+    }
+
+    processAUX(args, expanded);
 
     // // ... LFO
-    // float m = parameters.m;
-    // float A = parameters.A;
-    // float φ = matrix.φ;
-
-    // float pʼ = matrix.pʼ;
-    // float qʼ = matrix.qʼ;
-    // float rʼ = matrix.rʼ;
-    // float sʼ = matrix.sʼ;
-    // float tʼ = matrix.tʼ;
-    // float uʼ = matrix.uʼ;
-
     // if ((outputs[LFO_OUTPUT].isConnected() || outputs[SUM_OUTPUT].isConnected()) && recalculate) {
     //     for (int ch = 0; ch < channels; ch++) {
     //         float α = 2.0f * M_PI * LFO[ch].phase;
@@ -217,44 +203,6 @@ void sn_vcv_lfox::process(const ProcessArgs &args) {
 
     //     outputs[LFO_OUTPUT].setChannels(channels);
     //     outputs[SUM_OUTPUT].setChannels(channels);
-    // }
-
-    // // ... AUX
-    // if (outputs[AUX_OUTPUT].isConnected() || expanded) {
-    //     float α = 2.0f * M_PI * aux.phase;
-
-    //     float 𝜓 = 0.0f;
-    //     float αʼ = m * (α + 𝜓) - φ;
-
-    //     float x = std::cos(αʼ);
-    //     float y = std::sin(αʼ);
-    //     float xʼ = pʼ * x - qʼ * y + rʼ;
-    //     float yʼ = sʼ * x + tʼ * y + uʼ;
-
-    //     float r = std::hypot(xʼ, yʼ);
-    //     float sn = r > 0.0f ? yʼ / r : 0.0f;
-
-    //     aux.out.osc = sn;
-    //     aux.out.sum += A * sn;
-    // }
-
-    // if (outputs[AUX_OUTPUT].isConnected()) {
-    //     switch (aux.mode) {
-    //     case POLY:
-    //         outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.osc, 0);
-    //         outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.sum, 1);
-    //         outputs[AUX_OUTPUT].setChannels(2);
-    //         break;
-
-    //     case SUM:
-    //         outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.sum);
-    //         outputs[AUX_OUTPUT].setChannels(1);
-    //         break;
-
-    //     default:
-    //         outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.osc);
-    //         outputs[AUX_OUTPUT].setChannels(1);
-    //     }
     // }
 
     // ... update expanders
@@ -297,61 +245,59 @@ void sn_vcv_lfox::process(const ProcessArgs &args) {
     }
 }
 
-void sn_vcv_lfox::settings(bool debug) {
-    // // ... param values
-    // float e = params[ECCENTRICITY_PARAM].getValue();
-    // float s = params[SENSITIVITY_PARAM].getValue();
-    // float θ = params[ROTATION_PARAM].getValue();
-    // float A = params[AMPLITUDE_PARAM].getValue();
-    // float δx = params[DX_PARAM].getValue();
-    // float δy = params[DY_PARAM].getValue();
-    // float Φ = params[PHI_PARAM].getValue();
-    // float m = params[M_PARAM].getValue();
+void sn_vcv_lfox::recompute() {
+    // ... param values
+    float e = params[ECCENTRICITY_PARAM].getValue();
+    float s = params[SENSITIVITY_PARAM].getValue();
+    float θ = params[ROTATION_PARAM].getValue();
+    float A = params[AMPLITUDE_PARAM].getValue();
+    float δx = params[DX_PARAM].getValue();
+    float δy = params[DY_PARAM].getValue();
+    float Φ = params[PHI_PARAM].getValue();
+    float m = params[M_PARAM].getValue();
 
-    // // ... rescale, sanitize and package
-    // parameters.ε = std::tanh(s * e);
-    // parameters.θ = clamp(θ, -89.95f, +89.95f) * M_PI / 180.0f;
-    // parameters.A = A;
-    // parameters.δx = δx;
-    // parameters.δy = δy;
-    // parameters.Φ = Φ;
-    // parameters.m = m;
+    // ... set internal SN parameters
+    sn.ε = std::tanh(s * e);
+    sn.θ = clamp(θ, -89.95f, +89.95f) * M_PI / 180.0f;
+    sn.A = A;
+    sn.δx = δx;
+    sn.δy = δy;
+    sn.Φ = Φ;
+    sn.m = m;
 
-    // if (debug) {
-    //     INFO("snyth-lfo  A:%.3f", A);
-    // }
+    sn.recompute();
 }
 
-// ... recompute transform matrix
-void sn_vcv_lfox::recompute(bool debug) {
-    // float ε = parameters.ε;
-    // float θ = parameters.θ;
-    // float A = parameters.A;
-    // float δx = parameters.δx;
-    // float δy = parameters.δy;
-    // float Φ = parameters.Φ;
+void sn_vcv_lfox::processAUX(const ProcessArgs &args, bool expanded) {
+    if (outputs[AUX_OUTPUT].isConnected() || expanded) {
+        float α = aux.phase * 2.0f * M_PI;
+        float υ = sn.υ(α);
 
-    // float εʼ = std::sqrt(1.0f - ε * ε);
-    // float a = (ε < 0.0f) ? εʼ : 1.0f;
-    // float b = (ε > 0.0f) ? εʼ : 1.0f;
+        aux.out.osc = υ;
+        aux.out.sum += sn.A * υ;
+    } else {
+        aux.out.osc = 0.0f;
+        aux.out.sum = 0.0f;
+    }
 
-    // float cosθ = std::cos(θ);
-    // float sinθ = std::sin(θ);
+    if (outputs[AUX_OUTPUT].isConnected()) {
+        switch (aux.mode) {
+        case POLY:
+            outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.osc, 0);
+            outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.sum, 1);
+            outputs[AUX_OUTPUT].setChannels(2);
+            break;
 
-    // float u = std::atan(-b * std::tan(θ) / a);
-    // float v = std::atan((b / std::tan(θ)) * a);
-    // float tx = a * std::cos(u) * cosθ - b * std::sin(u) * sinθ;
-    // float ty = b * std::sin(v) * cosθ + a * std::cos(v) * sinθ;
-    // float δxʼ = tx * δx;
-    // float δyʼ = ty * δy;
+        case SUM:
+            outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.sum);
+            outputs[AUX_OUTPUT].setChannels(1);
+            break;
 
-    // matrix.pʼ = A * a * cosθ;
-    // matrix.qʼ = A * b * sinθ;
-    // matrix.rʼ = A * δxʼ;
-    // matrix.sʼ = A * a * sinθ;
-    // matrix.tʼ = A * b * cosθ;
-    // matrix.uʼ = A * δyʼ;
-    // matrix.φ = phi(a, b, θ, Φ);
+        default:
+            outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.osc);
+            outputs[AUX_OUTPUT].setChannels(1);
+        }
+    }
 }
 
 bool sn_vcv_lfox::isLinkedLeft() {
@@ -423,7 +369,7 @@ void sn_vcv_lfoxWidget::appendContextMenu(Menu *menu) {
 
     menu->addChild(createIndexPtrSubmenuItem("k-rate",
                                              KRATES,
-                                             &module->krate));
+                                             &module->update.krate));
 
     menu->addChild(createIndexPtrSubmenuItem("aux-mode",
                                              AUX_MODES,
