@@ -20,13 +20,13 @@
 
 - [ ] _sn-vcv-osc_
       - [x] AUX gain
-      - [ ] Remove PSI param
-      - [ ] Update presets
+      - [x] Remove PSI param
+      - [x] Update presets
 
 - [ ] _sn-vcv-oscx_
       - [x] AUX gain
-      - [ ] Remove PSI param
-      - [ ] Update presets
+      - [x] Remove PSI param
+      - [x] Update presets
       - [ ] OUT attenuator
 
 - [ ] _sn-vcv-lfo_
