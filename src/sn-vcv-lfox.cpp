@@ -32,6 +32,7 @@ json_t *sn_vcv_lfox::dataToJson() {
 
     json_object_set_new(root, "k-rate", json_integer(update.krate));
     json_object_set_new(root, "aux-mode", json_integer(aux.mode));
+    json_object_set_new(root, "aux-gain", json_integer(aux.gain));
 
     return root;
 }
@@ -39,6 +40,7 @@ json_t *sn_vcv_lfox::dataToJson() {
 void sn_vcv_lfox::dataFromJson(json_t *root) {
     json_t *krate = json_object_get(root, "k-rate");
     json_t *aux_mode = json_object_get(root, "aux-mode");
+    json_t *gain = json_object_get(root, "aux-gain");
 
     if (krate) {
         int v = json_integer_value(krate);
@@ -57,6 +59,14 @@ void sn_vcv_lfox::dataFromJson(json_t *root) {
             aux.mode = SUM;
         } else if (v == 2)
             aux.mode = POLY;
+    }
+
+    if (gain) {
+        int v = json_integer_value(gain);
+
+        if (v >= 0 && v <= 4) {
+            aux.gain = v;
+        }
     }
 }
 
@@ -270,15 +280,17 @@ void sn_vcv_lfox::processAUX(const ProcessArgs &args, bool expanded) {
     }
 
     if (outputs[AUX_OUTPUT].isConnected()) {
+        float g = AUX_GAIN[aux.gain];
+
         switch (aux.mode) {
         case POLY:
             outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.osc, 0);
-            outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.sum, 1);
+            outputs[AUX_OUTPUT].setVoltage(5.f * g * aux.out.sum, 1);
             outputs[AUX_OUTPUT].setChannels(2);
             break;
 
         case SUM:
-            outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.sum);
+            outputs[AUX_OUTPUT].setVoltage(5.f * g * aux.out.sum);
             outputs[AUX_OUTPUT].setChannels(1);
             break;
 
@@ -363,6 +375,10 @@ void sn_vcv_lfoxWidget::appendContextMenu(Menu *menu) {
     menu->addChild(createIndexPtrSubmenuItem("aux-mode",
                                              AUX_MODES,
                                              &module->aux.mode));
+
+    menu->addChild(createIndexPtrSubmenuItem("aux-gain",
+                                             AUX_GAINS,
+                                             &module->aux.gain));
 }
 
 Model *modelSn_vcv_lfox = createModel<sn_vcv_lfox, sn_vcv_lfoxWidget>("sn-vcv-lfox");

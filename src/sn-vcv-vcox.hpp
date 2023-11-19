@@ -81,6 +81,7 @@ struct sn_vcv_vcox : Module {
 
     struct AUX aux = {
         .mode = POLY,
+        .gain = 0,
         .phase = 0.f,
         .out = {.osc = 0.f, .sum = 0.f},
     };

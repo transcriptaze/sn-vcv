@@ -18,15 +18,18 @@
       - [ ] Greensleeves
       - [ ] Toccata
 
-- [x] _sn-vcv-osc_
+- [ ] _sn-vcv-osc_
+      - [x] AUX gain
       - [ ] Remove PSI param
       - [ ] Update presets
 
-- [x] _sn-vcv-oscx_
+- [ ] _sn-vcv-oscx_
+      - [x] AUX gain
       - [ ] Remove PSI param
       - [ ] Update presets
+      - [ ] OUT attenuator
 
-- [x] _sn-vcv-lfo_
+- [ ] _sn-vcv-lfo_
       - [x] SVG resource
       - [x] Context menu
       - [x] Save/restore
@@ -36,9 +39,9 @@
       - [x] k-rate for output
       - [x] Factory presets
       - [x] Expanders
+      - [x] AUX gain
       - [ ] Fix param order
       - [ ] Fix phase - needs to be multipled by m
-      - [ ] OUT attenuator
 
 - [ ] _sn-vcv-lfox_
       - [x] SVG resource
@@ -50,6 +53,7 @@
       - [x] k-rate for output
       - [x] Expanders
       - [x] Factory presets
+      - [x] AUX gain
       - [ ] Fix phase - needs to be multipled by m
       - [ ] OUT attenuator
 

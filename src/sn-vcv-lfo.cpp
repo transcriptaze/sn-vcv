@@ -54,31 +54,33 @@ sn_vcv_lfo::sn_vcv_lfo() {
 json_t *sn_vcv_lfo::dataToJson() {
     json_t *root = json_object();
 
-    json_object_set_new(root, "k-rate", json_integer(update.krate));
     json_object_set_new(root, "range", json_integer(getRange()));
+    json_object_set_new(root, "k-rate", json_integer(update.krate));
     json_object_set_new(root, "aux-mode", json_integer(aux.mode));
+    json_object_set_new(root, "aux-gain", json_integer(aux.gain));
 
     return root;
 }
 
 void sn_vcv_lfo::dataFromJson(json_t *root) {
-    json_t *krate = json_object_get(root, "k-rate");
     json_t *range = json_object_get(root, "range");
+    json_t *krate = json_object_get(root, "k-rate");
     json_t *aux_mode = json_object_get(root, "aux-mode");
-
-    if (krate) {
-        int v = json_integer_value(krate);
-
-        if (v >= 0 && v < 4) {
-            update.krate = json_integer_value(krate);
-        }
-    }
+    json_t *gain = json_object_get(root, "aux-gain");
 
     if (range) {
         int v = json_integer_value(range);
 
         if (v >= 0 && v <= 2) {
             setRange(json_integer_value(range));
+        }
+    }
+
+    if (krate) {
+        int v = json_integer_value(krate);
+
+        if (v >= 0 && v < 4) {
+            update.krate = json_integer_value(krate);
         }
     }
 
@@ -91,6 +93,14 @@ void sn_vcv_lfo::dataFromJson(json_t *root) {
             aux.mode = SUM;
         } else if (v == 2)
             aux.mode = POLY;
+    }
+
+    if (gain) {
+        int v = json_integer_value(gain);
+
+        if (v >= 0 && v <= 4) {
+            aux.gain = v;
+        }
     }
 }
 
@@ -293,15 +303,17 @@ void sn_vcv_lfo::processAUX(const ProcessArgs &args, bool expanded, bool resync)
     }
 
     if (outputs[AUX_OUTPUT].isConnected()) {
+        float g = AUX_GAIN[aux.gain];
+
         switch (aux.mode) {
         case POLY:
             outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.osc, 0);
-            outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.sum, 1);
+            outputs[AUX_OUTPUT].setVoltage(5.f * g * aux.out.sum, 1);
             outputs[AUX_OUTPUT].setChannels(2);
             break;
 
         case SUM:
-            outputs[AUX_OUTPUT].setVoltage(5.f * aux.out.sum);
+            outputs[AUX_OUTPUT].setVoltage(5.f * g * aux.out.sum);
             outputs[AUX_OUTPUT].setChannels(1);
             break;
 
@@ -400,14 +412,6 @@ void sn_vcv_lfoWidget::appendContextMenu(Menu *menu) {
     menu->addChild(new MenuSeparator);
     menu->addChild(createMenuLabel("sn-lfo settings"));
 
-    menu->addChild(createIndexPtrSubmenuItem("k-rate",
-                                             KRATES,
-                                             &module->update.krate));
-
-    menu->addChild(createIndexPtrSubmenuItem("aux-mode",
-                                             AUX_MODES,
-                                             &module->aux.mode));
-
     menu->addChild(createIndexSubmenuItem(
         "range",
         {"0.1-10Hz", "0.02-2Hz", "0.5-25Hz"},
@@ -417,6 +421,18 @@ void sn_vcv_lfoWidget::appendContextMenu(Menu *menu) {
         [=](int range) {
             module->setRange(range);
         }));
+
+    menu->addChild(createIndexPtrSubmenuItem("k-rate",
+                                             KRATES,
+                                             &module->update.krate));
+
+    menu->addChild(createIndexPtrSubmenuItem("aux-mode",
+                                             AUX_MODES,
+                                             &module->aux.mode));
+
+    menu->addChild(createIndexPtrSubmenuItem("aux-gain",
+                                             AUX_GAINS,
+                                             &module->aux.gain));
 }
 
 Model *modelSn_vcv_lfo = createModel<sn_vcv_lfo, sn_vcv_lfoWidget>("sn-vcv-lfo");

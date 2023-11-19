@@ -13,8 +13,10 @@ const float PI2 = M_PI / 2;    // π/2
 extern const std::vector<unsigned> KRATE;
 extern const std::vector<std::string> KRATES;
 
-// ... AUX modes
+// ... AUX
 extern const float AUX_FREQUENCY;                // auxiliary output fixed frequency (Hz)
+extern const std::vector<float> AUX_GAIN;        // auxiliary output default gain
+extern const std::vector<std::string> AUX_GAINS; // AUX gain labels
 extern const std::vector<std::string> AUX_MODES; // AUX mode labels
 
 enum AUXMODE {
@@ -34,6 +36,7 @@ typedef struct VCO {
 
 typedef struct AUX {
     enum AUXMODE mode;
+    int gain;
     float phase;
     struct {
         float osc;

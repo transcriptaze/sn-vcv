@@ -78,15 +78,9 @@ struct sn_vcv_lfox : Module {
         {.phase = 0.f, .out = {.osc = 0.f, .sum = 0.f}},
     };
 
-    struct {
-        enum AUXMODE mode;
-        float phase;
-        struct {
-            float osc;
-            float sum;
-        } out;
-    } aux = {
+    struct AUX aux = {
         .mode = POLY,
+        .gain = 0,
         .phase = 0.f,
         .out = {.osc = 0.f, .sum = 0.f},
     };
