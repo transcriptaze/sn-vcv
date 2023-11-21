@@ -30,9 +30,9 @@
       - [x] AUX gain
       - [x] Remove PSI param
       - [x] Update presets
-      - [ ] Reinstate PSI param as a placeholder
+      - [x] Reinstate PSI param as a placeholder
+      - [x] OUT attenuator
       - [ ] Move AUX to top of outputs (future)
-      - [ ] OUT attenuator
 
 - [ ] _sn-vcv-lfo_
       - [x] AUX gain

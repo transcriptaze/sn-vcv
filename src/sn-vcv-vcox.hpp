@@ -13,6 +13,7 @@ struct sn_vcv_vcox : Module {
         DY_PARAM,
         PLACEHOLDER_PARAM,
         M_PARAM,
+        GAIN_PARAM,
         PARAMS_LEN
     };
 
