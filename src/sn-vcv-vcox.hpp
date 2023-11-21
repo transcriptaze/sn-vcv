@@ -11,6 +11,7 @@ struct sn_vcv_vcox : Module {
         AMPLITUDE_PARAM,
         DX_PARAM,
         DY_PARAM,
+        PLACEHOLDER_PARAM,
         M_PARAM,
         PARAMS_LEN
     };
