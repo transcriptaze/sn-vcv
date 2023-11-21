@@ -239,7 +239,7 @@ void sn_vcv_lfox::recompute() {
     sn.A = A;
     sn.δx = δx;
     sn.δy = δy;
-    sn.Φ = Φ;
+    sn.Φ = clamp(Φ, -89.95f, +89.95f) * M_PI / 180.0f;
     sn.m = m;
 
     sn.recompute();

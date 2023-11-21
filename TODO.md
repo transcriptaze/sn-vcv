@@ -7,6 +7,7 @@
             - [ ] Linux
       - https://github.com/qno/vcv-plugin-github-actions-example/blob/main/.github/workflows/build-plugin.yml
 
+- [ ] Fix logo so that blue goes back to blue
 - [ ] README
 - [ ] github tags
 - [ ] Demo patches
@@ -30,30 +31,12 @@
       - [ ] OUT attenuator
 
 - [ ] _sn-vcv-lfo_
-      - [x] SVG resource
-      - [x] Context menu
-      - [x] Save/restore
-      - [x] AUX out
-      - [x] LFO out
-      - [x] Dark mode
-      - [x] k-rate for output
-      - [x] Factory presets
-      - [x] Expanders
       - [x] AUX gain
       - [x] Fix param order
-      - [ ] Fix phase - needs to be multipled by m
+      - [x] Fix phase
 
 - [ ] _sn-vcv-lfox_
-      - [x] SVG resource
-      - [x] Context menu
-      - [x] Save/restore
-      - [x] AUX out
-      - [x] LFO out
-      - [x] Dark mode
-      - [x] k-rate for output
-      - [x] Expanders
-      - [x] Factory presets
       - [x] AUX gain
-      - [ ] Fix phase - needs to be multipled by m
+      - [x] Fix phase
       - [ ] OUT attenuator
 
