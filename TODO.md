@@ -40,9 +40,9 @@
       - [x] Fix phase
       - [x] Move AUX to top of outputs (future)
 
-- [ ] _sn-vcv-lfox_
+- [x] _sn-vcv-lfox_
       - [x] AUX gain
       - [x] Fix phase
       - [x] Move AUX to top of outputs (future)
-      - [ ] OUT attenuator
+      - [x] OUT attenuator
 

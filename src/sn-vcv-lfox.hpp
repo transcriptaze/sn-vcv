@@ -24,9 +24,9 @@ struct sn_vcv_lfox : Module {
     };
 
     enum OutputId {
+        AUX_OUTPUT,
         LFO_OUTPUT,
         SUM_OUTPUT,
-        AUX_OUTPUT,
         OUTPUTS_LEN
     };
 
