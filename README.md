@@ -29,7 +29,7 @@ more detail [here](https://github.com/transcriptaze/snyth) if you're really curi
 
 ### Parameters
 
-The modules use the following parameters to determine the wave shape:
+The modules all use the following parameters to determine the wave shape:
 
 | Parameter | Range | Name           | Description                                                     |
 |-----------|-------|----------------|-----------------------------------------------------------------|
@@ -44,39 +44,6 @@ The modules use the following parameters to determine the wave shape:
 
 
 ## Modules
-
-### _sn-vco_
-
-_sn-vco_ is a more or less standard VCO module except that it produces a _sn_ output rather than a _sine_:
-
-| Input      | Range | Name           | Description                                                    |
-|------------|-------|----------------|----------------------------------------------------------------|
-| _pitch_    | ±5V   | _frequency_    | Polyphonal 1V/octave pitch input, normalized for C4 at 0V      |
-| _velocity_ | 0-10V | _velocity_     | Polyphonal MIDI note velocity input. Defaults to 10V (127)     |
-|            |       |                |                                                                |
-| _ε_        | ±5V   | _eccentricity_ | Overrides the _eccentricity_ parameter control                 |
-| _s_        | 0-10V | _sensitivity_  | Overrides the _sensitivity_ parameter control                  |
-| _θ_        | ±5V   | _rotation_     | Overrides the _rotation_ parameter control                     |
-| _a_        | 0-10V | _amplitude_    | Overrides the _amplitude_ parameter control                    |
-| _δx_       | ±5V   | _shift-x_      | Overrides the _shift-x_ parameter control                      |
-| _δy_       | ±5V   | _shift-y_      | Overrides the _shift-y_ parameter control                      |
-
-| Output      | Range | Name          | Description                                                    |
-|------------|-------|----------------|----------------------------------------------------------------|
-| _VCO_      | ±5V   | _VCO_          | Polyphonal VCO audio output                                    |
-| _AUX_      | ±5V   | _AUX_          | 2 channel 25Hz signal 'monitor' output for use with the scope  |
-| _TRIG_     | 0-10V | _trigger_      | Trigger output for the AUX output                              |
-
-#### Context Menu
-
-1. _k-rate_
-   Sets the rate at which the parameter values are used to recalculate the waveform.
-
-2. _aux-mode_
-   Sets the AUX output mode:
-   - _OSC_ outputs a 25Hz 'monitor' waveform
-   - _SUM_ outputs the summed 25Hz 'monitor' waveform
-   - _POLY_ outputs the monitor wave form on channel 1 and the summed monitor waveform on channel 2 |
 
 ### _sn-vcox_
 

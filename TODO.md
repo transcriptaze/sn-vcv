@@ -1,5 +1,6 @@
 # TODO
 
+- [x] github tags
 - [ ] github workflow
       - [ ] Nightlies
             - [ ] Windows
@@ -11,10 +12,10 @@
       - https://community.vcvrack.com/t/rack-development-blog/5864/84
 
 - [ ] Fix logo so that blue goes back to blue
+
 - [ ] README
       - `convert *.png -crop 392x331+281+90 cropped/screenshot%d.png`
 
-- [ ] github tags
 - [ ] Demo patches
       - [x] sn-vco
       - [x] sn-vcox
