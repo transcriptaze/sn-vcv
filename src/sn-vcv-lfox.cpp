@@ -13,8 +13,10 @@ sn_vcv_lfox::sn_vcv_lfox() {
     configParam(DY_PARAM, -1.0f, +1.0f, 0.0f, "δy");
     configParam(PHI_PARAM, -90.0f, +90.0f, 0.0f, "Φ");
     configSwitch(M_PARAM, 1.f, 5.f, 1.f, "m", {"1", "2", "3", "4", "5"});
+    configParam(ATT_PARAM, 0.0f, +1.0f, 1.0f, "ɡ");
 
     getParamQuantity(M_PARAM)->randomizeEnabled = false;
+    getParamQuantity(ATT_PARAM)->randomizeEnabled = false;
 
     configOutput(LFO_OUTPUT, "LFO");
     configOutput(SUM_OUTPUT, "Summed");
@@ -163,16 +165,16 @@ void sn_vcv_lfox::process(const ProcessArgs &args) {
         channels = msg->channels;
 
         for (int ch = 0; ch < channels; ch++) {
-            LFO[ch].phase = msg->LFO[ch].phase;
-            LFO[ch].out.sum = msg->LFO[ch].out;
+            lfo[ch].phase = msg->LFO[ch].phase;
+            lfo[ch].out.sum = msg->LFO[ch].out;
         }
 
         aux.phase = msg->AUX.phase;
         aux.out.sum = msg->AUX.out;
     } else {
         for (int ch = 0; ch < channels; ch++) {
-            LFO[ch].phase = 0.0f;
-            LFO[ch].out.sum = 0.0f;
+            lfo[ch].phase = 0.0f;
+            lfo[ch].out.sum = 0.0f;
         }
 
         aux.phase = 0.0f;
@@ -191,8 +193,8 @@ void sn_vcv_lfox::process(const ProcessArgs &args) {
             msg->channels = channels;
 
             for (int ch = 0; ch < channels; ch++) {
-                msg->LFO[ch].phase = LFO[ch].phase;
-                msg->LFO[ch].out = LFO[ch].out.sum;
+                msg->LFO[ch].phase = lfo[ch].phase;
+                msg->LFO[ch].out = lfo[ch].out.sum;
             }
 
             msg->AUX.phase = aux.phase;
@@ -210,8 +212,8 @@ void sn_vcv_lfox::process(const ProcessArgs &args) {
             msg->channels = channels;
 
             for (int ch = 0; ch < channels; ch++) {
-                msg->LFO[ch].phase = LFO[ch].phase;
-                msg->LFO[ch].out = LFO[ch].out.sum;
+                msg->LFO[ch].phase = lfo[ch].phase;
+                msg->LFO[ch].out = lfo[ch].out.sum;
             }
 
             msg->AUX.phase = aux.phase;
@@ -246,20 +248,22 @@ void sn_vcv_lfox::recompute() {
 }
 
 void sn_vcv_lfox::processLFO(const ProcessArgs &args, int channels, bool expanded, bool recalculate) {
+    float gain = params[ATT_PARAM].getValue();
+
     if ((outputs[LFO_OUTPUT].isConnected() || outputs[SUM_OUTPUT].isConnected() || expanded) && recalculate) {
         for (int ch = 0; ch < channels; ch++) {
-            float α = 2.0f * M_PI * LFO[ch].phase;
+            float α = 2.0f * M_PI * lfo[ch].phase;
             float υ = sn.υ(α);
 
-            LFO[ch].out.osc = υ;
-            LFO[ch].out.sum += sn.A * υ;
+            lfo[ch].out.lfo = υ;
+            lfo[ch].out.sum += sn.A * υ;
         }
     }
 
     if (outputs[LFO_OUTPUT].isConnected() || outputs[SUM_OUTPUT].isConnected()) {
         for (int ch = 0; ch < channels; ch++) {
-            outputs[LFO_OUTPUT].setVoltage(5.f * LFO[ch].out.osc, ch);
-            outputs[SUM_OUTPUT].setVoltage(5.f * LFO[ch].out.sum, ch);
+            outputs[LFO_OUTPUT].setVoltage(5.f * lfo[ch].out.lfo, ch);
+            outputs[SUM_OUTPUT].setVoltage(5.f * gain * lfo[ch].out.sum, ch);
         }
 
         outputs[LFO_OUTPUT].setChannels(channels);
@@ -323,6 +327,7 @@ sn_vcv_lfoxWidget::sn_vcv_lfoxWidget(sn_vcv_lfox *module) {
     Vec δy(left, top + 5 * dh);
     Vec 𝜓(left, top + 6 * dh);
     Vec m(left, top + 7 * dh);
+    Vec param_att(right, top + 0.5 * dh);
 
     Vec aux(right, top + 4 * dh);
     Vec lfo(right, top + 6 * dh);
@@ -349,6 +354,9 @@ sn_vcv_lfoxWidget::sn_vcv_lfoxWidget(sn_vcv_lfox *module) {
     addParam(createParamCentered<RoundBlackKnob>(mm2px(δy), module, sn_vcv_lfox::DY_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(𝜓), module, sn_vcv_lfox::PHI_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(m), module, sn_vcv_lfox::M_PARAM));
+
+    // ... ATT
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_att), module, sn_vcv_lfox::ATT_PARAM));
 
     // ... outputs
     addOutput(createOutputCentered<PJ301MPort>(mm2px(lfo), module, sn_vcv_lfox::LFO_OUTPUT));

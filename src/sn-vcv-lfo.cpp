@@ -165,8 +165,8 @@ void sn_vcv_lfo::process(const ProcessArgs &args) {
             msg->channels = channels;
 
             for (int ch = 0; ch < channels; ch++) {
-                msg->LFO[ch].phase = LFO.phase[ch];
-                msg->LFO[ch].out = LFO.out[ch];
+                msg->LFO[ch].phase = lfo[ch].phase;
+                msg->LFO[ch].out = lfo[ch].out.sum;
             }
 
             msg->AUX.phase = aux.phase;
@@ -184,8 +184,8 @@ void sn_vcv_lfo::process(const ProcessArgs &args) {
             msg->channels = channels;
 
             for (int ch = 0; ch < channels; ch++) {
-                msg->LFO[ch].phase = LFO.phase[ch];
-                msg->LFO[ch].out = LFO.out[ch];
+                msg->LFO[ch].phase = lfo[ch].phase;
+                msg->LFO[ch].out = lfo[ch].out.sum;
             }
 
             msg->AUX.phase = aux.phase;
@@ -233,34 +233,35 @@ void sn_vcv_lfo::processLFO(const ProcessArgs &args, int channels, bool resync, 
 
     for (int ch = 0; ch < 16; ch++) {
         if (ch < channels) {
-            LFO.phase[ch] += frequency[ch] * args.sampleTime;
-            if (LFO.phase[ch] >= 1.f) {
-                LFO.phase[ch] -= 1.f;
+            lfo[ch].phase += frequency[ch] * args.sampleTime;
+            if (lfo[ch].phase >= 1.f) {
+                lfo[ch].phase -= 1.f;
             }
         } else {
-            LFO.phase[ch] = 0.f;
+            lfo[ch].phase = 0.f;
         }
     }
 
     if (resync) {
         for (int ch = 0; ch < 16; ch++) {
-            LFO.phase[ch] = 0.f;
+            lfo[ch].phase = 0.f;
         }
     }
 
     // ... generate LFO signal
     if ((outputs[LFO_OUTPUT].isConnected() || expanded) && recalculate) {
         for (int ch = 0; ch < channels; ch++) {
-            float α = 2.0f * M_PI * LFO.phase[ch];
+            float α = 2.0f * M_PI * lfo[ch].phase;
             float υ = sn.υ(α);
 
-            LFO.out[ch] = sn.A * υ;
+            lfo[ch].out.lfo = υ;
+            lfo[ch].out.sum = sn.A * υ;
         }
     }
 
     if (outputs[LFO_OUTPUT].isConnected()) {
         for (int ch = 0; ch < channels; ch++) {
-            outputs[LFO_OUTPUT].setVoltage(5.f * LFO.out[ch], ch);
+            outputs[LFO_OUTPUT].setVoltage(5.f * lfo[ch].out.lfo, ch);
         }
 
         outputs[LFO_OUTPUT].setChannels(channels);

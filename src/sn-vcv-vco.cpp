@@ -15,6 +15,7 @@ sn_vcv_vco::sn_vcv_vco() {
     configParam(DY_PARAM, -1.0f, +1.0f, 0.0f, "δy");
     configSwitch(M_PARAM, 1.f, 5.f, 1.f, "m", {"1", "2", "3", "4", "5"});
 
+    getParamQuantity(PLACEHOLDER_PARAM)->randomizeEnabled = false;
     getParamQuantity(M_PARAM)->randomizeEnabled = false;
 
     configInput(ECCENTRICITY_INPUT, "±5V ε");

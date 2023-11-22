@@ -72,12 +72,23 @@ struct sn_vcv_lfo : Module {
 
     struct SN sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 
-    struct {
-        float phase[16];
-        float out[16];
-    } LFO = {
-        .phase = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f},
-        .out = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f},
+    struct LFO lfo[16] = {
+        {.phase = 0.f, .out = {.lfo = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .out = {.lfo = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .out = {.lfo = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .out = {.lfo = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .out = {.lfo = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .out = {.lfo = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .out = {.lfo = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .out = {.lfo = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .out = {.lfo = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .out = {.lfo = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .out = {.lfo = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .out = {.lfo = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .out = {.lfo = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .out = {.lfo = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .out = {.lfo = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .out = {.lfo = 0.f, .sum = 0.f}},
     };
 
     struct AUX aux = {

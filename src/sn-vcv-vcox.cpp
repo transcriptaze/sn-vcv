@@ -11,10 +11,12 @@ sn_vcv_vcox::sn_vcv_vcox() {
     configParam(AMPLITUDE_PARAM, 0.0f, +1.0f, 1.0f, "a");
     configParam(DX_PARAM, -1.0f, +1.0f, 0.0f, "δx");
     configParam(DY_PARAM, -1.0f, +1.0f, 0.0f, "δy");
-    configParam(GAIN_PARAM, 0.0f, +1.0f, 1.0f, "ɡ");
     configSwitch(M_PARAM, 1.f, 5.f, 2.f, "m", {"1", "2", "3", "4", "5"});
+    configParam(ATT_PARAM, 0.0f, +1.0f, 1.0f, "ɡ");
 
+    getParamQuantity(PLACEHOLDER_PARAM)->randomizeEnabled = false;
     getParamQuantity(M_PARAM)->randomizeEnabled = false;
+    getParamQuantity(ATT_PARAM)->randomizeEnabled = false;
 
     configInput(ECCENTRICITY_INPUT, "±5V ε");
     configInput(SENSITIVITY_INPUT, "0-10V s");
@@ -238,7 +240,7 @@ void sn_vcv_vcox::process(const ProcessArgs &args) {
 
 void sn_vcv_vcox::processVCO(const ProcessArgs &args, int channels, bool expanded) {
     bool connected = outputs[VCO_OUTPUT].isConnected() | outputs[VCO_SUM_OUTPUT].isConnected();
-    float gain = params[GAIN_PARAM].getValue();
+    float gain = params[ATT_PARAM].getValue();
 
     if (connected || expanded) {
         for (int ch = 0; ch < channels; ch++) {
@@ -368,7 +370,7 @@ sn_vcv_vcoxWidget::sn_vcv_vcoxWidget(sn_vcv_vcox *module) {
     Vec param_δx(middle, top + 4 * dh);
     Vec param_δy(middle, top + 5 * dh);
     Vec param_m(middle, top + 6 * dh);
-    Vec param_g(right, top + 0.5 * dh);
+    Vec param_att(right, top + 0.5 * dh);
 
     Vec aux(right, top + 4 * dh);
     Vec vco(right, top + 6 * dh);
@@ -386,35 +388,24 @@ sn_vcv_vcoxWidget::sn_vcv_vcoxWidget(sn_vcv_vcox *module) {
     addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
     addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-    // ... e
+    // ... parameters
     addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_e), module, sn_vcv_vcox::ECCENTRICITY_INPUT));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_e), module, sn_vcv_vcox::ECCENTRICITY_PARAM));
-
-    // ... s
     addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_s), module, sn_vcv_vcox::SENSITIVITY_INPUT));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_s), module, sn_vcv_vcox::SENSITIVITY_PARAM));
-
-    // ... θ
     addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_θ), module, sn_vcv_vcox::ROTATION_INPUT));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_θ), module, sn_vcv_vcox::ROTATION_PARAM));
-
-    // ... A
     addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_A), module, sn_vcv_vcox::AMPLITUDE_INPUT));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_A), module, sn_vcv_vcox::AMPLITUDE_PARAM));
-
-    // ... δx
     addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_δx), module, sn_vcv_vcox::DX_INPUT));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_δx), module, sn_vcv_vcox::DX_PARAM));
-
-    // ... δy
     addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_δy), module, sn_vcv_vcox::DY_INPUT));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_δy), module, sn_vcv_vcox::DY_PARAM));
 
-    // ... m
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_e), module, sn_vcv_vcox::ECCENTRICITY_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_s), module, sn_vcv_vcox::SENSITIVITY_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_θ), module, sn_vcv_vcox::ROTATION_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_A), module, sn_vcv_vcox::AMPLITUDE_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_δx), module, sn_vcv_vcox::DX_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_δy), module, sn_vcv_vcox::DY_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(param_m), module, sn_vcv_vcox::M_PARAM));
 
     // ... ATT
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_g), module, sn_vcv_vcox::GAIN_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_att), module, sn_vcv_vcox::ATT_PARAM));
 
     // ... aux, VCO and VCO-Σ outputs
     addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(aux), module, sn_vcv_vcox::AUX_OUTPUT));

@@ -12,9 +12,9 @@
 - [ ] github tags
 - [ ] Demo patches
       - [x] sn-vco
-      - [ ] sn-vcox
+      - [x] sn-vcox
       - [x] sn-lfo
-      - [ ] sn-lfox
+      - [x] sn-lfox
       - [ ] sn-vcv
       - [ ] Greensleeves
       - [ ] Toccata
@@ -43,6 +43,6 @@
 - [ ] _sn-vcv-lfox_
       - [x] AUX gain
       - [x] Fix phase
+      - [x] Move AUX to top of outputs (future)
       - [ ] OUT attenuator
-      - [ ] Move AUX to top of outputs (future)
 

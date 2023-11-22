@@ -34,6 +34,14 @@ typedef struct VCO {
     } out;
 } VCO;
 
+typedef struct LFO {
+    float phase;
+    struct {
+        float lfo;
+        float sum;
+    } out;
+} LFO;
+
 typedef struct AUX {
     enum AUXMODE mode;
     int gain;
