@@ -7,7 +7,7 @@ generator function.
 
 - [Background](#background)
 - [Modules](#modules)
-   - [sn vco](#sn-vco)
+   - [sn vco](/documentation/sn-vco.md)
    - [sn vcox](#sn-vcox)
    - [sn lfo](#sn-lfo)
    - [sn lfox](#sn-lfox)

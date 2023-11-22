@@ -6,9 +6,14 @@
             - [ ] Mac
             - [ ] Linux
       - https://github.com/qno/vcv-plugin-github-actions-example/blob/main/.github/workflows/build-plugin.yml
+      - https://community.vcvrack.com/t/help-needed-for-beta-testing/20711/30
+      - https://community.vcvrack.com/t/automated-building-and-releasing-plugins-on-github-with-github-actions/11364
+      - https://community.vcvrack.com/t/rack-development-blog/5864/84
 
 - [ ] Fix logo so that blue goes back to blue
 - [ ] README
+      - `convert *.png -crop 392x331+281+90 cropped/screenshot%d.png`
+
 - [ ] github tags
 - [ ] Demo patches
       - [x] sn-vco
