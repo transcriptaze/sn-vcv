@@ -2,15 +2,17 @@
 
 # sn-vcv
 
-A set of VCV modules for the _sn_ experimental additive synthesizer which uses the _Jacobi ellipse_ as the 
-generator function.
+A set of VCV modules for the _sn_ experimental additive synthesizer which uses the _sn_ function as the 
+generator function instead of the more usual _sine_. The modules comprise:
+- a _stackable_ VCO with a waveshape that can be smoothly modified by either manual controls or control voltages from e.g. an LCO.
+- a _stackable_ LFO with a waveshape that can be composed from multiple harmonics with individually controlled waveshapes.
 
 - [Background](#background)
 - [Modules](#modules)
-   - [sn vco](/documentation/sn-vco.md)
-   - [sn vcox](#sn-vcox)
-   - [sn lfo](#sn-lfo)
-   - [sn lfox](#sn-lfox)
+   - [sn-vco](/documentation/sn-vco.md)
+   - [sn-vcox](#sn-vcox)
+   - [sn-lfo](#sn-lfo)
+   - [sn-lfox](#sn-lfox)
 - [Patches](#patches)
 - [License](#license)
 
