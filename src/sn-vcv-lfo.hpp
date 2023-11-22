@@ -43,9 +43,9 @@ struct sn_vcv_lfo : Module {
     };
 
     enum OutputId {
-        LFO_OUTPUT,
         AUX_OUTPUT,
         AUX_TRIGGER,
+        LFO_OUTPUT,
         OUTPUTS_LEN
     };
 

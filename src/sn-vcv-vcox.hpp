@@ -28,9 +28,9 @@ struct sn_vcv_vcox : Module {
     };
 
     enum OutputId {
+        AUX_OUTPUT,
         VCO_OUTPUT,
         VCO_SUM_OUTPUT,
-        AUX_OUTPUT,
         OUTPUTS_LEN
     };
 

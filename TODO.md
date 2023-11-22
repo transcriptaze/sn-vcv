@@ -24,21 +24,21 @@
       - [x] Remove PSI param
       - [x] Update presets
       - [x] Reinstate PSI param as a placeholder
-      - [ ] Move AUX to top of outputs (future)
+      - [x] Move AUX to top of outputs (future)
 
-- [ ] _sn-vcv-oscx_
+- [x] _sn-vcv-oscx_
       - [x] AUX gain
       - [x] Remove PSI param
       - [x] Update presets
       - [x] Reinstate PSI param as a placeholder
       - [x] OUT attenuator
-      - [ ] Move AUX to top of outputs (future)
+      - [x] Move AUX to top of outputs (future)
 
-- [ ] _sn-vcv-lfo_
+- [x] _sn-vcv-lfo_
       - [x] AUX gain
       - [x] Fix param order
       - [x] Fix phase
-      - [ ] Move AUX to top of outputs (future)
+      - [x] Move AUX to top of outputs (future)
 
 - [ ] _sn-vcv-lfox_
       - [x] AUX gain

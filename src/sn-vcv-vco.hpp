@@ -30,9 +30,9 @@ struct sn_vcv_vco : Module {
     };
 
     enum OutputId {
-        VCO_OUTPUT,
         AUX_OUTPUT,
         AUX_TRIGGER,
+        VCO_OUTPUT,
         OUTPUTS_LEN
     };
 
