@@ -12,7 +12,7 @@
       - https://community.vcvrack.com/t/rack-development-blog/5864/84
 
 - [x] Fix logo so that blue goes back to blue
-- [ ] Include as snyth submodule
+- [x] Include as snyth submodule
 
 - [ ] README
       - `convert *.png -crop 392x331+281+90 cropped/screenshot%d.png`
