@@ -33,7 +33,7 @@
       - [x] Update presets
       - [x] Reinstate PSI param as a placeholder
       - [x] Move AUX to top of outputs (future)
-      - [ ] Make inputs additive
+      - [x] Make inputs additive
 
 - [x] _sn-vcv-oscx_
       - [x] AUX gain

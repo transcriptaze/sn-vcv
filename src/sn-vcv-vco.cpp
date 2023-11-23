@@ -19,9 +19,9 @@ sn_vcv_vco::sn_vcv_vco() {
     getParamQuantity(M_PARAM)->randomizeEnabled = false;
 
     configInput(ECCENTRICITY_INPUT, "±5V ε");
-    configInput(SENSITIVITY_INPUT, "0-10V s");
+    configInput(SENSITIVITY_INPUT, "±5V s");
     configInput(ROTATION_INPUT, "±5V Φ");
-    configInput(AMPLITUDE_INPUT, "0-10V a");
+    configInput(AMPLITUDE_INPUT, "±5V a");
     configInput(DX_INPUT, "±5V δx");
     configInput(DY_INPUT, "±5V δy");
 
@@ -263,35 +263,38 @@ void sn_vcv_vco::recompute() {
 
     // ... override with inputs
     if (inputs[ECCENTRICITY_INPUT].isConnected()) {
-        e = clamp(inputs[ECCENTRICITY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+        e = e + clamp(inputs[ECCENTRICITY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
     }
 
     if (inputs[SENSITIVITY_INPUT].isConnected()) {
-        s = clamp(inputs[SENSITIVITY_INPUT].getVoltage() / 2.0f, 0.0f, +5.0f);
+        s = s + clamp(inputs[SENSITIVITY_INPUT].getVoltage() / 1.0f, -5.0f, +5.0f);
     }
 
     if (inputs[ROTATION_INPUT].isConnected()) {
-        θ = clamp(90.0f * inputs[ROTATION_INPUT].getVoltage() / 5.0f, -90.0f, +90.0f);
+        θ = θ + 90.0f * clamp(inputs[ROTATION_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
     }
 
     if (inputs[AMPLITUDE_INPUT].isConnected()) {
-        A = clamp(inputs[AMPLITUDE_INPUT].getVoltage() / 10.0f, 0.0f, 1.0f);
+        A = A + clamp(inputs[AMPLITUDE_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
     }
 
     if (inputs[DX_INPUT].isConnected()) {
-        δx = clamp(inputs[DX_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+        δx = δx + clamp(inputs[DX_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
     }
 
     if (inputs[DY_INPUT].isConnected()) {
-        δy = clamp(inputs[DY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+        δy = δy + clamp(inputs[DY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
     }
 
     // ... set internal SN parameters
+    e = clamp(e, -1.0f, +1.0f);
+    s = clamp(s, 0.0f, +5.0f);
+
     sn.ε = std::tanh(s * e);
     sn.θ = clamp(θ, -89.95f, +89.95f) * M_PI / 180.0f;
-    sn.A = A;
-    sn.δx = δx;
-    sn.δy = δy;
+    sn.A = clamp(A, 0.0f, +1.0f);
+    sn.δx = clamp(δx, -1.0f, +1.0f);
+    sn.δy = clamp(δy, -1.0f, +1.0f);
     sn.m = m;
 
     sn.recompute();
