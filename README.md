@@ -42,6 +42,12 @@ The modules all use the following parameters to determine the wave shape:
 | _Φ_       | ±90°  | _phase_        | Adjust a harmonic phase offset                                  |
 | _m_       | 1-5   | _multiplier_   | Base frequency multiplier                                       |
 
+## Installation
+
+### VCV Rack Library
+
+### Building from source
+
 
 ## Modules
 
@@ -174,7 +180,7 @@ _Requires_:
 
 ## License
 
-[GPL-3.0](https://github.com/transcriptaze/sn-vcv/blob/master/LICENSE). 
+The source code and panel files are licensed under [Gnu General Public License v3](https://github.com/transcriptaze/sn-vcv/blob/master/LICENSE). 
 
 
 

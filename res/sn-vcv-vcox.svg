@@ -249,13 +249,13 @@
 
   <g inkscape:groupmode="layer" inkscape:label="logo" transform="translate(0.0,7.62)"
      fill="none" stroke-width="0.5" stroke-linejoin="round" stroke-opacity="0.5">
-    <path d="M 0,-1.27 l11.43,0.0 l1.27,1.27  l1.27,0" stroke="red" />
-    <path d="M 0,0.0   l11.43,0.0 l1.27,-1.27 l1.27,0" stroke="green" />
-    <path d="M 0,1.27  l13.97,0.0001"                  stroke="blue" />
+    <path d="M 0,-1.27 l5.08,0.0 l1.27,1.27  l2.54,0 l1.27,1.27 l3.81,0" stroke="red" />
+    <path d="M 0,0.0   l5.08,0.0 l1.27,-1.27 l3.81,0 l1.27,1.27 l2.54,0" stroke="green" />
+    <path d="M 0,1.27  l8.89,0.0 l2.54,-2.54 l2.54,0" stroke="blue" />
 
-    <path d="M 31.75,-1.27 l3.175,0.0 l1.27,1.27 l9.525,0.0" stroke="green" />
-    <path d="M 31.75,0.0   l2.54,0.0 l1.27,1.27  l10.16,0.0" stroke="red" />
-    <path d="M 31.75,1.27  l2.54,0.0 l2.54,-2.54 l8.89,0.0"  stroke="blue" />
+    <path d="M 31.75,-1.27 l5.08,0.0 l1.27,1.27  l2.54,0 l1.27,1.27 l3.81,0" stroke="blue" />
+    <path d="M 31.75,0.0   l5.08,0.0 l1.27,-1.27 l3.81,0 l1.27,1.27 l2.54,0" stroke="green" />
+    <path d="M 31.75,1.27  l8.89,0.0 l2.54,-2.54 l2.54,0" stroke="red" />
   </g>
 
 </svg>
