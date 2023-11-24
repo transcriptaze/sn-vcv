@@ -218,7 +218,7 @@ void sn_vcv_vco::processAUX(const ProcessArgs &args, bool expanded) {
         float α = aux.phase * 2.0f * M_PI;
         float υ = sn.υ(α);
 
-        aux.out.osc = υ;
+        aux.out.osc = sn.A * υ;
         aux.out.sum = sn.A * υ;
     } else {
         aux.out.osc = 0.0f;
@@ -262,36 +262,21 @@ void sn_vcv_vco::recompute() {
     float m = params[M_PARAM].getValue();
 
     // ... override with inputs
-    if (inputs[ECCENTRICITY_INPUT].isConnected()) {
-        e = e + clamp(inputs[ECCENTRICITY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
-    }
+    e += clamp(inputs[ECCENTRICITY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    s += 5.0f * clamp(inputs[SENSITIVITY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    θ += 90.0f * clamp(inputs[ROTATION_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    A += clamp(inputs[AMPLITUDE_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    δx += clamp(inputs[DX_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    δy += clamp(inputs[DY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
 
-    if (inputs[SENSITIVITY_INPUT].isConnected()) {
-        s = s + clamp(inputs[SENSITIVITY_INPUT].getVoltage() / 1.0f, -5.0f, +5.0f);
-    }
-
-    if (inputs[ROTATION_INPUT].isConnected()) {
-        θ = θ + 90.0f * clamp(inputs[ROTATION_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
-    }
-
-    if (inputs[AMPLITUDE_INPUT].isConnected()) {
-        A = A + clamp(inputs[AMPLITUDE_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
-    }
-
-    if (inputs[DX_INPUT].isConnected()) {
-        δx = δx + clamp(inputs[DX_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
-    }
-
-    if (inputs[DY_INPUT].isConnected()) {
-        δy = δy + clamp(inputs[DY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
-    }
-
-    // ... set internal SN parameters
+    // ... preconditioning
     e = clamp(e, -1.0f, +1.0f);
     s = clamp(s, 0.0f, +5.0f);
+    θ = clamp(θ, -89.95f, +89.95f);
 
+    // ... recalculate SN parameters
     sn.ε = std::tanh(s * e);
-    sn.θ = clamp(θ, -89.95f, +89.95f) * M_PI / 180.0f;
+    sn.θ = θ * M_PI / 180.0f;
     sn.A = clamp(A, 0.0f, +1.0f);
     sn.δx = clamp(δx, -1.0f, +1.0f);
     sn.δy = clamp(δy, -1.0f, +1.0f);

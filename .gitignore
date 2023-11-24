@@ -5,4 +5,5 @@
 /*.dylib
 /*.dll
 assets
+documentation/patches/sn-vcv-dev.vcv
 

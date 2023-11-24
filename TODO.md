@@ -33,7 +33,7 @@
       - [x] Update presets
       - [x] Reinstate PSI param as a placeholder
       - [x] Move AUX to top of outputs (future)
-      - [x] Make inputs additive
+      - [x] Add inputs to params
 
 - [x] _sn-vcv-oscx_
       - [x] AUX gain
@@ -42,19 +42,19 @@
       - [x] Reinstate PSI param as a placeholder
       - [x] OUT attenuator
       - [x] Move AUX to top of outputs (future)
-      - [ ] Make inputs additive
+      - [x] Add inputs to params
 
 - [x] _sn-vcv-lfo_
       - [x] AUX gain
       - [x] Fix param order
       - [x] Fix phase
       - [x] Move AUX to top of outputs (future)
-      - [ ] Make inputs additive
+      - [ ] Add inputs to params
 
 - [x] _sn-vcv-lfox_
       - [x] AUX gain
       - [x] Fix phase
       - [x] Move AUX to top of outputs (future)
       - [x] OUT attenuator
-      - [ ] Make inputs additive
+      - [ ] Add inputs to params
 
