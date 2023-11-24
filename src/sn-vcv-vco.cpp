@@ -5,6 +5,7 @@ const int sn_vcv_vco::CHANNELS = 1;
 const float sn_vcv_vco::VELOCITY = 1.0f;
 
 sn_vcv_vco::sn_vcv_vco() {
+    // ... params
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
     configParam(ECCENTRICITY_PARAM, -1.0f, +1.0f, 0.0f, "ε");
@@ -18,6 +19,7 @@ sn_vcv_vco::sn_vcv_vco() {
     getParamQuantity(PLACEHOLDER_PARAM)->randomizeEnabled = false;
     getParamQuantity(M_PARAM)->randomizeEnabled = false;
 
+    // ... inputs
     configInput(ECCENTRICITY_INPUT, "±5V ε");
     configInput(SENSITIVITY_INPUT, "±5V s");
     configInput(ROTATION_INPUT, "±5V Φ");
@@ -28,6 +30,7 @@ sn_vcv_vco::sn_vcv_vco() {
     configInput(PITCH_INPUT, "1V/octave pitch");
     configInput(VELOCITY_INPUT, "0-10V velocity");
 
+    // ... outputs
     configOutput(VCO_OUTPUT, "VCO");
     configOutput(AUX_OUTPUT, "AUX");
     configOutput(AUX_TRIGGER, "Trigger");

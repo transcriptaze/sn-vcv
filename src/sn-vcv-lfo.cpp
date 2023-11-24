@@ -15,6 +15,7 @@ const range RANGES[] = {
 const int sn_vcv_lfo::CHANNELS = 1;
 
 sn_vcv_lfo::sn_vcv_lfo() {
+    // ... params
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
     configParam(ECCENTRICITY_PARAM, -1.0f, +1.0f, 0.0f, "ε");
@@ -40,9 +41,11 @@ sn_vcv_lfo::sn_vcv_lfo() {
 
     getParamQuantity(M_PARAM)->randomizeEnabled = false;
 
-    configInput(FREQUENCY_INPUT, "0-10V, log frequency (0.1 to 10Hz)");
+    // ... inputs
+    configInput(FREQUENCY_INPUT, "±5V, log frequency modulation");
     configInput(SYNCH_INPUT, "Trigger input to sync phase");
 
+    // ... outputs
     configOutput(LFO_OUTPUT, "LFO");
     configOutput(AUX_OUTPUT, "AUX");
     configOutput(AUX_TRIGGER, "Trigger");
@@ -223,11 +226,14 @@ void sn_vcv_lfo::processLFO(const ProcessArgs &args, int channels, bool resync, 
     // ... update instantaneous phase
     float fv = params[FREQUENCY_PARAM].getValue();
     float f = range.frequency(fv);
-    float frequency[16] = {f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
+    float frequency[16] = {f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f};
 
     if (inputs[FREQUENCY_INPUT].isConnected()) {
         for (int ch = 0; ch < channels; ch++) {
-            frequency[ch] = clamp(inputs[FREQUENCY_INPUT].getPolyVoltage(ch), 0.1f, 10.0f);
+            float fm = 10.f * clamp(inputs[FREQUENCY_INPUT].getPolyVoltage(ch) / 5.0f, -1.0f, +1.0f);
+            float v = clamp(fv + fm, 0.f, 10.f);
+
+            frequency[ch] = range.frequency(v);
         }
     }
 
@@ -291,7 +297,7 @@ void sn_vcv_lfo::processAUX(const ProcessArgs &args, bool expanded, bool resync)
         float α = aux.phase * 2.0f * M_PI;
         float υ = sn.υ(α);
 
-        aux.out.osc = υ;
+        aux.out.osc = sn.A * υ;
         aux.out.sum = sn.A * υ;
     } else {
         aux.out.osc = 0.0f;

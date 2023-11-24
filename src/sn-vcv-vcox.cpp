@@ -3,6 +3,7 @@
 const int sn_vcv_vcox::CHANNELS = 1;
 
 sn_vcv_vcox::sn_vcv_vcox() {
+    // ... params
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
     configParam(ECCENTRICITY_PARAM, -1.0f, +1.0f, 0.0f, "ε");
@@ -18,6 +19,7 @@ sn_vcv_vcox::sn_vcv_vcox() {
     getParamQuantity(M_PARAM)->randomizeEnabled = false;
     getParamQuantity(ATT_PARAM)->randomizeEnabled = false;
 
+    // ... inputs
     configInput(ECCENTRICITY_INPUT, "±5V ε");
     configInput(SENSITIVITY_INPUT, "±5V s");
     configInput(ROTATION_INPUT, "±5V Φ");
@@ -25,10 +27,12 @@ sn_vcv_vcox::sn_vcv_vcox() {
     configInput(DX_INPUT, "±5V δx");
     configInput(DY_INPUT, "±5V δy");
 
+    // ... outputs
     configOutput(VCO_OUTPUT, "VCO");
     configOutput(VCO_SUM_OUTPUT, "VCO-Σ");
     configOutput(AUX_OUTPUT, "AUX");
 
+    // ... expanders
     getLeftExpander().producerMessage = &expanders.left.messages[0];
     getLeftExpander().consumerMessage = &expanders.left.messages[1];
 

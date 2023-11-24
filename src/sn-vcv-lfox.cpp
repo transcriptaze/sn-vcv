@@ -276,7 +276,7 @@ void sn_vcv_lfox::processAUX(const ProcessArgs &args, bool expanded) {
         float α = aux.phase * 2.0f * M_PI;
         float υ = sn.υ(α);
 
-        aux.out.osc = υ;
+        aux.out.osc = sn.A * υ;
         aux.out.sum += sn.A * υ;
     } else {
         aux.out.osc = 0.0f;

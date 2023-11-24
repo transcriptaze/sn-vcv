@@ -49,12 +49,11 @@
       - [x] Fix param order
       - [x] Fix phase
       - [x] Move AUX to top of outputs (future)
-      - [ ] Add inputs to params
+      - [x] Add inputs to params
 
 - [x] _sn-vcv-lfox_
       - [x] AUX gain
       - [x] Fix phase
       - [x] Move AUX to top of outputs (future)
       - [x] OUT attenuator
-      - [ ] Add inputs to params
 
