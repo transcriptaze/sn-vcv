@@ -1,17 +1,17 @@
-![build](https://github.com/transcriptaze/sn-vcv/workflows/build/badge.svg)
+![build](/workflows/build/badge.svg)
 
 # sn-vcv
 
 A set of VCV modules for the _sn_ experimental additive synthesizer which uses the _sn_ function as the 
 generator function instead of the more usual _sine_. The modules comprise:
-- a _stackable_ VCO with a waveshape that can be smoothly modified by either manual controls or control voltages from e.g. an LCO.
-- a _stackable_ LFO with a waveshape that can be composed from multiple harmonics with individually controlled waveshapes.
+- a _stackable_ VCO, outputs an audio signal with a _smoothly adjustable_ shape
+- a _stackable_ LFO, outputs a low frequency control voltage signal with a smoothly _adjustable_ shape.
 
 - [Background](#background)
 - [Modules](#modules)
    - [sn-vco](/documentation/sn-vco.md)
    - [sn-vcox](/documentation/sn-vcox.md)
-   - [sn-lfo](#sn-lfo)
+   - [sn-lfo](/documentation/sn-lfo.md)
    - [sn-lfox](#sn-lfox)
 - [Patches](#patches)
 - [License](#license)
@@ -23,13 +23,13 @@ a circle is a special case of an ellipse). The _sn-vcv_ VCV modules use the _sn_
 _sine_ function to generate harmonically rich waveforms that are also continuous and differentiable.
 
 By modifying the parameters of the _sn_ function it is possible to smoothly morph between a sine wave,
-a square (well, square'ish) wave, a triangular wave and a sawtooth. There is a [web app](https://snyth.pages.dev)
-which may make this a bit clearer than this umm, very extremely brief explanation, and there is a little 
+a square (well, square'ish) wave, a triangular'ish wave and a sawtooth. There is a [web app](https://snyth.pages.dev)
+which may make this a bit clearer than this umm, very extremely brief explanation, and there is a little
 more detail [here](https://github.com/transcriptaze/snyth) if you're really curious.
 
 ### Parameters
 
-The modules all use the following parameters to determine the wave shape:
+The modules share a common set of parameters that determine the wave shape:
 
 | Parameter | Range | Name           | Description                                                     |
 |-----------|-------|----------------|-----------------------------------------------------------------|
@@ -39,50 +39,19 @@ The modules all use the following parameters to determine the wave shape:
 | _a_       | 0-1   | _amplitude_    | Sets the amplitude of the _sn_ function                         |
 | _δx_      | ±1    | _shift-x_      | Sets the horizontal displacement                                |
 | _δy_      | ±1    | _shift-y_      | Sets the vertical displacement                                  |
-| _Φ_       | ±90°  | _phase_        | Adjust a harmonic phase offset                                  |
+| _Φ_       | ±90°  | _phase_        | Adjust a harmonic phase offset (LFO only)                       |
 | _m_       | 1-5   | _multiplier_   | Base frequency multiplier                                       |
 
 ## Installation
 
 ### VCV Rack Library
 
+### Manual
+
 ### Building from source
 
 
 ## Modules
-
-### _sn-lfo_
-
-_sn-lfo_ is a more or less standard LFO module except that it produces a _sn_ output rather than a _sine_:
-
-| Input       | Range  | Name         | Description                                                    |
-|-------------|--------|--------------|----------------------------------------------------------------|
-| _frequency_ | 0-10V  | _frequency_  | Polyphonal 1V/octave pitch input, normalized for C4 at 0V      |
-| _sync_      | 0-10V  | _sync_       | Trigger input to reset the waveform to start                   |
-
-| Output      | Range  | Name         | Description                                                    |
-|-------------|--------|--------------|----------------------------------------------------------------|
-| _LFO_       | ±5V    | _LFO_        | Polyphonal LFO signal output                                   |
-| _AUX_       | ±5V    | _AUX_        | 2 channel 25Hz signal 'monitor' output for use with the scope  |
-| _TRIG_      | 0-10V  | _trigger_    | Trigger output for the AUX output                              |
-
-#### Context Menu
-
-1. _k-rate_
-   Sets the rate at which the parameter values are used to recalculate the waveform.
-
-2. _aux-mode_
-   Sets the AUX output mode:
-   - _OSC_ outputs a 25Hz 'monitor' waveform
-   - _SUM_ outputs the summed 25Hz 'monitor' waveform
-   - _POLY_ outputs the monitor wave form on channel 1 and the summed monitor waveform on channel 2 |
-
-3. _range_ 
-   Sets the frequency range mapped to the input level:
-   - 0.1-10Hz (logarithmic)
-   - 0.2-2Hz (logarithmic)
-   - 0.5-20Hz (linear)
-
 
 ### _sn-lfox_
 
@@ -116,39 +85,35 @@ _sn-lfo_. Multiple expanders can be stacked to create a waveform using harmonics
 
 ## Patches
 
-### [*sn-vcv-vco*](https://github.com/transcriptaze/sn-vcv/blob/main/documentation/patches/sn-vcv-vco.vcv)
+### Basic operation 
 
-Basic patch to demonstrate the operation of the _sn-vco_ module.
+The basic patches require only the _VCV Fundamental_ modules are intended to demonstrate the basic
+setup and operation of the modules:
 
-_Requires_:
-1. _Fundamental_ modules
+#### [sn-vcv-vco](/documentation/patches/sn-vcv-vco.vcv)
 
-### [*sn-vcv-vcox*](https://github.com/transcriptaze/sn-vcv/blob/main/documentation/patches/sn-vcv-vcox.vcv)
+Steps through a four note sequence with an LFO morphing the waveform between a _sine_ and a _square_ wave.
 
-Basic patch to demonstrate stacking of harmonics with the the _sn-vcox_ expander module to create more complex VCO 
-wave shapes.
+### [sn-vcv-vcox](/documentation/patches/sn-vcv-vcox.vcv)
 
-_Requires_:
-1. _Fundamental_ modules
+Stacks an _sn-vco_ module and two _sn-vcox_ expanders and modifies the component waveforms
+independently using an LFO. Sounds just about as horrible as you would expect.
 
-### [*sn-vcv-lfo*](https://github.com/transcriptaze/sn-vcv/blob/main/documentation/patches/sn-vcv-lfo.vcv)
+### [sn-vcv-lfo](/documentation/patches/sn-vcv-lfo.vcv)
 
-Basic patch to demonstrate the operation of the _sn-lfo_ module.
+Uses the _sn-lfo_ module to generate an oddly shaped waveform to modify the envelope of a very long note. 
+Nothing wildly exciting but with some fiddling can sound vaguely _Goblin'esque_.
 
-_Requires_:
-1. _Fundamental_ modules
+### [*sn-vcv-lfox*](/documentation/patches/sn-vcv-lfox.vcv)
 
-### [*sn-vcv-lfox*](https://github.com/transcriptaze/sn-vcv/blob/main/documentation/patches/sn-vcv-lfox.vcv)
-
-Basic patch to demonstrate stacking of harmonics with the the _sn-lfox_ expander module to create more complex LFO
-wave shapes.
+Stacks harmonics with the _sn-lfox_ expander module to create some fairly weird LFO wave forms.
 
 _Requires_:
 1. _Fundamental_ modules
 
 ## License
 
-The source code and panel files are licensed under [Gnu General Public License v3](https://github.com/transcriptaze/sn-vcv/blob/master/LICENSE). 
+The source code and panel files are licensed under [Gnu General Public License v3](/LICENSE). 
 
 
 
