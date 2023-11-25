@@ -37,7 +37,7 @@ the base for stacked _sn-vcox_ expanders.
 | _δx_       | ±5V   | _shift-x_      | Modulates the _shift-x_ parameter                              |
 | _δy_       | ±5V   | _shift-y_      | Modulates the _shift-y_ parameter                              |
 
-| Output      | Range | Name          | Description                                                    |
+| Output     | Range | Name           | Description                                                    |
 |------------|-------|----------------|----------------------------------------------------------------|
 | _VCO_      | ±5V   | _VCO_          | Polyphonal VCO audio output                                    |
 | _AUX_      | ±5V   | _AUX_          | 2 channel 25Hz signal 'monitor' output for use with the scope  |
@@ -77,7 +77,7 @@ The module includes a set of factory presets:
 - sawtooth (right)
 
 | Preset         |  _ε_   | _s_ | _θ_ | _a_ | _δx_  | _δy_ |
-|----------------|--------|-----|-----|-----|-- ----|------|
+|----------------|--------|-----|-----|-----|-------|------|
 | sine           |  0.0   | 2.5 | 0°  | 1.0 |  0.0  | 0.0  |
 | square         | -1.0   | 5.0 | 0°  | 1.0 |  0.0  | 0.0  |
 | trianglular    |  0.175 | 5.0 | 0°  | 1.0 |  0.0  | 0.0  |
