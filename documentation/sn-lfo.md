@@ -58,12 +58,13 @@ the base for stacked _sn-lfox_ expanders.
 
 ## Patches
 
-### [*sn-vcv-lfo*](https://github.com/transcriptaze/sn-vcv/blob/main/documentation/patches/sn-vcv-vco.vcv)
+### [*sn-vcv-lfo*](/documentation/patches/sn-vcv-vco.vcv)
 
 Basic patch to demonstrate the operation of the _sn-lfo_ module. 
 
-The patch uses an oddly shaped waveform to modify the envelope of a very long note. As with the other demo
-patches, its not very exciting but intended more to give some idea of the operation of the module.
+Replaces the LFOs in the basic _sn-vco_ patch with three independent _sn-lfo_ modules each with its own
+waveform. The effect is to make the _sn-vco_ output morph in some weird and unexpected ways - most of
+which don't sound good but at least a bit more perk-up-your-ears interesting.
 
 _Requires_:
 1. _Fundamental_ modules

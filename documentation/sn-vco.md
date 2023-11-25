@@ -59,13 +59,13 @@ the base for stacked _sn-vcox_ expanders.
 
 ## Patches
 
-### [*sn-vcv-vco*](https://github.com/transcriptaze/sn-vcv/blob/main/documentation/patches/sn-vcv-vco.vcv)
+### [*sn-vcv-vco*](/documentation/patches/sn-vcv-vco.vcv)
 
 Basic patch to demonstrate the operation of the _sn-vco_ module. 
 
-The patch basically steps through a sequence of four (very arbitrary notes) using an LFO to morph the waveshape
-between a _sine_ and a _square_ wave. Not very inspired but should (hopefully) give some idea of the operation
-of the module.
+The patch basically connects three standard LFOs to _ε_, _δx_ and _δy_ inputs of a single _sn-vco_ module
+to output a continuously varying waveform. Not very inspired and sounds pretty bland but should (hopefully)
+give some idea of the operation of the module.
 
 _Requires_:
 1. _Fundamental_ modules

@@ -11,9 +11,6 @@
       - https://community.vcvrack.com/t/automated-building-and-releasing-plugins-on-github-with-github-actions/11364
       - https://community.vcvrack.com/t/rack-development-blog/5864/84
 
-- [x] Fix logo so that blue goes back to blue
-- [x] Include as snyth submodule
-
 - [ ] README
       - `convert *.png -crop 392x331+281+90 cropped/screenshot%d.png`
       - https://github.com/nullJaX/vcvrack-patchable-devices
@@ -28,32 +25,9 @@
       - [ ] Toccata
 
 - [x] _sn-vcv-osc_
-      - [x] AUX gain
-      - [x] Remove PSI param
-      - [x] Update presets
-      - [x] Reinstate PSI param as a placeholder
-      - [x] Move AUX to top of outputs (future)
-      - [x] Add inputs to params
-
 - [x] _sn-vcv-oscx_
-      - [x] AUX gain
-      - [x] Remove PSI param
-      - [x] Update presets
-      - [x] Reinstate PSI param as a placeholder
-      - [x] OUT attenuator
-      - [x] Move AUX to top of outputs (future)
-      - [x] Add inputs to params
-
 - [x] _sn-vcv-lfo_
-      - [x] AUX gain
-      - [x] Fix param order
-      - [x] Fix phase
-      - [x] Move AUX to top of outputs (future)
-      - [x] Add inputs to params
-
 - [x] _sn-vcv-lfox_
-      - [x] AUX gain
-      - [x] Fix phase
-      - [x] Move AUX to top of outputs (future)
-      - [x] OUT attenuator
+- [x] Fix logo so that blue goes back to blue
+- [x] Include as snyth submodule
 

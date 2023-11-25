@@ -1,7 +1,7 @@
 # **sn-vcox**
 
-_sn-vcox_ is an expander module for the _sn-vco_ module that adds a harmonic wave to the output of _sn-vco_.
-Multiple expanders can be stacked to create a waveform using harmonics and/or variations.
+_sn-vcox_ is an expander module for the _sn-vco_ module that adds a harmonic wave to the output of 
+_sn-vco_. Multiple expanders can be stacked to create a waveform using harmonics and/or variations.
 
 ## Parameters
 
@@ -56,13 +56,14 @@ range.
 
 ## Patches
 
-### [*sn-vcv-vcox*](https://github.com/transcriptaze/sn-vcv/blob/main/documentation/patches/sn-vcv-vcox.vcv)
+### [*sn-vcv-vcox*](/documentation/patches/sn-vcv-vcox.vcv)
 
-Basic patch to demonstrate the operation of stacked the _sn-vcox_ modules. 
+Basic patch to demonstrate the operation of stacked _sn-vcox_ modules. 
 
-The patch basically stacks an _sn-vco_ module and two _sn-vcox_ expanders and modifies the waveforms
-independently using an LFO. Sounds pretty horrible but does at least demonstrate the operation of the
-modules.
+Uses three independent LFOs to drive the parameter inputs of an _sn-vco_ module with two stacked _sn-vcox_ 
+extenders to that the resulting waveform is the sum of three more or less independent harmonics, each
+of which is shape-shifting in it's own particular way. A little more interesting than just the basic
+_sn-vco_ patch but its not going to win any awards.
 
 _Requires_:
 1. _Fundamental_ modules
