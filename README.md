@@ -1,14 +1,15 @@
-![build](/workflows/build/badge.svg)
+![build](https://github.com/transcriptaze/sn-vcv/workflows/build/badge.svg)
 
 # sn-vcv
 
 A set of VCV modules for the _sn_ experimental additive synthesizer which uses the _sn_ function as the 
 generator function instead of the more usual _sine_. The modules comprise:
-- a _stackable_ VCO, outputs an audio signal with a _smoothly adjustable_ shape
-- a _stackable_ LFO, outputs a low frequency control voltage signal with a smoothly _adjustable_ shape.
+- a _stackable_ VCO, which generaes an audio signal with a _smoothly adjustable_ shape
+- a _stackable_ LFO, which generates a low frequency control voltage signal with a smoothly _adjustable_ shape.
 
 The modules don't do anything particuarly radical but are an interesting way to add subtle variations to
-a sound i.e. if you're already using a VCO, replacing it with _sn-vco_ just adds a touch more tonal interest. 
+a sound e.g. if you're already using a VCO, replacing it with _sn-vco_ is a way to adds a touch more tonal
+interest. 
 
 - [Background](#background)
 - [Modules](#modules)
@@ -61,7 +62,7 @@ The modules share a common set of parameters that determine the wave shape:
 ### [sn-vco](/documentation/sn-vco.md)
 
 _sn-vco_ is a more-or-less standard VCO module except that it produces a _sn_ output rather than a _sine_
-which, as described above, allows the waveshape to be morphed between a sine, square, triangular and sawtooth
+which (as described above), allows the waveshape to be morphed between a sine, square, triangular and sawtooth
 wave. 
 
 ### [sn-vcox](/documentation/sn-vcox.md)
@@ -81,7 +82,7 @@ the base for stacked _sn-lfox_ expanders.
 _sn-lfox_ is an expander module for the _sn-lfo_ module that adds a harmonic wave to the output of _sn-lfo_.
 Multiple expanders can be stacked to create a waveform using harmonics and/or variations.
 
-## Patches
+## Demo Patches
 
 ### Basic operation 
 
@@ -92,20 +93,20 @@ setup and operation of the modules.
 
 Hooks up 3 standard LFOs to a single _sn-vco_ module to demonstrate the basic shape shifting.
 
-### [sn-vcv-vcox](/documentation/patches/sn-vcv-vcox.vcv)
+#### [sn-vcv-vcox](/documentation/patches/sn-vcv-vcox.vcv)
 
 Extends the basic _sn-vco_ patch by stacking two _sn-vcox_ modules on to the_sn-vco_ module and generating
 waveforms at the 2nd and 4th harmonics. The LFOs from the _sn-vco_ demo are routed to the parameter inputs
 on each of the modules so that each module shape shifts independently. Sounds just about as horrible as you
 would expect but looks pretty.
 
-### [sn-vcv-lfo](/documentation/patches/sn-vcv-lfo.vcv)
+#### [sn-vcv-lfo](/documentation/patches/sn-vcv-lfo.vcv)
 
 Replaces the LFOs in the basic _sn-vco_ patch with three independent _sn-lfo_ modules each with its own
 waveform. The effect is to make the _sn-vco_ output morph in some unexpected ways - still sounds weird
 rather than actually good, but at least it's starting to sound a little interesting.
 
-### [*sn-vcv-lfox*](/documentation/patches/sn-vcv-lfox.vcv)
+#### [*sn-vcv-lfox*](/documentation/patches/sn-vcv-lfox.vcv)
 
 Stacks harmonics with the _sn-lfox_ expander module to create some fairly weird LFO wave forms.
 
