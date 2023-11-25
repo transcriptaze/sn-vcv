@@ -70,11 +70,6 @@ the base for stacked _sn-vcox_ expanders.
 ## Factory Presets
 
 The module includes a set of factory presets:
-- sine
-- square
-- triangular
-- sawtooth (left)
-- sawtooth (right)
 
 | Preset         |  _ε_   | _s_ | _θ_ | _a_ | _δx_  | _δy_ |
 |----------------|--------|-----|-----|-----|-------|------|

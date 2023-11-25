@@ -4,11 +4,15 @@
 
 A set of VCV modules for the _sn_ experimental additive synthesizer which uses the _sn_ function as the 
 generator function instead of the more usual _sine_. The modules comprise:
-- a _stackable_ VCO, which generaes an audio signal with a _smoothly adjustable_ shape
+- a _stackable_ VCO, which generates an audio signal with a _smoothly adjustable_ shape
 - a _stackable_ LFO, which generates a low frequency control voltage signal with a smoothly _adjustable_ shape.
 
+<img width="128" src="documentation/images/sine.png"><img width="128" src="documentation/images/square.png"><img width="128" src="documentation/images/triangle.png">
+<img width="128" src="documentation/images/sawtooth.png"><img width="128" src="documentation/images/spike.png"><img width="128" src="documentation/images/bumps.png">
+<img width="128" src="documentation/images/wonky.png">
+
 The modules don't do anything particuarly radical but are an interesting way to add subtle variations to
-a sound e.g. if you're already using a VCO, replacing it with _sn-vco_ is a way to adds a touch more tonal
+a sound e.g. if you're already using a VCO, replacing it with _sn-vco_ is a way to add a touch more tonal
 interest. 
 
 - [Background](#background)

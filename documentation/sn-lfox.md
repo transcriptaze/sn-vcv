@@ -54,7 +54,19 @@ range.
    - ¼ (±1.25V, 2.5V peak-to-peak)
    - ⅕ (±1V, 2V peak-to-peak)
 
-## Presets
+
+## Factory Presets
+
+The module includes a set of factory presets:
+
+| Preset         |  _ε_   | _s_ | _θ_ | _a_ | _δx_  | _δy_ | _Φ_ |
+|----------------|--------|-----|-----|-----|-------|------|-----|
+| sine           |  0.0   | 2.5 | 0°  | 1.0 |  0.0  | 0.0  | 0°  |
+| square         | -1.0   | 5.0 | 0°  | 1.0 |  0.0  | 0.0  | 0°  |
+| trianglular    |  0.175 | 5.0 | 0°  | 1.0 |  0.0  | 0.0  | 0°  |
+| sawtooth-left  | -0.175 | 5.0 | 90° | 1.0 | -0.99 | 0.0  | 0°  |
+| sawtooth-right | -0.175 | 5.0 | 90° | 1.0 | +0.99 | 0.0  | 0°  |
+
 
 ## Patches
 
