@@ -74,7 +74,9 @@ The module includes a set of factory presets:
 
 Basic patch to demonstrate the operation of stacked _sn-lfox_ modules. 
 
-The patch basically stacks an _sn-lfo_ module and two _sn-lfox_ expanders..
+Replaces the independent LFOs in the basic _sn-lfo_ patch with an _sn-lfo_ module and two stacked 
+_sn-lfox_ expanders for a slightly different effect.Oddly ambient'ish in a way .. maybe with some
+reverb ..
 
 _Requires_:
 1. _Fundamental_ modules
