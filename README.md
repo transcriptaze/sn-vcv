@@ -11,9 +11,7 @@ generator function instead of the more usual _sine_. The modules comprise:
 
 The modules don't do anything particuarly radical but are an interesting way to add subtle variations to
 a sound e.g. if you're already using a VCO, replacing it with _sn-vco_ is a way to add a touch more tonal
-interest, e.g.:
-
-https://github.com/transcriptaze/sn-vcv/assets/7932356/15ec3ec8-c7c1-47b4-99ba-9471848ec995
+interest, e.g. [Greensleeves](#greensleeves)
 
 - [Background](#background)
 - [Modules](#modules)
@@ -91,8 +89,8 @@ Multiple expanders can be stacked to create a waveform using harmonics and/or va
 ### Basic operation 
 
 The basic patches have been kept as simple as possible and require only the _VCV Fundamental_ modules included
-with _VCV Rack 2_ and are mostly intended just to demonstrate the basic setup and operation of the modules rather
-than as shining examples.
+with _VCV Rack 2_. They are mostly intended just to demonstrate the basic setup and operation of the modules rather
+than as shining examples of the art of synthesis.
 
 #### [sn-vcv-vco](/documentation/patches/sn-vcv-vco.vcv)
 
@@ -116,6 +114,25 @@ rather than actually good, but at least it's starting to sound a little interest
 Replaces the independent LFOs in the basic _sn-lfo_ patch with an _sn-lfo_ module and two stacked 
 _sn-lfox_ expanders for a slightly different effect. Oddly ambient'ish in a way .. maybe with some
 reverb .. 
+
+### MIDI
+
+## [Greensleeves](/documentation/patches/greensleeves.vcv))
+
+Relatively simple arrangement of Greensleeves using a stack of one _sn-vco_ and two _sn-vcox_ modules 
+for the VCO audio generator and a stack of one _sn-lfo_ and two _sn-lfox_ LFOs to continuousaly vary
+the eccentricity, volume and ADSR envelope. A lot of the credit has to go to he SurgeXT Reverb2 which
+adds a lot of depth to the rendering.
+
+Requires:
+- [Impromptu Clocked](https://library.vcvrack.com/ImpromptuModular/Clocked)
+- [Entrian Player Melody](https://library.vcvrack.com/Entrian-Free/Player-Melody)
+- [Mindmeld EQMaster](https://library.vcvrack.com/MindMeldModular/EqMaster)
+- [SurgeXT Reverb2](https://library.vcvrack.com/SurgeXTRack/SurgeXTFXReverb2)
+
+Audio:
+
+https://github.com/transcriptaze/sn-vcv/assets/7932356/15ec3ec8-c7c1-47b4-99ba-9471848ec995
 
 ## License
 
