@@ -117,11 +117,14 @@ reverb ..
 
 ### MIDI
 
-## [Greensleeves](/documentation/patches/greensleeves.vcv)
+The MIDI demos are more complex patches that use the _sn-xxx_ modules in combinations to render MIDI files
+of complete songs.
+
+#### [Greensleeves](/documentation/patches/greensleeves.vcv)
 
 Relatively simple arrangement of Greensleeves using a stack of one _sn-vco_ and two _sn-vcox_ modules 
 for the VCO audio generator and a stack of one _sn-lfo_ and two _sn-lfox_ LFOs to continuously vary
-the waveshape, volume and ADSR envelope. A lot of the credit has to go to he SurgeXT Reverb2 which
+the waveshape, volume and ADSR envelope. A lot of the credit has to go to the _SurgeXT Reverb2_ which
 adds some much needed depth to the rendering.
 
 Requires:
