@@ -4,14 +4,16 @@
 
 A set of VCV modules for the _sn_ experimental additive synthesizer which uses the _sn_ function as the 
 generator function instead of the more usual _sine_. The modules comprise:
-- a _stackable_ VCO, which generates an audio signal with a _smoothly adjustable_ shape
-- a _stackable_ LFO, which generates a low frequency control voltage signal with a smoothly _adjustable_ shape.
+- a _stackable_ VCO, which generates an audio signal with a smoothly adjustable shape
+- a _stackable_ LFO, which generates a low frequency control voltage signal with a smoothly adjustable shape.
 
 <img width="96" src="documentation/images/sine.png"> <img width="96" src="documentation/images/square.png"> <img width="96" src="documentation/images/triangle.png"> <img width="96" src="documentation/images/sawtooth.png"> <img width="96" src="documentation/images/spike.png"> <img width="96" src="documentation/images/bumps.png"> <img width="96" src="documentation/images/wonky.png">
 
 The modules don't do anything particuarly radical but are an interesting way to add subtle variations to
 a sound e.g. if you're already using a VCO, replacing it with _sn-vco_ is a way to add a touch more tonal
-interest. 
+interest, e.g.:
+
+[Greensleeves](/documentation/examples/greensleeves.mp3)
 
 - [Background](#background)
 - [Modules](#modules)
@@ -88,8 +90,9 @@ Multiple expanders can be stacked to create a waveform using harmonics and/or va
 
 ### Basic operation 
 
-The basic patches require only the _VCV Fundamental_ modules and are intended to demonstrate the basic
-setup and operation of the modules.
+The basic patches have been kept as simple as possible and require only the _VCV Fundamental_ modules included
+with _VCV Rack 2_ and are mostly intended just to demonstrate the basic setup and operation of the modules rather
+than as shining examples.
 
 #### [sn-vcv-vco](/documentation/patches/sn-vcv-vco.vcv)
 
@@ -110,10 +113,9 @@ rather than actually good, but at least it's starting to sound a little interest
 
 #### [*sn-vcv-lfox*](/documentation/patches/sn-vcv-lfox.vcv)
 
-Stacks harmonics with the _sn-lfox_ expander module to create some fairly weird LFO wave forms.
-
-_Requires_:
-1. _Fundamental_ modules
+Replaces the independent LFOs in the basic _sn-lfo_ patch with an _sn-lfo_ module and two stacked 
+_sn-lfox_ expanders for a slightly different effect. Oddly ambient'ish in a way .. maybe with some
+reverb .. 
 
 ## License
 
