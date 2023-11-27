@@ -11,9 +11,7 @@ generator function instead of the more usual _sine_. The modules comprise:
 
 The modules don't do anything particuarly radical but are an interesting way to add subtle variations to
 a sound e.g. if you're already using a VCO, replacing it with _sn-vco_ is a way to add a touch more tonal
-interest, e.g.:
-
-[Greensleeves](/documentation/examples/greensleeves.mp3)
+interest.
 
 - [Background](#background)
 - [Modules](#modules)
