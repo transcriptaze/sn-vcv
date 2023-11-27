@@ -11,7 +11,9 @@ generator function instead of the more usual _sine_. The modules comprise:
 
 The modules don't do anything particuarly radical but are an interesting way to add subtle variations to
 a sound e.g. if you're already using a VCO, replacing it with _sn-vco_ is a way to add a touch more tonal
-interest.
+interest, e.g.:
+
+https://github.com/transcriptaze/sn-vcv/assets/7932356/3239b409-b5e5-4cda-bdd9-81680753c44e
 
 - [Background](#background)
 - [Modules](#modules)
