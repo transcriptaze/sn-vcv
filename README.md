@@ -120,9 +120,9 @@ reverb ..
 ## [Greensleeves](/documentation/patches/greensleeves.vcv)
 
 Relatively simple arrangement of Greensleeves using a stack of one _sn-vco_ and two _sn-vcox_ modules 
-for the VCO audio generator and a stack of one _sn-lfo_ and two _sn-lfox_ LFOs to continuousaly vary
-the eccentricity, volume and ADSR envelope. A lot of the credit has to go to he SurgeXT Reverb2 which
-adds a lot of depth to the rendering.
+for the VCO audio generator and a stack of one _sn-lfo_ and two _sn-lfox_ LFOs to continuously vary
+the waveshape, volume and ADSR envelope. A lot of the credit has to go to he SurgeXT Reverb2 which
+adds some much needed depth to the rendering.
 
 Requires:
 - [Impromptu Clocked](https://library.vcvrack.com/ImpromptuModular/Clocked)
