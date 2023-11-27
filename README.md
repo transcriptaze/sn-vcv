@@ -117,7 +117,7 @@ reverb ..
 
 ### MIDI
 
-## [Greensleeves](/documentation/patches/greensleeves.vcv))
+## [Greensleeves](/documentation/patches/greensleeves.vcv)
 
 Relatively simple arrangement of Greensleeves using a stack of one _sn-vco_ and two _sn-vcox_ modules 
 for the VCO audio generator and a stack of one _sn-lfo_ and two _sn-lfox_ LFOs to continuousaly vary
