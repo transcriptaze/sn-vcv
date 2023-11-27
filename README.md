@@ -13,7 +13,7 @@ The modules don't do anything particuarly radical but are an interesting way to 
 a sound e.g. if you're already using a VCO, replacing it with _sn-vco_ is a way to add a touch more tonal
 interest, e.g.:
 
-https://github.com/transcriptaze/sn-vcv/assets/7932356/3239b409-b5e5-4cda-bdd9-81680753c44e
+https://github.com/transcriptaze/sn-vcv/assets/7932356/15ec3ec8-c7c1-47b4-99ba-9471848ec995
 
 - [Background](#background)
 - [Modules](#modules)
