@@ -10,8 +10,8 @@ generator function instead of the more usual _sine_. The modules comprise:
 <img width="96" src="documentation/images/sine.png"> <img width="96" src="documentation/images/square.png"> <img width="96" src="documentation/images/triangle.png"> <img width="96" src="documentation/images/sawtooth.png"> <img width="96" src="documentation/images/spike.png"> <img width="96" src="documentation/images/bumps.png"> <img width="96" src="documentation/images/wonky.png">
 
 The modules don't do anything particuarly radical but are an interesting way to add subtle variations to
-a sound e.g. if you're already using a VCO, replacing it with _sn-vco_ is a way to add a touch more tonal
-interest, e.g. [Greensleeves](#greensleeves)
+a sound e.g. the [Greensleeves](#greensleeves) demo uses _sn-vco_ to add some tonal interest to an otherwise
+fairly plain rendering.
 
 - [Background](#background)
 - [Modules](#modules)
