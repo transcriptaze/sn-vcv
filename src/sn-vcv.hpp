@@ -148,7 +148,7 @@ typedef struct sn_vco_message {
     bool linked = false;
     int channels = 1;
 
-    struct VCO {
+    struct _VCO {
         float phase;
         float velocity;
         float out;
@@ -171,15 +171,27 @@ typedef struct sn_vco_message {
         {.phase = 0.f, .velocity = 0.f, .out = 0.f},
     };
 
-    struct AUX {
+    struct _AUX {
         float phase;
-        float velocity;
         float out;
     } aux = {
         .phase = 0.f,
-        .velocity = 0.f,
         .out = 0.f,
     };
+
+    void set(bool linked, int channels, const struct VCO vco[], const struct AUX aux) {
+        this->linked = linked;
+        this->channels = channels;
+
+        for (int i = 0; i < channels; i++) {
+            this->vco[i].phase = vco[i].phase;
+            this->vco[i].velocity = vco[i].velocity;
+            this->vco[i].out = vco[i].out.sum;
+        }
+
+        this->aux.phase = aux.phase;
+        this->aux.out = aux.out.sum;
+    }
 } sn_vco_message;
 
 typedef struct sn_lfo_message {

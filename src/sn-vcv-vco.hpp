@@ -68,27 +68,23 @@ struct sn_vcv_vco : Module {
 
     struct SN sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 
-    struct {
-        float phase;
-        float velocity;
-        float out;
-    } VCO[16] = {
-        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
-        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
-        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
-        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
-        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
-        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
-        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
-        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
-        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
-        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
-        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
-        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
-        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
-        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
-        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
-        {.phase = 0.f, .velocity = 0.f, .out = 0.f},
+    struct VCO vco[16] = {
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = 0.f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = 0.f, .sum = 0.f}},
     };
 
     // ... state update
@@ -102,11 +98,11 @@ struct sn_vcv_vco : Module {
 
     // ... expanders
     struct {
-        Module *left;
-        Module *right;
+        sn_expander<sn_vco_message> left;
+        sn_expander<sn_vco_message> right;
     } expanders = {
-        .left = NULL,
-        .right = NULL,
+        .left = sn_expander<sn_vco_message>(LEFT),
+        .right = sn_expander<sn_vco_message>(RIGHT),
     };
 };
 

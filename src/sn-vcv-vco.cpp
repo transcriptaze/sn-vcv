@@ -87,15 +87,15 @@ void sn_vcv_vco::onExpanderChange(const ExpanderChangeEvent &e) {
     Module *right = getRightExpander().module;
 
     if (left && left->model == modelSn_vcv_vcox) {
-        expanders.left = left;
+        expanders.left.module = left;
     } else {
-        expanders.left = NULL;
+        expanders.left.module = NULL;
     }
 
     if (right && right->model == modelSn_vcv_vcox) {
-        expanders.right = right;
+        expanders.right.module = right;
     } else {
-        expanders.right = NULL;
+        expanders.right.module = NULL;
     }
 }
 
@@ -103,12 +103,12 @@ void sn_vcv_vco::process(const ProcessArgs &args) {
     int channels = this->channels();
 
     // ... expanders
-    bool expanded = expanders.left != NULL || expanders.right != NULL;
+    bool expanded = expanders.left.module != NULL || expanders.right.module != NULL;
     bool xll = false;
-    bool xrr = expanders.right;
+    bool xrr = expanders.right.module != NULL;
 
-    if (expanders.left) {
-        sn_vcv_vcox *x = (sn_vcv_vcox *)expanders.left;
+    if (expanders.left.module != NULL) {
+        sn_vcv_vcox *x = (sn_vcv_vcox *)expanders.left.module;
         if (!x->isLinkedLeft()) {
             xll = true;
         }
@@ -130,75 +130,48 @@ void sn_vcv_vco::process(const ProcessArgs &args) {
     processAUX(args, expanded);
 
     // ... update expanders
-    if (expanders.left) {
-        sn_vco_message *msg = (sn_vco_message *)expanders.left->getRightExpander().producerMessage;
+    sn_vco_message *msg;
 
-        if (msg != NULL) {
-            msg->linked = true;
-            msg->channels = channels;
-
-            for (int ch = 0; ch < 16; ch++) {
-                msg->vco[ch].phase = VCO[ch].phase;
-                msg->vco[ch].velocity = VCO[ch].velocity;
-                msg->vco[ch].out = VCO[ch].out;
-            }
-
-            msg->aux.phase = aux.phase;
-            msg->aux.out = aux.out.sum;
-
-            expanders.left->getRightExpander().requestMessageFlip();
-        }
+    if ((msg = expanders.left.producer()) != NULL) {
+        msg->set(true, channels, vco, aux);
+        expanders.left.flip();
     }
 
-    if (expanders.right) {
-        sn_vco_message *msg = (sn_vco_message *)expanders.right->getLeftExpander().producerMessage;
-
-        if (msg != NULL) {
-            msg->linked = true;
-            msg->channels = channels;
-
-            for (int ch = 0; ch < 16; ch++) {
-                msg->vco[ch].phase = VCO[ch].phase;
-                msg->vco[ch].velocity = VCO[ch].velocity;
-                msg->vco[ch].out = VCO[ch].out;
-            }
-
-            msg->aux.phase = aux.phase;
-            msg->aux.out = aux.out.sum;
-
-            expanders.right->getLeftExpander().requestMessageFlip();
-        }
+    if ((msg = expanders.right.producer()) != NULL) {
+        msg->set(true, channels, vco, aux);
+        expanders.right.flip();
     }
 }
 
 void sn_vcv_vco::processVCO(const ProcessArgs &args, int channels, bool expanded) {
-    bool vco = outputs[VCO_OUTPUT].isConnected();
+    bool connected = outputs[VCO_OUTPUT].isConnected();
 
     // ... convert pitch CV to instantaneous frequency
     for (int ch = 0; ch < channels; ch++) {
         float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
         float f = dsp::FREQ_C4 * std::pow(2.f, pitch);
 
-        VCO[ch].phase += f * args.sampleTime;
-        if (VCO[ch].phase >= 1.f) {
-            VCO[ch].phase -= 1.f;
+        vco[ch].phase += f * args.sampleTime;
+        if (vco[ch].phase >= 1.f) {
+            vco[ch].phase -= 1.f;
         }
     }
 
     // ... generate
-    if (vco || expanded) {
+    if (connected || expanded) {
         for (int ch = 0; ch < channels; ch++) {
-            float α = VCO[ch].phase * 2.0f * M_PI;
+            float α = vco[ch].phase * 2.0f * M_PI;
             float υ = sn.υ(α);
 
-            VCO[ch].out = sn.A * υ;
-            VCO[ch].velocity = velocity(ch);
+            vco[ch].out.vco = υ;
+            vco[ch].out.sum = sn.A * υ;
+            vco[ch].velocity = velocity(ch);
         }
     }
 
-    if (vco) {
+    if (connected) {
         for (int ch = 0; ch < channels; ch++) {
-            outputs[VCO_OUTPUT].setVoltage(5.f * VCO[ch].velocity * VCO[ch].out, ch);
+            outputs[VCO_OUTPUT].setVoltage(5.f * vco[ch].velocity * vco[ch].out.vco, ch);
         }
 
         outputs[VCO_OUTPUT].setChannels(channels);
