@@ -202,41 +202,17 @@ void sn_vcv_vcox::process(const ProcessArgs &args) {
 
     // ... update expanders
     {
-        sn_vco_message *msg = expanders.left.producer();
+        sn_vco_message *msg;
 
-        if (msg != NULL) {
-            msg->linked = msgR != NULL && msgR->linked;
-            msg->channels = channels;
-
-            for (int ch = 0; ch < channels; ch++) {
-                msg->vco[ch].phase = vco[ch].phase;
-                msg->vco[ch].velocity = vco[ch].velocity;
-                msg->vco[ch].out = vco[ch].out.sum;
-            }
-
-            msg->aux.phase = aux.phase;
-            msg->aux.out = aux.out.sum;
-
+        if ((msg = expanders.left.producer()) != NULL) {
+            bool linked = msgR != NULL && msgR->linked;
+            msg->set(linked, channels, vco, aux);
             expanders.left.flip();
         }
-    }
 
-    {
-        sn_vco_message *msg = expanders.right.producer();
-
-        if (msg != NULL) {
-            msg->linked = msgL != NULL && msgL->linked;
-            msg->channels = channels;
-
-            for (int ch = 0; ch < channels; ch++) {
-                msg->vco[ch].phase = vco[ch].phase;
-                msg->vco[ch].velocity = vco[ch].velocity;
-                msg->vco[ch].out = vco[ch].out.sum;
-            }
-
-            msg->aux.phase = aux.phase;
-            msg->aux.out = aux.out.sum;
-
+        if ((msg = expanders.right.producer()) != NULL) {
+            bool linked = msgL != NULL && msgL->linked;
+            msg->set(linked, channels, vco, aux);
             expanders.right.flip();
         }
     }

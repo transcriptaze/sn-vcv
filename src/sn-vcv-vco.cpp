@@ -130,16 +130,18 @@ void sn_vcv_vco::process(const ProcessArgs &args) {
     processAUX(args, expanded);
 
     // ... update expanders
-    sn_vco_message *msg;
+    {
+        sn_vco_message *msg;
 
-    if ((msg = expanders.left.producer()) != NULL) {
-        msg->set(true, channels, vco, aux);
-        expanders.left.flip();
-    }
+        if ((msg = expanders.left.producer()) != NULL) {
+            msg->set(true, channels, vco, aux);
+            expanders.left.flip();
+        }
 
-    if ((msg = expanders.right.producer()) != NULL) {
-        msg->set(true, channels, vco, aux);
-        expanders.right.flip();
+        if ((msg = expanders.right.producer()) != NULL) {
+            msg->set(true, channels, vco, aux);
+            expanders.right.flip();
+        }
     }
 }
 
