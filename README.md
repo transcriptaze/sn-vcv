@@ -137,6 +137,11 @@ Audio:
 
 https://github.com/transcriptaze/sn-vcv/assets/7932356/15ec3ec8-c7c1-47b4-99ba-9471848ec995
 
+YouTube:
+
+https://www.youtube.com/watch?v=D5CsH6UzfaU
+
+
 ## License
 
 The source code and panel files are licensed under [Gnu General Public License v3](/LICENSE). 
