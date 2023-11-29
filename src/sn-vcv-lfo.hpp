@@ -70,6 +70,10 @@ struct sn_vcv_lfo : Module {
     int getRange();
     void setRange(int);
 
+    // ... instance variables
+    dsp::PulseGenerator trigger;
+    dsp::SchmittTrigger sync;
+
     struct SN sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 
     struct LFO lfo[16] = {
@@ -98,16 +102,14 @@ struct sn_vcv_lfo : Module {
         .out = {.osc = 0.f, .sum = 0.f},
     };
 
+    // ... expanders
     struct {
-        Module *left;
-        Module *right;
+        sn_expander<sn_lfo_message> left;
+        sn_expander<sn_lfo_message> right;
     } expanders = {
-        .left = NULL,
-        .right = NULL,
+        .left = sn_expander<sn_lfo_message>(LEFT),
+        .right = sn_expander<sn_lfo_message>(RIGHT),
     };
-
-    dsp::PulseGenerator trigger;
-    dsp::SchmittTrigger sync;
 
     // ... state update
     struct {

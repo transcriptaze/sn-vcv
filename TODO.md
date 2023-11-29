@@ -11,7 +11,8 @@
       - https://community.vcvrack.com/t/automated-building-and-releasing-plugins-on-github-with-github-actions/11364
       - https://community.vcvrack.com/t/rack-development-blog/5864/84
 
-- [ ] README
+- [ ] README & Manuals
+      - [ ] modules images
       - `convert *.png -crop 392x331+281+90 cropped/screenshot%d.png`
       - https://github.com/nullJaX/vcvrack-patchable-devices
 
@@ -21,13 +22,12 @@
       - [x] sn-lfo
       - [x] sn-lfox
       - [ ] sn-vcv
-      - [ ] Greensleeves
+      - [x] Greensleeves
       - [ ] Toccata
 
 - [x] _sn-vcv-osc_
 - [x] _sn-vcv-oscx_
 - [x] _sn-vcv-lfo_
 - [x] _sn-vcv-lfox_
-- [x] Fix logo so that blue goes back to blue
 - [x] Include as snyth submodule
 

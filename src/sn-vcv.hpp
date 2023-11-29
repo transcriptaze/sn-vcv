@@ -198,10 +198,10 @@ typedef struct sn_lfo_message {
     bool linked = false;
     int channels = 1;
 
-    struct LFO {
+    struct _LFO {
         float phase;
         float out;
-    } LFO[16] = {
+    } lfo[16] = {
         {.phase = 0.0f, .out = 0.0f},
         {.phase = 0.0f, .out = 0.0f},
         {.phase = 0.0f, .out = 0.0f},
@@ -220,13 +220,26 @@ typedef struct sn_lfo_message {
         {.phase = 0.0f, .out = 0.0f},
     };
 
-    struct AUX {
+    struct _AUX {
         float phase;
         float out;
-    } AUX = {
+    } aux = {
         .phase = 0.0f,
         .out = 0.0f,
     };
+
+    void set(bool linked, int channels, const struct LFO lfo[], const struct AUX aux) {
+        this->linked = linked;
+        this->channels = channels;
+
+        for (int i = 0; i < channels; i++) {
+            this->lfo[i].phase = lfo[i].phase;
+            this->lfo[i].out = lfo[i].out.sum;
+        }
+
+        this->aux.phase = aux.phase;
+        this->aux.out = aux.out.sum;
+    }
 } sn_lfo_message;
 
 // ... channels display widget

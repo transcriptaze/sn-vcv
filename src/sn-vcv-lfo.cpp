@@ -112,15 +112,15 @@ void sn_vcv_lfo::onExpanderChange(const ExpanderChangeEvent &e) {
     Module *right = getRightExpander().module;
 
     if (left && left->model == modelSn_vcv_lfox) {
-        expanders.left = left;
+        expanders.left.module = left;
     } else {
-        expanders.left = NULL;
+        expanders.left.module = NULL;
     }
 
     if (right && right->model == modelSn_vcv_lfox) {
-        expanders.right = right;
+        expanders.right.module = right;
     } else {
-        expanders.right = NULL;
+        expanders.right.module = NULL;
     }
 }
 
@@ -129,12 +129,12 @@ void sn_vcv_lfo::process(const ProcessArgs &args) {
     bool resync = sync.process(inputs[SYNCH_INPUT].getVoltage());
 
     // ... expander
-    bool expanded = expanders.left != NULL || expanders.right != NULL;
+    bool expanded = expanders.left.module != NULL || expanders.right.module != NULL;
     bool xll = false;
-    bool xrr = expanders.right;
+    bool xrr = expanders.right.module != NULL;
 
-    if (expanders.left) {
-        sn_vcv_lfox *x = (sn_vcv_lfox *)expanders.left;
+    if (expanders.left.module != NULL) {
+        sn_vcv_lfox *x = (sn_vcv_lfox *)expanders.left.module;
 
         if (!x->isLinkedLeft()) {
             xll = true;
@@ -160,41 +160,17 @@ void sn_vcv_lfo::process(const ProcessArgs &args) {
     processAUX(args, expanded, resync);
 
     // ... update expanders
-    if (expanders.left) {
-        sn_lfo_message *msg = (sn_lfo_message *)expanders.left->getRightExpander().producerMessage;
+    {
+        sn_lfo_message *msg;
 
-        if (msg != NULL) {
-            msg->linked = true;
-            msg->channels = channels;
-
-            for (int ch = 0; ch < channels; ch++) {
-                msg->LFO[ch].phase = lfo[ch].phase;
-                msg->LFO[ch].out = lfo[ch].out.sum;
-            }
-
-            msg->AUX.phase = aux.phase;
-            msg->AUX.out = aux.out.sum;
-
-            expanders.left->getRightExpander().requestMessageFlip();
+        if ((msg = expanders.left.producer()) != NULL) {
+            msg->set(true, channels, lfo, aux);
+            expanders.left.flip();
         }
-    }
 
-    if (expanders.right) {
-        sn_lfo_message *msg = (sn_lfo_message *)expanders.right->getLeftExpander().producerMessage;
-
-        if (msg != NULL) {
-            msg->linked = true;
-            msg->channels = channels;
-
-            for (int ch = 0; ch < channels; ch++) {
-                msg->LFO[ch].phase = lfo[ch].phase;
-                msg->LFO[ch].out = lfo[ch].out.sum;
-            }
-
-            msg->AUX.phase = aux.phase;
-            msg->AUX.out = aux.out.sum;
-
-            expanders.right->getLeftExpander().requestMessageFlip();
+        if ((msg = expanders.right.producer()) != NULL) {
+            msg->set(true, channels, lfo, aux);
+            expanders.right.flip();
         }
     }
 }

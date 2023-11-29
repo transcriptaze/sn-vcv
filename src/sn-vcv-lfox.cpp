@@ -165,12 +165,12 @@ void sn_vcv_lfox::process(const ProcessArgs &args) {
         channels = msg->channels;
 
         for (int ch = 0; ch < channels; ch++) {
-            lfo[ch].phase = msg->LFO[ch].phase;
-            lfo[ch].out.sum = msg->LFO[ch].out;
+            lfo[ch].phase = msg->lfo[ch].phase;
+            lfo[ch].out.sum = msg->lfo[ch].out;
         }
 
-        aux.phase = msg->AUX.phase;
-        aux.out.sum = msg->AUX.out;
+        aux.phase = msg->aux.phase;
+        aux.out.sum = msg->aux.out;
     } else {
         for (int ch = 0; ch < channels; ch++) {
             lfo[ch].phase = 0.0f;
@@ -186,39 +186,17 @@ void sn_vcv_lfox::process(const ProcessArgs &args) {
 
     // ... update expanders
     {
-        sn_lfo_message *msg = expanders.left.producer();
+        sn_lfo_message *msg;
 
-        if (msg != NULL) {
-            msg->linked = msgR != NULL && msgR->linked;
-            msg->channels = channels;
-
-            for (int ch = 0; ch < channels; ch++) {
-                msg->LFO[ch].phase = lfo[ch].phase;
-                msg->LFO[ch].out = lfo[ch].out.sum;
-            }
-
-            msg->AUX.phase = aux.phase;
-            msg->AUX.out = aux.out.sum;
-
+        if ((msg = expanders.left.producer()) != NULL) {
+            bool linked = msgR != NULL && msgR->linked;
+            msg->set(linked, channels, lfo, aux);
             expanders.left.flip();
         }
-    }
 
-    {
-        sn_lfo_message *msg = expanders.right.producer();
-
-        if (msg != NULL) {
-            msg->linked = msgL != NULL && msgL->linked;
-            msg->channels = channels;
-
-            for (int ch = 0; ch < channels; ch++) {
-                msg->LFO[ch].phase = lfo[ch].phase;
-                msg->LFO[ch].out = lfo[ch].out.sum;
-            }
-
-            msg->AUX.phase = aux.phase;
-            msg->AUX.out = aux.out.sum;
-
+        if ((msg = expanders.right.producer()) != NULL) {
+            bool linked = msgL != NULL && msgL->linked;
+            msg->set(linked, channels, lfo, aux);
             expanders.right.flip();
         }
     }

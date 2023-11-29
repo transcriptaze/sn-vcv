@@ -9,16 +9,18 @@ generator function instead of the more usual _sine_. The modules comprise:
 
 <img width="96" src="documentation/images/sine.png"> <img width="96" src="documentation/images/square.png"> <img width="96" src="documentation/images/triangle.png"> <img width="96" src="documentation/images/sawtooth.png"> <img width="96" src="documentation/images/spike.png"> <img width="96" src="documentation/images/bumps.png"> <img width="96" src="documentation/images/wonky.png">
 
-The modules don't do anything particuarly radical but are an interesting way to add subtle variations to
-a sound e.g. the [Greensleeves](#greensleeves) demo uses _sn-vco_ to add some tonal interest to an otherwise
+The modules don't do anything particuarly radical but are an interesting way to add subtle variations to a sound. 
+The [Greensleeves](#greensleeves) demo is an example of the _sn-vco_ to add some tonal interest to an otherwise
 fairly plain rendering.
+
+## Contents
 
 - [Background](#background)
 - [Modules](#modules)
-   - [sn-vco](/documentation/sn-vco.md)
-   - [sn-vcox](/documentation/sn-vcox.md)
-   - [sn-lfo](/documentation/sn-lfo.md)
-   - [sn-lfox](/documentation/sn-lfox.md)
+   - [sn-vco](/documentation/MANUAL.md#sn-vco)
+   - [sn-vcox](/documentation/MANUAL.md#sn-vcox)
+   - [sn-lfo](/documentation/MANUAL.md#sn-lfo)
+   - [sn-lfox](/documentation/MANUAL.md#sn-lfox)
 - [Patches](#patches)
 - [License](#license)
 
