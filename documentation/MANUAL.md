@@ -7,7 +7,7 @@
 
 ## **sn-vco**
 
-<img width="128" src="images/sn-vco.svg"> _sn-vco_ is a more or less standard VCO module except that it
+<img width="128" src="images/sn-vcv-vco.svg"> _sn-vco_ is a more or less standard VCO module except that it
 produces a _sn_ output rather than a _sine_, allowing the waveshape to be morphed between a sine, square,
 triangular and sawtooth wave and pretty much everything in between. Although it can be used on its own,
 the module is really intended to be used as the base for stacked _sn-vcox_ expanders. 
@@ -170,7 +170,7 @@ The module includes a set of factory presets:
 
 #### [*sn-vcv-vcox*](/documentation/patches/sn-vcv-vcox.vcv)
 
-Basic patch to demonstrate the operation of stacked _sn-vcox_ modules. 
+<img width="128" src="images/sn-vcv-vcox.svg"> Basic patch to demonstrate the operation of stacked _sn-vcox_ modules. 
 
 Uses three independent LFOs to drive the parameter inputs of an _sn-vco_ module with two stacked _sn-vcox_ 
 extenders to that the resulting waveform is the sum of three more or less independent harmonics, each
@@ -183,7 +183,7 @@ _Requires_:
 
 ## **sn-lfo**
 
-_sn-lfo_ is a more or less standard LFO module except that it produces a _sn_ output rather than a _sine_,
+<img width="128" src="images/sn-vcv-lfo.svg"> _sn-lfo_ is a more or less standard LFO module except that it produces a _sn_ output rather than a _sine_,
 allowing the waveshape to be morphed between a sine, square, triangular and sawtooth wave and pretty much
 everything in between. Although it can be used on its own, the module is really intended to be used as
 the base for stacked _sn-lfox_ expanders. 
@@ -262,7 +262,7 @@ _Requires_:
 
 ## **sn-lfox**
 
-_sn-lfox_ is an expander module for the _sn-lfo_ module that adds a harmonic wave to the output of _sn-lfo_.
+<img width="128" src="images/sn-vcv-lfox.svg"> _sn-lfox_ is an expander module for the _sn-lfo_ module that adds a harmonic wave to the output of _sn-lfo_.
 Multiple expanders can be stacked to create a waveform using harmonics and/or variations.
 
 ### Controls
