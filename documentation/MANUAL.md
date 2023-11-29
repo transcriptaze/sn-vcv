@@ -14,6 +14,7 @@ the module is really intended to be used as the base for stacked _sn-vcox_ expan
 
 <img width="128" src="images/sine.png"> <img width="128" src="images/square.png"> <img width="128" src="images/triangle.png"> <img width="128" src="images/sawtooth.png"> <img width="128" src="images/spike.png"> <img width="128" src="images/bumps.png"> <img width="128" src="images/wonky.png">
 
+<br/>
 ### Controls
 
 | Control    | Range | Name           | Description                                                    |
@@ -24,8 +25,7 @@ the module is really intended to be used as the base for stacked _sn-vcox_ expan
 | _a_        | 0-1   | _amplitude_    | Sets the amplitude of the harmonic component                   |
 | _δx_       | ±1    | _shift-x_      | Sets the horizontal shift of the _sn_ generator function       |
 | _δy_       | ±1    | _shift-y_      | Sets the vertical shift of the _sn_ generator function         |
-|            |       |                |                                                                |
-| _ATT_      | 0-1   | _gain_         | Attenuates the summed output to bring it back into range       |
+| _m_        | 1-5   | _multiplier_   | Multiplies the base frequency                                  |
 
 
 ### Inputs and outputs
@@ -103,8 +103,20 @@ _Requires_:
 <img align="left" width="128" src="images/sn-vcv-vcox.svg"> _sn-vcox_ is an expander module for the _sn-vco_ module that adds a harmonic wave to the output of 
 _sn-vco_. Multiple expanders can be stacked to create a waveform using harmonics and/or variations.
 
-### Parameters
+<br/>
+### Controls
 
+| Control    | Range | Name           | Description                                                    |
+|------------|-------|----------------|----------------------------------------------------------------|
+| _ε_        | ±1    | _eccentricity_ | Sets the _eccentricity_ of the _sn_ generator function         |
+| _s_        | 0-5   | _sensitivity_  | Fine adjust for the _eccentricity_ set by the _ε_ control      |
+| _θ_        | ±90°  | _rotation_     | Sets the rotation angle of he _sn_ generator function          |
+| _a_        | 0-1   | _amplitude_    | Sets the amplitude of the harmonic component                   |
+| _δx_       | ±1    | _shift-x_      | Sets the horizontal shift of the _sn_ generator function       |
+| _δy_       | ±1    | _shift-y_      | Sets the vertical shift of the _sn_ generator function         |
+| _m_        | 1-5   | _multiplier_   | Multiplies the base frequency                                  |
+|            |       |                |                                                                |
+| _ATT_      | 0-1   | _gain_         | Attenuates the summed output to bring it back into range       |
 
 ### Inputs and outputs
 
@@ -186,6 +198,22 @@ allowing the waveshape to be morphed between a sine, square, triangular and sawt
 everything in between. Although it can be used on its own, the module is really intended to be used as
 the base for stacked _sn-lfox_ expanders. 
 
+<br/>
+
+### Controls
+
+| Control    | Range  | Name           | Description                                                   |
+|------------|--------|----------------|---------------------------------------------------------------|
+| _ε_        | ±1     | _eccentricity_ | Sets the _eccentricity_ of the _sn_ generator function        |
+| _s_        | 0-5    | _sensitivity_  | Fine adjust for the _eccentricity_ set by the _ε_ control     |
+| _θ_        | ±90°   | _rotation_     | Sets the rotation angle of he _sn_ generator function         |
+| _a_        | 0-1    | _amplitude_    | Sets the amplitude of the harmonic component                  |
+| _δx_       | ±1     | _shift-x_      | Sets the horizontal shift of the _sn_ generator function      |
+| _δy_       | ±1     | _shift-y_      | Sets the vertical shift of the _sn_ generator function        |
+| _m_        | 1-5    | _multiplier_   | Multiplies the base frequency                                 |
+|            |        |                |                                                               |
+| _f_        | 0.1-10 | _frequency_    | LFO frequency (0.1Hz to 10hz, log scale)                      |
+
 ### Inputs and outputs
 
 | Input       | Range  | Name         | Description                                                    |
@@ -256,8 +284,9 @@ _Requires_:
 
 ## **sn-lfox**
 
-<img align="left" width="128" src="images/sn-vcv-lfox.svg"> _sn-lfox_ is an expander module for the _sn-lfo_ module that adds a harmonic wave to the output of _sn-lfo_.
-Multiple expanders can be stacked to create a waveform using harmonics and/or variations.
+<img align="left" width="128" src="images/sn-vcv-lfox.svg"> _sn-lfox_ is an expander module for the _sn-lfo_ module that adds a harmonic wave to the output of _sn-lfo_. Multiple expanders can be stacked to create a waveform using harmonics and/or variations.
+
+<br/>
 
 ### Controls
 
@@ -269,6 +298,7 @@ Multiple expanders can be stacked to create a waveform using harmonics and/or va
 | _a_        | 0-1   | _amplitude_    | Sets the amplitude of the harmonic component                   |
 | _δx_       | ±1    | _shift-x_      | Sets the horizontal shift of the _sn_ generator function       |
 | _δy_       | ±1    | _shift-y_      | Sets the vertical shift of the _sn_ generator function         |
+| _m_        | 1-5   | _multiplier_   | Multiplies the base frequency                                  |
 |            |       |                |                                                                |
 | _ATT_      | 0-1   | _gain_         | Attenuates the summed output to bring it back into range       |
 
