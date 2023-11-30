@@ -7,12 +7,12 @@
 
 ## **sn-vco**
 
-<img align="left" width="128" src="images/sn-vcv-vco.svg"> _sn-vco_ is a more or less standard VCO module except that it
+<img align="left" width="128" src="/documentation/images/sn-vcv-vco.svg"> _sn-vco_ is a more or less standard VCO module except that it
 produces a _sn_ output rather than a _sine_, allowing the waveshape to be morphed between a sine, square,
 triangular and sawtooth wave and pretty much everything in between. Although it can be used on its own,
 the module is really intended to be used as the base for stacked _sn-vcox_ expanders. 
 
-<img width="128" src="images/sine.png"> <img width="128" src="images/square.png"> <img width="128" src="images/triangle.png"> <img width="128" src="images/sawtooth.png"> <img width="128" src="images/spike.png"> <img width="128" src="images/bumps.png"> <img width="128" src="images/wonky.png">
+<img width="128" src="/documentation/images/sine.png"> <img width="128" src="/documentation/images/square.png"> <img width="128" src="/documentation/images/triangle.png"> <img width="128" src="/documentation/images/sawtooth.png"> <img width="128" src="/documentation/images/spike.png"> <img width="128" src="/documentation/images/bumps.png"> <img width="128" src="/documentation/images/wonky.png">
 
 <br/>
 ### Controls
@@ -84,23 +84,9 @@ The module includes a set of factory presets:
 | sawtooth-left  | -0.175 | 5.0 | 90° | 1.0 | -0.99 | 0.0  |
 | sawtooth-right | -0.175 | 5.0 | 90° | 1.0 | +0.99 | 0.0  |
 
-### Patches
-
-#### [*sn-vcv-vco*](/documentation/patches/sn-vcv-vco.vcv)
-
-Basic patch to demonstrate the operation of the _sn-vco_ module. 
-
-The patch basically connects three standard LFOs to _ε_, _δx_ and _δy_ inputs of a single _sn-vco_ module
-to output a continuously varying waveform. Not very inspired and sounds pretty bland but should (hopefully)
-give some idea of the operation of the module.
-
-_Requires_:
-1. _Fundamental_ modules
-
-
 ## **sn-vcox**
 
-<img align="left" width="128" src="images/sn-vcv-vcox.svg"> _sn-vcox_ is an expander module for the _sn-vco_ module that adds a harmonic wave to the output of 
+<img align="left" width="128" src="/documentation/images/sn-vcv-vcox.svg"> _sn-vcox_ is an expander module for the _sn-vco_ module that adds a harmonic wave to the output of 
 _sn-vco_. Multiple expanders can be stacked to create a waveform using harmonics and/or variations.
 
 <br/>
@@ -176,24 +162,10 @@ The module includes a set of factory presets:
 | sawtooth-left  | -0.175 | 5.0 | 90° | 1.0 | -0.99 | 0.0  |
 | sawtooth-right | -0.175 | 5.0 | 90° | 1.0 | +0.99 | 0.0  |
 
-### Patches
-
-#### [*sn-vcv-vcox*](/documentation/patches/sn-vcv-vcox.vcv)
-
-Basic patch to demonstrate the operation of stacked _sn-vcox_ modules. 
-
-Uses three independent LFOs to drive the parameter inputs of an _sn-vco_ module with two stacked _sn-vcox_ 
-extenders to that the resulting waveform is the sum of three more or less independent harmonics, each
-of which is shape-shifting in it's own particular way. A little more interesting than just the basic
-_sn-vco_ patch but its not going to win any awards.
-
-_Requires_:
-1. _Fundamental_ modules
-
 
 ## **sn-lfo**
 
-<img align="left" width="128" src="images/sn-vcv-lfo.svg"> _sn-lfo_ is a more or less standard LFO module except that it produces a _sn_ output rather than a _sine_,
+<img align="left" width="128" src="/documentation/images/sn-vcv-lfo.svg"> _sn-lfo_ is a more or less standard LFO module except that it produces a _sn_ output rather than a _sine_,
 allowing the waveshape to be morphed between a sine, square, triangular and sawtooth wave and pretty much
 everything in between. Although it can be used on its own, the module is really intended to be used as
 the base for stacked _sn-lfox_ expanders. 
@@ -268,23 +240,10 @@ The module includes a set of factory presets:
 | sawtooth-left  | -0.175 | 5.0 | 90° | 1.0 | -0.99 | 0.0  | 0°  |
 | sawtooth-right | -0.175 | 5.0 | 90° | 1.0 | +0.99 | 0.0  | 0°  |
 
-### Patches
-
-#### [*sn-vcv-lfo*](/documentation/patches/sn-vcv-vco.vcv)
-
-Basic patch to demonstrate the operation of the _sn-lfo_ module. 
-
-Replaces the LFOs in the basic _sn-vco_ patch with three independent _sn-lfo_ modules each with its own
-waveform. The effect is to make the _sn-vco_ output morph in some weird and unexpected ways - most of
-which don't sound good but at least a bit more perk-up-your-ears interesting.
-
-_Requires_:
-1. _Fundamental_ modules
-
 
 ## **sn-lfox**
 
-<img align="left" width="128" src="images/sn-vcv-lfox.svg"> _sn-lfox_ is an expander module for the _sn-lfo_ module that adds a harmonic wave to the output of _sn-lfo_. Multiple expanders can be stacked to create a waveform using harmonics and/or variations.
+<img align="left" width="128" src="/documentation/images/sn-vcv-lfox.svg"> _sn-lfox_ is an expander module for the _sn-lfo_ module that adds a harmonic wave to the output of _sn-lfo_. Multiple expanders can be stacked to create a waveform using harmonics and/or variations.
 
 <br/>
 
@@ -353,16 +312,3 @@ The module includes a set of factory presets:
 | sawtooth-left  | -0.175 | 5.0 | 90° | 1.0 | -0.99 | 0.0  | 0°  |
 | sawtooth-right | -0.175 | 5.0 | 90° | 1.0 | +0.99 | 0.0  | 0°  |
 
-
-### Patches
-
-#### [*sn-vcv-lfox*](/documentation/patches/sn-vcv-lfox.vcv)
-
-Basic patch to demonstrate the operation of stacked _sn-lfox_ modules. 
-
-Replaces the independent LFOs in the basic _sn-lfo_ patch with an _sn-lfo_ module and two stacked 
-_sn-lfox_ expanders for a slightly different effect.Oddly ambient'ish in a way .. maybe with some
-reverb ..
-
-_Requires_:
-1. _Fundamental_ modules

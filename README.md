@@ -96,26 +96,37 @@ than as shining examples of the art of synthesis.
 
 #### [sn-vcv-vco](/documentation/patches/sn-vcv-vco.vcv)
 
-Hooks up 3 standard LFOs to a single _sn-vco_ module to demonstrate the basic shape shifting.
+Hooks up 3 standard LFOs to a single _sn-vco_ module to demonstrate the basic waveshaping operation of the
+_sn-vco_ module. 
+
+The patch connects three standard LFOs to _ε_, _δx_ and _δy_ inputs of a single _sn-vco_ module to output a
+continuously varying waveform. Not very inspired and sounds pretty bland but should (hopefully) give some
+idea of the operation of the module.
+
 
 #### [sn-vcv-vcox](/documentation/patches/sn-vcv-vcox.vcv)
 
-Extends the basic _sn-vco_ patch by stacking two _sn-vcox_ modules on to the_sn-vco_ module and generating
-waveforms at the 2nd and 4th harmonics. The LFOs from the _sn-vco_ demo are routed to the parameter inputs
-on each of the modules so that each module shape shifts independently. Sounds just about as horrible as you
-would expect but looks pretty.
+Extends the basic _sn-vco_ patch with two _sn-vcox_ expanders stacked on to the _sn-vco_ module.
+
+Three independent LFOs are used to drive the parameter inputs of the _sn-vco_ module and _sn-vcox_ 
+expanders so that the resulting waveform is the sum of three more or less independent harmonics, each
+of which is shape-shifting in its own particular way. A little more interesting than just the basic
+_sn-vco_ patch but it's not going to win any awards.
+
 
 #### [sn-vcv-lfo](/documentation/patches/sn-vcv-lfo.vcv)
 
 Replaces the LFOs in the basic _sn-vco_ patch with three independent _sn-lfo_ modules each with its own
-waveform. The effect is to make the _sn-vco_ output morph in some unexpected ways - still sounds weird
-rather than actually good, but at least it's starting to sound a little interesting.
+waveform. The effect is to make the _sn-vco_ output morph in some weird and unexpected ways - most of
+which don't sound good but at least a bit more perk-up-your-ears interesting.
+
 
 #### [*sn-vcv-lfox*](/documentation/patches/sn-vcv-lfox.vcv)
 
 Replaces the independent LFOs in the basic _sn-lfo_ patch with an _sn-lfo_ module and two stacked 
 _sn-lfox_ expanders for a slightly different effect. Oddly ambient'ish in a way .. maybe with some
-reverb .. 
+reverb ..
+
 
 ### MIDI
 
@@ -130,18 +141,14 @@ the waveshape, volume and ADSR envelope. A lot of the credit has to go to the _S
 adds some much needed depth to the rendering.
 
 Requires:
-- [Impromptu Clocked](https://library.vcvrack.com/ImpromptuModular/Clocked)
-- [Entrian Player Melody](https://library.vcvrack.com/Entrian-Free/Player-Melody)
-- [Mindmeld EQMaster](https://library.vcvrack.com/MindMeldModular/EqMaster)
-- [SurgeXT Reverb2](https://library.vcvrack.com/SurgeXTRack/SurgeXTFXReverb2)
+- [_Impromptu Clocked_](https://library.vcvrack.com/ImpromptuModular/Clocked)
+- [_Entrian Player Melody_](https://library.vcvrack.com/Entrian-Free/Player-Melody)
+- [_Mindmeld EQMaster_](https://library.vcvrack.com/MindMeldModular/EqMaster)
+- [_SurgeXT Reverb2_](https://library.vcvrack.com/SurgeXTRack/SurgeXTFXReverb2)
 
-Audio:
+[Audio](https://github.com/transcriptaze/sn-vcv/assets/7932356/15ec3ec8-c7c1-47b4-99ba-9471848ec995)
 
-https://github.com/transcriptaze/sn-vcv/assets/7932356/15ec3ec8-c7c1-47b4-99ba-9471848ec995
-
-YouTube:
-
-[Greensleeves - VCV](https://www.youtube.com/watch?v=D5CsH6UzfaU)
+[YouTube](https://www.youtube.com/watch?v=D5CsH6UzfaU)
 
 
 ## License

@@ -12,7 +12,7 @@
       - https://community.vcvrack.com/t/rack-development-blog/5864/84
 
 - [ ] README & Manuals
-      - [ ] modules images
+      - [x] modules images
       - `convert *.png -crop 392x331+281+90 cropped/screenshot%d.png`
       - https://github.com/nullJaX/vcvrack-patchable-devices
 
@@ -30,4 +30,4 @@
 - [x] _sn-vcv-lfo_
 - [x] _sn-vcv-lfox_
 - [x] Include as snyth submodule
-
+- [ ] https://herbie.uwplse.org/
