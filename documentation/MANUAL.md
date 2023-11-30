@@ -177,6 +177,7 @@ the base for stacked _sn-lfox_ expanders.
 | _a_        | 0-1    | _amplitude_    | Sets the amplitude of the harmonic component                  |
 | _δx_       | ±1     | _shift-x_      | Sets the horizontal shift of the _sn_ generator function      |
 | _δy_       | ±1     | _shift-y_      | Sets the vertical shift of the _sn_ generator function        |
+| _Φ_        | ±90°   | _phase_        | Sets the phase offset of a harmonic                           |
 | _m_        | 1-5    | _multiplier_   | Multiplies the base frequency                                 |
 |            |        |                |                                                               |
 | _f_        | 0.1-10 | _frequency_    | LFO frequency (0.1Hz to 10hz, log scale)                      |
@@ -250,6 +251,7 @@ The module includes a set of factory presets:
 | _a_        | 0-1   | _amplitude_    | Sets the amplitude of the harmonic component                   |
 | _δx_       | ±1    | _shift-x_      | Sets the horizontal shift of the _sn_ generator function       |
 | _δy_       | ±1    | _shift-y_      | Sets the vertical shift of the _sn_ generator function         |
+| _Φ_        | ±90°  | _phase_        | Sets the phase offset of a harmonic                            |
 | _m_        | 1-5   | _multiplier_   | Multiplies the base frequency                                  |
 |            |       |                |                                                                |
 | _ATT_      | 0-1   | _gain_         | Attenuates the summed output to bring it back into range       |

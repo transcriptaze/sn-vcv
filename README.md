@@ -13,7 +13,7 @@ The modules don't do anything particuarly radical but are an interesting way to 
 e.g. the [Greensleeves](#greensleeves) demo is an example of using the _sn-vco_ to add some tonal interest to an
 otherwise fairly plain rendering.
 
-## Contents
+### Contents
 
 - [Background](#background)
 - [Modules](#modules)
@@ -22,11 +22,11 @@ otherwise fairly plain rendering.
    - [sn-vcox](/documentation/MANUAL.md#sn-vcox)
    - [sn-lfo](/documentation/MANUAL.md#sn-lfo)
    - [sn-lfox](/documentation/MANUAL.md#sn-lfox)
-- [Patches](#patches)
+- [Demos](#patches)
 - [License](#license)
 
 
-## Background
+### Background
 
 Mathematically a _sine_ function is a special case of the Jacobi elliptic _sn_ function (in the same way that
 a circle is a special case of an ellipse). The _sn-vcv_ VCV modules use the _sn_ function rather than the
@@ -63,7 +63,7 @@ The modules share a common set of parameters that determine the wave shape:
 
 ### Building from source
 
-1. Install [VCV Rack SDK](https://vcvrack.com/manual/Building)
+1. Install the [VCV Rack SDK](https://vcvrack.com/manual/Building)
 
 2. Set the [RACK_DIR](https://vcvrack.com/manual/PluginDevelopmentTutorial) environment variable:
 ```

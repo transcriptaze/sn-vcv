@@ -2,19 +2,17 @@
 
 - [x] github tags
 - [ ] github workflow
+      - [x] Windows
+      - [x] Linux
+      - [x] Mac
       - [ ] Nightlies
             - [ ] Windows
             - [ ] Mac
             - [ ] Linux
-      - https://github.com/qno/vcv-plugin-github-actions-example/blob/main/.github/workflows/build-plugin.yml
-      - https://community.vcvrack.com/t/help-needed-for-beta-testing/20711/30
-      - https://community.vcvrack.com/t/automated-building-and-releasing-plugins-on-github-with-github-actions/11364
-      - https://community.vcvrack.com/t/rack-development-blog/5864/84
 
 - [ ] README & Manuals
       - [x] modules images
-      - `convert *.png -crop 392x331+281+90 cropped/screenshot%d.png`
-      - https://github.com/nullJaX/vcvrack-patchable-devices
+      - [ ] sn-lfox logo
 
 - [ ] Demo patches
       - [x] sn-vco
@@ -29,5 +27,15 @@
 - [x] _sn-vcv-oscx_
 - [x] _sn-vcv-lfo_
 - [x] _sn-vcv-lfox_
-- [x] Include as snyth submodule
-- [ ] https://herbie.uwplse.org/
+- [x] Add as snyth submodule
+
+
+## Notes and References
+
+1. https://github.com/qno/vcv-plugin-github-actions-example/blob/main/.github/workflows/build-plugin.yml
+2. https://community.vcvrack.com/t/help-needed-for-beta-testing/20711/30
+3. https://community.vcvrack.com/t/automated-building-and-releasing-plugins-on-github-with-github-actions/11364
+4. https://community.vcvrack.com/t/rack-development-blog/5864/84
+5. https://herbie.uwplse.org
+6. `convert *.png -crop 392x331+281+90 cropped/screenshot%d.png`
+7. https://github.com/nullJaX/vcvrack-patchable-devices
