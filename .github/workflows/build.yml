@@ -73,11 +73,11 @@ jobs:
           make dep
           make dist
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          path: dist/*.vcvplugin
-          name: mac-${{ matrix.platform }}
+      # - name: Upload artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     path: dist/*.vcvplugin
+      #     name: mac-${{ matrix.platform }}
 
 
   build-linux:
@@ -102,11 +102,11 @@ jobs:
           make dep
           make dist
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          path: dist/*.vcvplugin
-          name: linux-${{ matrix.platform }}
+      # - name: Upload artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     path: dist/*.vcvplugin
+      #     name: linux-${{ matrix.platform }}
 
 
   # build-windows:
