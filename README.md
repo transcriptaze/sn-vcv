@@ -17,6 +17,7 @@ otherwise fairly plain rendering.
 
 - [Background](#background)
 - [Modules](#modules)
+- [Manual](/documentation/MANUAL.md)
    - [sn-vco](/documentation/MANUAL.md#sn-vco)
    - [sn-vcox](/documentation/MANUAL.md#sn-vcox)
    - [sn-lfo](/documentation/MANUAL.md#sn-lfo)
@@ -49,39 +50,54 @@ The modules share a common set of parameters that determine the wave shape:
 | _a_       | 0-1   | _amplitude_    | Sets the amplitude of the harmonic component                    |
 | _δx_      | ±1    | _shift-x_      | Sets the horizontal shift of the _sn_ generator function        |
 | _δy_      | ±1    | _shift-y_      | Sets the vertical shift of the _sn_ generator function          |
-| _Φ_       | ±90°  | _phase_        | (LFO only) Adjust the phase offset of a harmonic                |
+| _Φ_       | ±90°  | _phase_        | Adjust the phase offset of a harmonic (LFO only)                |
 | _m_       | 1-5   | _multiplier_   | Base frequency multiplier                                       |
 
 ## Installation
 
 ### VCV Rack Library
 
+(not yet)
+
 ### Manual
 
 ### Building from source
 
+1. Install [VCV Rack SDK](https://vcvrack.com/manual/Building)
+
+2. Set the [RACK_DIR](https://vcvrack.com/manual/PluginDevelopmentTutorial) environment variable:
+```
+export RACK_DIR=<Rack SDK folder>
+```
+
+3. Build and install the _sn-xxx_ plugins:
+```
+git clone https://github.com/transcriptaze/sn-vcv.git
+cd sn-vcv
+make
+```
 
 ## Modules
 
-### [sn-vco](/documentation/sn-vco.md)
+### [sn-vco](/documentation/MANUAL.md#sn-vco)
 
 _sn-vco_ is a more-or-less standard VCO module except that it produces a _sn_ output rather than a _sine_
 which (as described above), allows the waveshape to be morphed between a sine, square, triangular and sawtooth
 wave. 
 
-### [sn-vcox](/documentation/sn-vcox.md)
+### [sn-vcox](/documentation/MANUAL.md#sn-vcox)
 
 _sn-vcox_ is an expander module for the _sn-vco_ module that adds a harmonic component to the output of 
 _sn-vco_. Multiple expanders can be stacked to create a waveform using harmonics and/or variations.
 
-### [sn-lfo](/documentation/sn-lfo.md)
+### [sn-lfo](/documentation/MANUAL.md#sn-lfo)
 
 _sn-lfo_ is a more or less standard LFO module except that it produces a _sn_ output rather than a _sine_,
 allowing the waveshape to be morphed between a sine, square, triangular and sawtooth wave and pretty much
 everything in between. Although it can be used on its own, the module is really intended to be used as
 the base for stacked _sn-lfox_ expanders. 
 
-### [sn-lfox](/documentation/sn-lfox.md)
+### [sn-lfox](/documentation/MANUAL.md#sn-lfox)
 
 _sn-lfox_ is an expander module for the _sn-lfo_ module that adds a harmonic wave to the output of _sn-lfo_.
 Multiple expanders can be stacked to create a waveform using harmonics and/or variations.

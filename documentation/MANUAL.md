@@ -12,10 +12,9 @@ produces a _sn_ output rather than a _sine_, allowing the waveshape to be morphe
 triangular and sawtooth wave and pretty much everything in between. Although it can be used on its own,
 the module is really intended to be used as the base for stacked _sn-vcox_ expanders. 
 
-<img width="128" src="/documentation/images/sine.png"> <img width="128" src="/documentation/images/square.png"> <img width="128" src="/documentation/images/triangle.png"> <img width="128" src="/documentation/images/sawtooth.png"> <img width="128" src="/documentation/images/spike.png"> <img width="128" src="/documentation/images/bumps.png"> <img width="128" src="/documentation/images/wonky.png">
+<img width="96" src="/documentation/images/sine.png"> <img width="96" src="/documentation/images/square.png"> <img width="96" src="/documentation/images/triangle.png"> <img width="96" src="/documentation/images/sawtooth.png"> <img width="96" src="/documentation/images/spike.png"> <img width="96" src="/documentation/images/bumps.png"> <img width="96" src="/documentation/images/wonky.png">
 
-<br/>
-### Controls
+#### Controls
 
 | Control    | Range | Name           | Description                                                    |
 |------------|-------|----------------|----------------------------------------------------------------|
@@ -28,7 +27,7 @@ the module is really intended to be used as the base for stacked _sn-vcox_ expan
 | _m_        | 1-5   | _multiplier_   | Multiplies the base frequency                                  |
 
 
-### Inputs and outputs
+#### Inputs and outputs
 
 | Input      | Range | Name           | Description                                                    |
 |------------|-------|----------------|----------------------------------------------------------------|
@@ -49,7 +48,7 @@ the module is really intended to be used as the base for stacked _sn-vcox_ expan
 | _TRIG_     | 0-10V | _trigger_      | Trigger output for the AUX output                              |
 
 
-### Context Menu
+#### Context Menu
 
 1. _k-rate_
    Sets the rate at which the parameter values are used to recalculate the waveform:
@@ -72,7 +71,7 @@ the module is really intended to be used as the base for stacked _sn-vcox_ expan
    - ¼ (±1.25V, 2.5V peak-to-peak)
    - ⅕ (±1V, 2V peak-to-peak)
 
-### Factory Presets
+#### Factory Presets
 
 The module includes a set of factory presets:
 
@@ -89,8 +88,7 @@ The module includes a set of factory presets:
 <img align="left" width="128" src="/documentation/images/sn-vcv-vcox.svg"> _sn-vcox_ is an expander module for the _sn-vco_ module that adds a harmonic wave to the output of 
 _sn-vco_. Multiple expanders can be stacked to create a waveform using harmonics and/or variations.
 
-<br/>
-### Controls
+#### Controls
 
 | Control    | Range | Name           | Description                                                    |
 |------------|-------|----------------|----------------------------------------------------------------|
@@ -104,7 +102,7 @@ _sn-vco_. Multiple expanders can be stacked to create a waveform using harmonics
 |            |       |                |                                                                |
 | _ATT_      | 0-1   | _gain_         | Attenuates the summed output to bring it back into range       |
 
-### Inputs and outputs
+#### Inputs and outputs
 
 | Input      | Range | Name           | Description                                                    |
 |------------|-------|----------------|----------------------------------------------------------------|
@@ -126,8 +124,7 @@ The _VCO-Σ_ is a summed voltage and can easily exceed the ±5V audio signal ran
 are at their maximum amplitudes. The _ATT_ control can be used to attenuate the _VCO-Σ_ output to a usable
 range.
 
-
-### Context Menu
+#### Context Menu
 
 1. _k-rate_
    Sets the rate at which the parameter values are used to recalculate the waveform:
@@ -150,7 +147,7 @@ range.
    - ¼ (±1.25V, 2.5V peak-to-peak)
    - ⅕ (±1V, 2V peak-to-peak)
 
-### Factory Presets
+#### Factory Presets
 
 The module includes a set of factory presets:
 
@@ -170,9 +167,7 @@ allowing the waveshape to be morphed between a sine, square, triangular and sawt
 everything in between. Although it can be used on its own, the module is really intended to be used as
 the base for stacked _sn-lfox_ expanders. 
 
-<br/>
-
-### Controls
+#### Controls
 
 | Control    | Range  | Name           | Description                                                   |
 |------------|--------|----------------|---------------------------------------------------------------|
@@ -186,7 +181,7 @@ the base for stacked _sn-lfox_ expanders.
 |            |        |                |                                                               |
 | _f_        | 0.1-10 | _frequency_    | LFO frequency (0.1Hz to 10hz, log scale)                      |
 
-### Inputs and outputs
+#### Inputs and outputs
 
 | Input       | Range  | Name         | Description                                                    |
 |-------------|--------|--------------|----------------------------------------------------------------|
@@ -199,7 +194,7 @@ the base for stacked _sn-lfox_ expanders.
 | _AUX_       | ±5V    | _AUX_        | 2 channel 25Hz signal 'monitor' output for use with the scope  |
 | _TRIG_      | 0-10V  | _trigger_    | Trigger output for the AUX output                              |
 
-### Context Menu
+#### Context Menu
 
 1. _range_ 
    Sets the _range_ and _mode_ for the frequency parameter:
@@ -228,7 +223,7 @@ the base for stacked _sn-lfox_ expanders.
    - ¼ (±1.25V, 2.5V peak-to-peak)
    - ⅕ (±1V, 2V peak-to-peak)
 
-### Factory Presets
+#### Factory Presets
 
 The module includes a set of factory presets:
 
@@ -245,9 +240,7 @@ The module includes a set of factory presets:
 
 <img align="left" width="128" src="/documentation/images/sn-vcv-lfox.svg"> _sn-lfox_ is an expander module for the _sn-lfo_ module that adds a harmonic wave to the output of _sn-lfo_. Multiple expanders can be stacked to create a waveform using harmonics and/or variations.
 
-<br/>
-
-### Controls
+#### Controls
 
 | Control    | Range | Name           | Description                                                    |
 |------------|-------|----------------|----------------------------------------------------------------|
@@ -262,7 +255,7 @@ The module includes a set of factory presets:
 | _ATT_      | 0-1   | _gain_         | Attenuates the summed output to bring it back into range       |
 
 
-### Outputs
+#### Outputs
 
 | Output      | Range | Name          | Description                                                    |
 |------------|-------|----------------|----------------------------------------------------------------|
@@ -276,7 +269,7 @@ are at their maximum amplitudes. The _ATT_ control can be used to attenuate the 
 range.
 
 
-### Context Menu
+#### Context Menu
 
 1. _k-rate_
    Sets the rate at which the parameter values are used to recalculate the waveform:
@@ -300,7 +293,7 @@ range.
    - ⅕ (±1V, 2V peak-to-peak)
 
 
-### Factory Presets
+#### Factory Presets
 
 The module includes a set of factory presets:
 
