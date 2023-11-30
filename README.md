@@ -22,7 +22,7 @@ otherwise fairly plain rendering.
    - [sn-vcox](/documentation/MANUAL.md#sn-vcox)
    - [sn-lfo](/documentation/MANUAL.md#sn-lfo)
    - [sn-lfox](/documentation/MANUAL.md#sn-lfox)
-- [Demos](#patches)
+- [Demos](#demo-patches)
 - [License](#license)
 
 
