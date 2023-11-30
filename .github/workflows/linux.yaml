@@ -1,8 +1,8 @@
-name: windows
+name: linux
 
 on:
   workflow_dispatch:  
-
+  
 env:
   rack-sdk-version: latest
   rack-plugin-toolchain-dir: /home/build/rack-plugin-toolchain
@@ -12,9 +12,9 @@ defaults:
     shell: bash
 
 jobs:
-  build-windows:
-    name: windows
-    runs-on: windows-latest
+  build:
+    name: linux
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
@@ -22,19 +22,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
       - name: Get Rack-SDK
         run: |
           pushd $HOME
-          C:\\msys64\\usr\\bin\\wget.exe -O Rack-SDK.zip https://vcvrack.com/downloads/Rack-SDK-${{ env.rack-sdk-version }}-win-${{ matrix.platform }}.zip
+          wget -O Rack-SDK.zip https://vcvrack.com/downloads/Rack-SDK-${{ env.rack-sdk-version }}-lin-${{ matrix.platform }}.zip
           unzip Rack-SDK.zip
-          dir .
 
       - name: Build plugin
         run: |
           export RACK_DIR=$HOME/Rack-SDK
-          export CC=gcc
-          echo ">>>>>>>>>>> ${RACK_DIR}"
           make dep
           make dist
 
@@ -42,4 +38,4 @@ jobs:
       #   uses: actions/upload-artifact@v3
       #   with:
       #     path: dist/*.vcvplugin
-      #     windows: linux-${{ matrix.platform }}
+      #     name: linux-${{ matrix.platform }}

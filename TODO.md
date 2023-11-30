@@ -2,7 +2,7 @@
 
 - [x] github tags
 - [ ] github workflow
-      - [x] Windows
+      - [ ] Windows
       - [x] Linux
       - [x] Mac
       - [ ] Nightlies
