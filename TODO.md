@@ -12,7 +12,7 @@
 
 - [ ] README & Manuals
       - [x] modules images
-      - [ ] sn-lfox logo
+      - [x] sn-lfox logo
 
 - [ ] Demo patches
       - [x] sn-vco
