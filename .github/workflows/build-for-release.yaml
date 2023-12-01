@@ -40,7 +40,7 @@ jobs:
           path: ${{ env.rack-plugin-toolchain-dir }}/plugin-build
           name: ${{ matrix.platform }}
 
-  build-mac-12:
+  build-mac:
     name: mac
     runs-on: macos-latest
 

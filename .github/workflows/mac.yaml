@@ -39,7 +39,7 @@ jobs:
           make dep
           make dist
 
-  build:
+  build-mac-11:
     name: mac-11
     runs-on: macos-11
 
