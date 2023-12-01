@@ -5,7 +5,7 @@
       - [ ] Windows
       - [x] Linux
       - [x] Mac
-      - [ ] Nightlies
+      - [ ] _dist_
             - [ ] Windows
             - [ ] Mac
             - [ ] Linux

@@ -1,14 +1,8 @@
-name: build
+name: build-for-release
 
 on:
   workflow_dispatch:  
   
-  # push:
-  #   branches: [ main ]
-  # 
-  # pull_request:
-  #   branches: [ main ]
-
 env:
   rack-sdk-version: latest
   rack-plugin-toolchain-dir: /home/build/rack-plugin-toolchain
@@ -40,7 +34,13 @@ jobs:
              pushd ${{ env.rack-plugin-toolchain-dir }}
              make plugin-build-${{ matrix.platform }}
 
-  build-mac:
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          path: ${{ env.rack-plugin-toolchain-dir }}/plugin-build
+          name: ${{ matrix.platform }}
+
+  build-mac-12:
     name: mac
     runs-on: macos-latest
 
@@ -66,3 +66,43 @@ jobs:
           export CROSS_COMPILE=$CROSS_COMPILE_TARGET_${{ matrix.platform }}
           make dep
           make dist
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          path: dist/*.vcvplugin
+          name: mac-${{ matrix.platform }}
+
+  build-mac-11:
+    name: mac
+    runs-on: macos-11
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [x64]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get Rack-SDK
+        run: |
+          pushd $HOME
+          wget -O Rack-SDK.zip https://vcvrack.com/downloads/Rack-SDK-${{ env.rack-sdk-version }}-mac-${{ matrix.platform }}.zip
+          unzip Rack-SDK.zip
+
+      - name: Build plugin
+        run: |
+          CROSS_COMPILE_TARGET_x64=x86_64-apple-darwin
+          CROSS_COMPILE_TARGET_arm64=arm64-apple-darwin
+          export RACK_DIR=$HOME/Rack-SDK
+          export CROSS_COMPILE=$CROSS_COMPILE_TARGET_${{ matrix.platform }}
+          make dep
+          make dist
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          path: dist/*.vcvplugin
+          name: mac-11-${{ matrix.platform }}
+

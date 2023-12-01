@@ -37,9 +37,3 @@ jobs:
           echo ">>>>>>>>>>> ${RACK_DIR}"
           make dep
           make dist
-
-      # - name: Upload artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     path: dist/*.vcvplugin
-      #     windows: linux-${{ matrix.platform }}

@@ -33,9 +33,3 @@ jobs:
           export RACK_DIR=$HOME/Rack-SDK
           make dep
           make dist
-
-      # - name: Upload artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     path: dist/*.vcvplugin
-      #     name: linux-${{ matrix.platform }}
