@@ -12,7 +12,7 @@ sn_vcv_lfox::sn_vcv_lfox() {
     configParam(DX_PARAM, -1.0f, +1.0f, 0.0f, "δx");
     configParam(DY_PARAM, -1.0f, +1.0f, 0.0f, "δy");
     configParam(PHI_PARAM, -90.0f, +90.0f, 0.0f, "Φ");
-    configSwitch(M_PARAM, 1.f, 5.f, 1.f, "m", {"1", "2", "3", "4", "5"});
+    configSwitch(M_PARAM, 1.f, 5.f, 2.f, "m", {"1", "2", "3", "4", "5"});
     configParam(ATT_PARAM, 0.0f, +1.0f, 1.0f, "ɡ");
 
     getParamQuantity(M_PARAM)->randomizeEnabled = false;
@@ -234,8 +234,11 @@ void sn_vcv_lfox::processLFO(const ProcessArgs &args, int channels, bool expande
             float υ = sn.υ(α);
 
             lfo[ch].out.lfo = υ;
-            lfo[ch].out.sum += sn.A * υ;
         }
+    }
+
+    for (int ch = 0; ch < channels; ch++) {
+        lfo[ch].out.sum += sn.A * lfo[ch].out.lfo;
     }
 
     if (outputs[LFO_OUTPUT].isConnected() || outputs[SUM_OUTPUT].isConnected()) {

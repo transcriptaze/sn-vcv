@@ -204,6 +204,12 @@ void sn_vcv_lfo::processLFO(const ProcessArgs &args, int channels, bool resync, 
     float f = range.frequency(fv);
     float frequency[16] = {f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f};
 
+    if (resync) {
+        for (int ch = 0; ch < 16; ch++) {
+            lfo[ch].phase = 0.f;
+        }
+    }
+
     if (inputs[FREQUENCY_INPUT].isConnected()) {
         for (int ch = 0; ch < channels; ch++) {
             float fm = 10.f * clamp(inputs[FREQUENCY_INPUT].getPolyVoltage(ch) / 5.0f, -1.0f, +1.0f);
@@ -224,14 +230,8 @@ void sn_vcv_lfo::processLFO(const ProcessArgs &args, int channels, bool resync, 
         }
     }
 
-    if (resync) {
-        for (int ch = 0; ch < 16; ch++) {
-            lfo[ch].phase = 0.f;
-        }
-    }
-
     // ... generate LFO signal
-    if ((outputs[LFO_OUTPUT].isConnected() || expanded) && recalculate) {
+    if (outputs[LFO_OUTPUT].isConnected() || expanded || recalculate) {
         for (int ch = 0; ch < channels; ch++) {
             float α = 2.0f * M_PI * lfo[ch].phase;
             float υ = sn.υ(α);
