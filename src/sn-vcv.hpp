@@ -15,7 +15,7 @@ extern const std::vector<std::string> KRATES;
 
 // ... AUX
 extern const float AUX_FREQUENCY;                // auxiliary output fixed frequency (Hz)
-extern const std::vector<float> AUX_GAIN;        // auxiliary output default gain
+extern const std::vector<float> AUX_GAIN;        // auxiliary output gains
 extern const std::vector<std::string> AUX_GAINS; // AUX gain labels
 extern const std::vector<std::string> AUX_MODES; // AUX mode labels
 

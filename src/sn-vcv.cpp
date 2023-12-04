@@ -5,8 +5,8 @@ const std::vector<unsigned> KRATE = {1, 64, 128, 256};                   // k-ra
 const std::vector<std::string> KRATES = {"1", "¹⁄₆₄", "¹⁄₁₂₈", "¹⁄₂₅₆"}; // k-rate labels
 
 // AUX port
-const float AUX_FREQUENCY = 25.0;                                     // auxiliary output fixed frequency (Hz)
-const std::vector<float> AUX_GAIN = {1.f, 0.5f, 0.333f, 0.25f, 0.2f}; // k-rates
+const float AUX_FREQUENCY = 25.0;                                     // AUX output fixed frequency (Hz)
+const std::vector<float> AUX_GAIN = {1.f, 0.5f, 0.333f, 0.25f, 0.2f}; // AUX output gain values
 const std::vector<std::string> AUX_MODES = {"OSC", "SUM", "POLY"};    // AUX mode labels
 const std::vector<std::string> AUX_GAINS = {"1", "½", "⅓", "¼", "⅕"}; // AUX gain labels
 

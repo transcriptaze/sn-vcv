@@ -154,7 +154,7 @@ void sn_vcv_vco::processVCO(const ProcessArgs &args, int channels, bool expanded
         float f = dsp::FREQ_C4 * std::pow(2.f, pitch);
 
         vco[ch].phase += f * args.sampleTime;
-        if (vco[ch].phase >= 1.f) {
+        while (vco[ch].phase >= 1.f) {
             vco[ch].phase -= 1.f;
         }
     }
@@ -182,7 +182,7 @@ void sn_vcv_vco::processVCO(const ProcessArgs &args, int channels, bool expanded
 
 void sn_vcv_vco::processAUX(const ProcessArgs &args, bool expanded) {
     aux.phase += AUX_FREQUENCY * args.sampleTime;
-    if (aux.phase >= 1.f) {
+    while (aux.phase >= 1.f) {
         aux.phase -= 1.f;
 
         if (outputs[AUX_TRIGGER].isConnected()) {
@@ -239,7 +239,7 @@ void sn_vcv_vco::recompute() {
     float δy = params[DY_PARAM].getValue();
     float m = params[M_PARAM].getValue();
 
-    // ... override with inputs
+    // ... modulate with inputs
     e += clamp(inputs[ECCENTRICITY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
     s += 5.0f * clamp(inputs[SENSITIVITY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
     θ += 90.0f * clamp(inputs[ROTATION_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
