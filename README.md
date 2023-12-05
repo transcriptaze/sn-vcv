@@ -60,9 +60,26 @@ The modules share a common set of parameters that determine the wave shape:
 
 ### VCV Rack Library
 
-(not yet)
+(hopefully one of these days)
 
 ### Manual
+
+1. Download the _zip_ file for your platform from the [Releases](https://github.com/transcriptaze/sn-vcv/releases) section
+   on _github_.
+
+2. Unzip the downloaded file and copy the unzipped plugin to the _VCV Rack 2_ plugins directory:
+   - MacOS + Intel: `~/Documents/Rack2/plugins-mac-x64/`
+   - MacOS + ARM: `~/Documents/Rack2/plugins-mac-arm/`
+   - Linux: `~/.Rack2/plugins-lin-x64/`
+   - Windows: `My Documents/Rack2/plugins-win-x64/`
+
+3. Restart _VCV Rack 2_ and the plugins should be available in the library.
+
+See also:
+
+1. [Installing plugins not available on the VCV Library](https://vcvrack.com/manual/Installing)
+2. [FAQ: Where is the “Rack user folder”?](https://vcvrack.com/manual/FAQ#where-is-the-rack-user-folder)
+
 
 ### Building from source
 
