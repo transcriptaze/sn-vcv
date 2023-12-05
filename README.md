@@ -165,13 +165,7 @@ Requires:
 - [_Mindmeld EQMaster_](https://library.vcvrack.com/MindMeldModular/EqMaster)
 - [_SurgeXT Reverb2_](https://library.vcvrack.com/SurgeXTRack/SurgeXTFXReverb2)
 
-[Audio](https://github.com/transcriptaze/sn-vcv/assets/7932356/15ec3ec8-c7c1-47b4-99ba-9471848ec995)
-
-{% include youtube.html id="D5CsH6UzfaU" %}
-
-[![YouTube]
-(https://img.youtube.com/vi/D5CsH6UzfaU/maxresdefault.jpg)]
-(https://www.youtube.com/watch?v=D5CsH6UzfaU)
+[![YouTube](https://img.youtube.com/vi/D5CsH6UzfaU/hqdefault.jpg)](https://www.youtube.com/watch?v=D5CsH6UzfaU)
 
 
 #### [Toccata in Dm](/documentation/patches/toccata.vcv)
@@ -186,12 +180,7 @@ Requires:
 - [_Mindmeld EQMaster_](https://library.vcvrack.com/MindMeldModular/EqMaster)
 - [_SurgeXT Reverb2_](https://library.vcvrack.com/SurgeXTRack/SurgeXTFXReverb2)
 
-
-[Audio](https://github.com/transcriptaze/sn-vcv/assets/7932356/bf6efaf8-98e1-4049-bd7e-aa063f33edd6)
-
-[![YouTube]
-(https://img.youtube.com/vi/PuENu5rqdfk/maxresdefault.jpg)]
-(https://www.youtube.com/watch?v=PuENu5rqdfk)
+[![YouTube](https://img.youtube.com/vi/PuENu5rqdfk/hqdefault.jpg)](https://www.youtube.com/watch?v=PuENu5rqdfk)
 
 ## License
 
