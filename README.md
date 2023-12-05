@@ -167,6 +167,23 @@ Requires:
 [YouTube](https://www.youtube.com/watch?v=D5CsH6UzfaU)
 
 
+#### [Toccata in Dm](/documentation/patches/toccata.vcv)
+
+A somewhat more ambitious patch that uses the _sn-lfo/x_ plugins to modulate just about every CV in reach. The
+result is a rendering where pretty much everything is changing all of the time - seldom dramatically but just
+enough to be interesting. Starting from halfway decent source material didn't hurt either :-).
+
+Requires:
+- [_Impromptu Clocked_](https://library.vcvrack.com/ImpromptuModular/Clocked)
+- [_Entrian Player Melody_](https://library.vcvrack.com/Entrian-Free/Player-Melody)
+- [_Mindmeld EQMaster_](https://library.vcvrack.com/MindMeldModular/EqMaster)
+- [_SurgeXT Reverb2_](https://library.vcvrack.com/SurgeXTRack/SurgeXTFXReverb2)
+
+[Audio](https://github.com/transcriptaze/sn-vcv/assets/7932356/15ec3ec8-c7c1-47b4-99ba-9471848ec995)
+
+[YouTube](https://www.youtube.com/watch?v=PuENu5rqdfk)
+
+
 ## License
 
 The source code and panel files are licensed under [Gnu General Public License v3](/LICENSE). 
