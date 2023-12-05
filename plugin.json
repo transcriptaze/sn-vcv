@@ -19,7 +19,8 @@
       "description": "sn experimental additive synthesizer VCO",
       "tags": [
         "VCO",
-        "Function generator"
+        "Function generator",
+        "Waveshaper"
       ]
     },
     {
@@ -36,7 +37,8 @@
       "description": "sn experimental additive synthesizer LFO",
       "tags": [
         "Function generator",
-        "Low-frequency oscillator"
+        "Low-frequency oscillator",
+        "Waveshaper"
       ]
     },
     {

@@ -2,10 +2,10 @@
 
 # sn-vcv
 
-A set of VCV modules for the _sn_ experimental additive synthesizer which uses the _sn_ function as the 
-generator function instead of the more usual _sine_. The modules comprise:
-- a _stackable_ VCO, which generates an audio signal with a smoothly adjustable shape
-- a _stackable_ LFO, which generates a low frequency control voltage signal with a smoothly adjustable shape.
+A set of [VCV Rack 2](https://vcvrack.com/Rack) plugins for the _sn_ experimental additive synthesizer which
+uses the _sn_ function as the generator function instead of the more usual _sine_. The modules comprise:
+- a _stackable_ VCO, which generates an audio signal with a smoothly adjustable waveshape
+- a _stackable_ LFO, which generates a low frequency control voltage signal with a smoothly adjustable waveshape.
 
 <img width="96" src="documentation/images/sine.png"> <img width="96" src="documentation/images/square.png"> <img width="96" src="documentation/images/triangle.png"> <img width="96" src="documentation/images/sawtooth.png"> <img width="96" src="documentation/images/spike.png"> <img width="96" src="documentation/images/bumps.png"> <img width="96" src="documentation/images/wonky.png">
 
@@ -60,12 +60,12 @@ The modules share a common set of parameters that determine the wave shape:
 
 ### VCV Rack Library
 
-(hopefully one of these days)
+_(hopefully one of these days)_
 
 ### Manual
 
-1. Download the _zip_ file for your platform from the [Releases](https://github.com/transcriptaze/sn-vcv/releases) section
-   on _github_.
+1. Download the _zip_ file for your platform from the [Releases](https://github.com/transcriptaze/sn-vcv/releases)
+   section.
 
 2. Unzip the downloaded file and copy the unzipped plugin to the _VCV Rack 2_ plugins directory:
    - MacOS + Intel: `~/Documents/Rack2/plugins-mac-x64/`
@@ -75,7 +75,7 @@ The modules share a common set of parameters that determine the wave shape:
 
 3. Restart _VCV Rack 2_ and the plugins should be available in the library.
 
-See also:
+_See also:_
 
 1. [Installing plugins not available on the VCV Library](https://vcvrack.com/manual/Installing)
 2. [FAQ: Where is the “Rack user folder”?](https://vcvrack.com/manual/FAQ#where-is-the-rack-user-folder)
@@ -171,10 +171,10 @@ of complete songs.
 
 #### [Greensleeves](/documentation/patches/greensleeves.vcv)
 
-Relatively simple arrangement of Greensleeves using a stack of one _sn-vco_ and two _sn-vcox_ modules 
-for the VCO audio generator and a stack of one _sn-lfo_ and two _sn-lfox_ LFOs to continuously vary
-the waveshape, volume and ADSR envelope. A lot of the credit has to go to the _SurgeXT Reverb2_ which
-adds some much needed depth to the rendering.
+Relatively simple arrangement of Greensleeves using a stack of _sn-vco_ and _sn-vcox_ modules for the VCO
+audio generator and a stack of _sn-lfo_ and _sn-lfox_ LFOs to continuously vary the waveshape, volume and
+ADSR envelope. A lot of the credit has to go to the _SurgeXT Reverb2_ which adds some much needed depth to
+the rendering.
 
 Requires:
 - [_Impromptu Clocked_](https://library.vcvrack.com/ImpromptuModular/Clocked)
@@ -187,8 +187,8 @@ Requires:
 
 #### [Toccata in Dm](/documentation/patches/toccata.vcv)
 
-A somewhat more ambitious patch that uses the _sn-lfo/x_ plugins to modulate just about every CV in reach. The
-result is a rendering where pretty much everything is changing all of the time - seldom dramatically but just
+A somewhat more ambitious patch that uses the _sn-lfo/x_ plugins to modulate just about every CV it can reach.
+The result is a rendering where pretty much everything is changing all of the time - seldom dramatically but
 enough to be interesting. Starting from halfway decent source material didn't hurt either :-).
 
 Requires:
