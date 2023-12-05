@@ -23,6 +23,9 @@ otherwise fairly plain rendering.
    - [sn-lfo](/documentation/MANUAL.md#sn-lfo)
    - [sn-lfox](/documentation/MANUAL.md#sn-lfox)
 - [Demos](#demo-patches)
+   - [Basic operation](#basic-operation)
+   - [Greensleeves](#greensleeves)
+   - [Toccata in Dm](#toccata-in-dm) 
 - [License](#license)
 
 
@@ -179,9 +182,10 @@ Requires:
 - [_Mindmeld EQMaster_](https://library.vcvrack.com/MindMeldModular/EqMaster)
 - [_SurgeXT Reverb2_](https://library.vcvrack.com/SurgeXTRack/SurgeXTFXReverb2)
 
-[Audio](https://github.com/transcriptaze/sn-vcv/assets/7932356/15ec3ec8-c7c1-47b4-99ba-9471848ec995)
 
-[YouTube](https://www.youtube.com/watch?v=PuENu5rqdfk)
+[Audio](https://github.com/transcriptaze/sn-vcv/assets/7932356/bf6efaf8-98e1-4049-bd7e-aa063f33edd6)
+
+[YouTube](https://www.youtube.com/watch?v=PuENu5rqdfk) (better version)
 
 
 ## License
