@@ -167,7 +167,7 @@ Requires:
 
 [Audio](https://github.com/transcriptaze/sn-vcv/assets/7932356/15ec3ec8-c7c1-47b4-99ba-9471848ec995)
 
-[YouTube](https://www.youtube.com/watch?v=D5CsH6UzfaU)
+{% include youtube.html id="D5CsH6UzfaU" %}
 
 
 #### [Toccata in Dm](/documentation/patches/toccata.vcv)
@@ -183,9 +183,13 @@ Requires:
 - [_SurgeXT Reverb2_](https://library.vcvrack.com/SurgeXTRack/SurgeXTFXReverb2)
 
 
+<<<<<<< Updated upstream
 [Audio](https://github.com/transcriptaze/sn-vcv/assets/7932356/bf6efaf8-98e1-4049-bd7e-aa063f33edd6)
 
 [YouTube](https://www.youtube.com/watch?v=PuENu5rqdfk) (better version)
+=======
+{% include youtube.html id="PuENu5rqdfk" %}
+>>>>>>> Stashed changes
 
 
 ## License
