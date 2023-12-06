@@ -1,27 +1,27 @@
 # TODO
 
 - [x] github tags
-- [ ] github workflow
-      - [ ] Windows
+- [x] github workflow
+      - [x] Windows
       - [x] Linux
       - [x] Mac
-      - [ ] _dist_
-            - [ ] Windows
-            - [ ] Mac
-            - [ ] Linux
+      - [x] _dist_
+            - [x] Windows
+            - [x] Mac
+            - [x] Linux
 
-- [ ] README & Manuals
+- [x] README & Manuals
       - [x] modules images
       - [x] sn-lfox logo
+      - [x] CHANGELOG
 
-- [ ] Demo patches
+- [x] Demo patches
       - [x] sn-vco
       - [x] sn-vcox
       - [x] sn-lfo
       - [x] sn-lfox
-      - [ ] sn-vcv
       - [x] Greensleeves
-      - [ ] Toccata
+      - [x] Toccata
 
 - [x] _sn-vcv-osc_
 - [x] _sn-vcv-oscx_
