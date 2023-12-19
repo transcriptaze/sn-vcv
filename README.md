@@ -26,6 +26,7 @@ otherwise fairly plain rendering.
    - [Basic operation](#basic-operation)
    - [Greensleeves](#greensleeves)
    - [Toccata in Dm](#toccata-in-dm) 
+- [Acknowledgements](#acknowledgements)
 - [License](#license)
 
 
@@ -198,6 +199,15 @@ Requires:
 - [_SurgeXT Reverb2_](https://library.vcvrack.com/SurgeXTRack/SurgeXTFXReverb2)
 
 [![YouTube](https://img.youtube.com/vi/PuENu5rqdfk/hqdefault.jpg)](https://www.youtube.com/watch?v=PuENu5rqdfk)
+
+
+## Acknowledgements
+
+For beta testing:
+
+- [Alessandro Paglia](https://community.vcvrack.com/u/ale47p/summary)
+- [kleat](https://community.vcvrack.com/u/sounds/summary)
+
 
 ## License
 

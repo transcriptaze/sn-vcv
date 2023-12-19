@@ -39,3 +39,4 @@
 5. https://herbie.uwplse.org
 6. `convert *.png -crop 392x331+281+90 cropped/screenshot%d.png`
 7. https://github.com/nullJaX/vcvrack-patchable-devices
+8. https://www.youtube.com/watch?v=yV52TMdGkng
