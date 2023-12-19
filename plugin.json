@@ -1,12 +1,12 @@
 {
   "slug": "sn-vcv",
-  "name": "sn-vcv",
+  "name": "sn",
   "version": "2.0.0",
   "license": "GPL-3.0-only",
   "brand": "sn-vcv",
   "author": "transcriptaze",
   "authorEmail": "transcriptaze.development@gmail.com",
-  "authorUrl": "https://github.com/transcriptaze/snyth",
+  "authorUrl": "https://github.com/transcriptaze",
   "pluginUrl": "https://github.com/transcriptaze/sn-vcv",
   "manualUrl": "https://github.com/transcriptaze/sn-vcv/documentation/MANUAL.md",
   "sourceUrl": "https://github.com/transcriptaze/sn-vcv",
@@ -15,7 +15,7 @@
   "modules": [
     {
       "slug": "sn-vcv-vco",
-      "name": "sn-vcv-vco",
+      "name": "sn-vco",
       "description": "sn experimental additive synthesizer VCO",
       "tags": [
         "VCO",
@@ -25,7 +25,7 @@
     },
     {
       "slug": "sn-vcv-vcox",
-      "name": "sn-vcv-vcox",
+      "name": "sn-vcox",
       "description": "sn experimental additive synthesizer VCO expander",
       "tags": [
         "Expander"
@@ -33,7 +33,7 @@
     },
     {
       "slug": "sn-vcv-lfo",
-      "name": "sn-vcv-lfo",
+      "name": "sn-lfo",
       "description": "sn experimental additive synthesizer LFO",
       "tags": [
         "Function generator",
@@ -43,7 +43,7 @@
     },
     {
       "slug": "sn-vcv-lfox",
-      "name": "sn-vcv-lfox",
+      "name": "sn-lfox",
       "description": "sn experimental additive synthesizer LFO expander",
       "tags": [
         "Expander"
