@@ -6,5 +6,6 @@
 /*.dll
 assets
 documentation/patches/sn-vcv-dev.vcv
+documentation/patches/sn-dev.vcv
 documentation/patches/archive
 documentation/midi

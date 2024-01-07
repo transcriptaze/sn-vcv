@@ -1,8 +1,8 @@
-#include "sn-vcv-lfox.hpp"
+#include "sn-lfox.hpp"
 
-const int sn_vcv_lfox::CHANNELS = 1;
+const int sn_lfox::CHANNELS = 1;
 
-sn_vcv_lfox::sn_vcv_lfox() {
+sn_lfox::sn_lfox() {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
     configParam(ECCENTRICITY_PARAM, -1.0f, +1.0f, 0.0f, "ε");
@@ -29,7 +29,7 @@ sn_vcv_lfox::sn_vcv_lfox() {
     getRightExpander().consumerMessage = &expanders.right.messages[1];
 }
 
-json_t *sn_vcv_lfox::dataToJson() {
+json_t *sn_lfox::dataToJson() {
     json_t *root = json_object();
 
     json_object_set_new(root, "k-rate", json_integer(update.krate));
@@ -39,7 +39,7 @@ json_t *sn_vcv_lfox::dataToJson() {
     return root;
 }
 
-void sn_vcv_lfox::dataFromJson(json_t *root) {
+void sn_lfox::dataFromJson(json_t *root) {
     json_t *krate = json_object_get(root, "k-rate");
     json_t *aux_mode = json_object_get(root, "aux-mode");
     json_t *gain = json_object_get(root, "aux-gain");
@@ -72,27 +72,27 @@ void sn_vcv_lfox::dataFromJson(json_t *root) {
     }
 }
 
-void sn_vcv_lfox::onExpanderChange(const ExpanderChangeEvent &e) {
+void sn_lfox::onExpanderChange(const ExpanderChangeEvent &e) {
     Module *left = getLeftExpander().module;
     Module *right = getRightExpander().module;
 
-    expanders.linkLeft = left && left->model == modelSn_vcv_lfo;
-    expanders.linkRight = right && right->model == modelSn_vcv_lfo;
+    expanders.linkLeft = left && left->model == model_sn_lfo;
+    expanders.linkRight = right && right->model == model_sn_lfo;
 
-    if (left && left->model == modelSn_vcv_lfox) {
+    if (left && left->model == model_sn_lfox) {
         expanders.left.module = left;
     } else {
         expanders.left.module = NULL;
     }
 
-    if (right && right->model == modelSn_vcv_lfox) {
+    if (right && right->model == model_sn_lfox) {
         expanders.right.module = right;
     } else {
         expanders.right.module = NULL;
     }
 }
 
-void sn_vcv_lfox::process(const ProcessArgs &args) {
+void sn_lfox::process(const ProcessArgs &args) {
     int channels = CHANNELS;
 
     // ... expanders
@@ -202,7 +202,7 @@ void sn_vcv_lfox::process(const ProcessArgs &args) {
     }
 }
 
-void sn_vcv_lfox::recompute() {
+void sn_lfox::recompute() {
     // ... param values
     float e = params[ECCENTRICITY_PARAM].getValue();
     float s = params[SENSITIVITY_PARAM].getValue();
@@ -225,7 +225,7 @@ void sn_vcv_lfox::recompute() {
     sn.recompute();
 }
 
-void sn_vcv_lfox::processLFO(const ProcessArgs &args, int channels, bool expanded, bool recalculate) {
+void sn_lfox::processLFO(const ProcessArgs &args, int channels, bool expanded, bool recalculate) {
     float gain = params[ATT_PARAM].getValue();
 
     if ((outputs[LFO_OUTPUT].isConnected() || outputs[SUM_OUTPUT].isConnected() || expanded) && recalculate) {
@@ -252,7 +252,7 @@ void sn_vcv_lfox::processLFO(const ProcessArgs &args, int channels, bool expande
     }
 }
 
-void sn_vcv_lfox::processAUX(const ProcessArgs &args, bool expanded) {
+void sn_lfox::processAUX(const ProcessArgs &args, bool expanded) {
     if (outputs[AUX_OUTPUT].isConnected() || expanded) {
         float α = aux.phase * 2.0f * M_PI;
         float υ = sn.υ(α);
@@ -286,15 +286,15 @@ void sn_vcv_lfox::processAUX(const ProcessArgs &args, bool expanded) {
     }
 }
 
-bool sn_vcv_lfox::isLinkedLeft() {
+bool sn_lfox::isLinkedLeft() {
     return expanders.left.linked;
 }
 
-bool sn_vcv_lfox::isLinkedRight() {
+bool sn_lfox::isLinkedRight() {
     return expanders.right.linked;
 }
 
-sn_vcv_lfoxWidget::sn_vcv_lfoxWidget(sn_vcv_lfox *module) {
+sn_lfoxWidget::sn_lfoxWidget(sn_lfox *module) {
     float left = 8.89;
     float right = 27.94;
     float top = 21.968 + 1.27;
@@ -327,32 +327,32 @@ sn_vcv_lfoxWidget::sn_vcv_lfoxWidget(sn_vcv_lfox *module) {
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     // ... parameters
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(e), module, sn_vcv_lfox::ECCENTRICITY_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(s), module, sn_vcv_lfox::SENSITIVITY_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(θ), module, sn_vcv_lfox::ROTATION_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(A), module, sn_vcv_lfox::AMPLITUDE_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(δx), module, sn_vcv_lfox::DX_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(δy), module, sn_vcv_lfox::DY_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(𝜓), module, sn_vcv_lfox::PHI_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(m), module, sn_vcv_lfox::M_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(e), module, sn_lfox::ECCENTRICITY_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(s), module, sn_lfox::SENSITIVITY_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(θ), module, sn_lfox::ROTATION_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(A), module, sn_lfox::AMPLITUDE_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(δx), module, sn_lfox::DX_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(δy), module, sn_lfox::DY_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(𝜓), module, sn_lfox::PHI_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(m), module, sn_lfox::M_PARAM));
 
     // ... ATT
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_att), module, sn_vcv_lfox::ATT_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_att), module, sn_lfox::ATT_PARAM));
 
     // ... outputs
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(lfo), module, sn_vcv_lfox::LFO_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(sum), module, sn_vcv_lfox::SUM_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(aux), module, sn_vcv_lfox::AUX_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(lfo), module, sn_lfox::LFO_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(sum), module, sn_lfox::SUM_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(aux), module, sn_lfox::AUX_OUTPUT));
 
     // ... expander indicators
-    addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xll), module, sn_vcv_lfox::XLL_LIGHT));
-    addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xll), module, sn_vcv_lfox::XLR_LIGHT));
-    addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_vcv_lfox::XRL_LIGHT));
-    addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xrr), module, sn_vcv_lfox::XRR_LIGHT));
+    addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xll), module, sn_lfox::XLL_LIGHT));
+    addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xll), module, sn_lfox::XLR_LIGHT));
+    addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_lfox::XRL_LIGHT));
+    addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xrr), module, sn_lfox::XRR_LIGHT));
 }
 
-void sn_vcv_lfoxWidget::appendContextMenu(Menu *menu) {
-    sn_vcv_lfox *module = getModule<sn_vcv_lfox>();
+void sn_lfoxWidget::appendContextMenu(Menu *menu) {
+    sn_lfox *module = getModule<sn_lfox>();
 
     menu->addChild(new MenuSeparator);
     menu->addChild(createMenuLabel("sn-lfo-x settings"));
@@ -370,4 +370,4 @@ void sn_vcv_lfoxWidget::appendContextMenu(Menu *menu) {
                                              &module->aux.gain));
 }
 
-Model *modelSn_vcv_lfox = createModel<sn_vcv_lfox, sn_vcv_lfoxWidget>("sn-vcv-lfox");
+Model *model_sn_lfox = createModel<sn_lfox, sn_lfoxWidget>("sn-lfox");

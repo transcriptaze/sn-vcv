@@ -1,4 +1,4 @@
-#include "sn-vcv.hpp"
+#include "sn.hpp"
 
 // Control rates
 const std::vector<unsigned> KRATE = {1, 64, 128, 256};                   // k-rates

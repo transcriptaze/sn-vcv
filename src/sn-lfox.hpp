@@ -1,26 +1,9 @@
 #pragma once
 
 #include "plugin.hpp"
-#include "sn-vcv.hpp"
+#include "sn.hpp"
 
-typedef struct range {
-    int index;
-    float defval;
-    float base;
-    float multiplier;
-    float offset;
-    int precision;
-
-    float frequency(float v) {
-        if (base > 0.f) {
-            return multiplier * std::pow(base, v) + offset;
-        } else {
-            return multiplier * v + offset;
-        }
-    };
-} range;
-
-struct sn_vcv_lfo : Module {
+struct sn_lfox : Module {
     static const int CHANNELS;
 
     enum ParamId {
@@ -32,47 +15,42 @@ struct sn_vcv_lfo : Module {
         DY_PARAM,
         PHI_PARAM,
         M_PARAM,
-        FREQUENCY_PARAM,
+        ATT_PARAM,
         PARAMS_LEN
     };
 
     enum InputId {
-        FREQUENCY_INPUT,
-        SYNCH_INPUT,
         INPUTS_LEN
     };
 
     enum OutputId {
         AUX_OUTPUT,
-        AUX_TRIGGER,
         LFO_OUTPUT,
+        SUM_OUTPUT,
         OUTPUTS_LEN
     };
 
     enum LightId {
         XLL_LIGHT,
+        XLR_LIGHT,
+        XRL_LIGHT,
         XRR_LIGHT,
         LIGHTS_LEN
     };
 
-    sn_vcv_lfo();
+    sn_lfox();
 
     json_t *dataToJson() override;
-    void dataFromJson(json_t *) override;
+    void dataFromJson(json_t *root) override;
     void onExpanderChange(const ExpanderChangeEvent &) override;
     void process(const ProcessArgs &) override;
 
+    bool isLinkedLeft();
+    bool isLinkedRight();
+
     void recompute();
-    void processLFO(const ProcessArgs &args, int, bool, bool, bool);
-    void processAUX(const ProcessArgs &args, bool, bool);
-
-    int channels();
-    int getRange();
-    void setRange(int);
-
-    // ... instance variables
-    dsp::PulseGenerator trigger;
-    dsp::SchmittTrigger sync;
+    void processLFO(const ProcessArgs &, int, bool, bool);
+    void processAUX(const ProcessArgs &, bool);
 
     struct SN sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 
@@ -102,16 +80,18 @@ struct sn_vcv_lfo : Module {
         .out = {.osc = 0.f, .sum = 0.f},
     };
 
-    // ... expanders
     struct {
+        bool linkLeft;
+        bool linkRight;
         sn_expander<sn_lfo_message> left;
         sn_expander<sn_lfo_message> right;
     } expanders = {
+        .linkLeft = false,
+        .linkRight = false,
         .left = sn_expander<sn_lfo_message>(LEFT),
         .right = sn_expander<sn_lfo_message>(RIGHT),
     };
 
-    // ... state update
     struct {
         int krate;
         int count;
@@ -119,19 +99,10 @@ struct sn_vcv_lfo : Module {
         .krate = 0,
         .count = 0,
     };
-
-    struct range range = {
-        .index = 0,
-        .defval = 5.f,
-        .base = 1.5848933f,
-        .multiplier = 0.1f,
-        .offset = 0.f,
-        .precision = 2,
-    };
 };
 
-struct sn_vcv_lfoWidget : ModuleWidget {
-    sn_vcv_lfoWidget(sn_vcv_lfo *);
+struct sn_lfoxWidget : ModuleWidget {
+    sn_lfoxWidget(sn_lfox *m);
 
     void appendContextMenu(Menu *) override;
 };

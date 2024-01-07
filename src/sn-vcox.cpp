@@ -1,8 +1,8 @@
-#include "sn-vcv-vcox.hpp"
+#include "sn-vcox.hpp"
 
-const int sn_vcv_vcox::CHANNELS = 1;
+const int sn_vcox::CHANNELS = 1;
 
-sn_vcv_vcox::sn_vcv_vcox() {
+sn_vcox::sn_vcox() {
     // ... params
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
@@ -40,15 +40,15 @@ sn_vcv_vcox::sn_vcv_vcox() {
     getRightExpander().consumerMessage = &expanders.right.messages[1];
 }
 
-bool sn_vcv_vcox::isLinkedLeft() {
+bool sn_vcox::isLinkedLeft() {
     return expanders.left.linked;
 }
 
-bool sn_vcv_vcox::isLinkedRight() {
+bool sn_vcox::isLinkedRight() {
     return expanders.right.linked;
 }
 
-json_t *sn_vcv_vcox::dataToJson() {
+json_t *sn_vcox::dataToJson() {
     json_t *root = json_object();
 
     json_object_set_new(root, "k-rate", json_integer(update.krate));
@@ -58,7 +58,7 @@ json_t *sn_vcv_vcox::dataToJson() {
     return root;
 }
 
-void sn_vcv_vcox::dataFromJson(json_t *root) {
+void sn_vcox::dataFromJson(json_t *root) {
     json_t *krate = json_object_get(root, "k-rate");
     json_t *aux_mode = json_object_get(root, "aux-mode");
     json_t *gain = json_object_get(root, "aux-gain");
@@ -91,27 +91,27 @@ void sn_vcv_vcox::dataFromJson(json_t *root) {
     }
 }
 
-void sn_vcv_vcox::onExpanderChange(const ExpanderChangeEvent &e) {
+void sn_vcox::onExpanderChange(const ExpanderChangeEvent &e) {
     Module *left = getLeftExpander().module;
     Module *right = getRightExpander().module;
 
-    expanders.linkedLeft = left && left->model == modelSn_vcv_vco;
-    expanders.linkedRight = right && right->model == modelSn_vcv_vco;
+    expanders.linkedLeft = left && left->model == model_sn_vco;
+    expanders.linkedRight = right && right->model == model_sn_vco;
 
-    if (left && left->model == modelSn_vcv_vcox) {
+    if (left && left->model == model_sn_vcox) {
         expanders.left.module = left;
     } else {
         expanders.left.module = NULL;
     }
 
-    if (right && right->model == modelSn_vcv_vcox) {
+    if (right && right->model == model_sn_vcox) {
         expanders.right.module = right;
     } else {
         expanders.right.module = NULL;
     }
 }
 
-void sn_vcv_vcox::process(const ProcessArgs &args) {
+void sn_vcox::process(const ProcessArgs &args) {
     int channels = CHANNELS;
     bool expanded = expanders.left.module != NULL || expanders.right.module != NULL;
 
@@ -218,7 +218,7 @@ void sn_vcv_vcox::process(const ProcessArgs &args) {
     }
 }
 
-void sn_vcv_vcox::processVCO(const ProcessArgs &args, int channels, bool expanded) {
+void sn_vcox::processVCO(const ProcessArgs &args, int channels, bool expanded) {
     bool connected = outputs[VCO_OUTPUT].isConnected() | outputs[VCO_SUM_OUTPUT].isConnected();
     float gain = params[ATT_PARAM].getValue();
 
@@ -249,7 +249,7 @@ void sn_vcv_vcox::processVCO(const ProcessArgs &args, int channels, bool expande
     }
 }
 
-void sn_vcv_vcox::processAUX(const ProcessArgs &args, bool expanded) {
+void sn_vcox::processAUX(const ProcessArgs &args, bool expanded) {
     if (outputs[AUX_OUTPUT].isConnected() || expanded) {
         float α = aux.phase * 2.0f * M_PI;
         float υ = sn.υ(α);
@@ -283,7 +283,7 @@ void sn_vcv_vcox::processAUX(const ProcessArgs &args, bool expanded) {
     }
 }
 
-void sn_vcv_vcox::recompute() {
+void sn_vcox::recompute() {
     // ... param values
     float e = params[ECCENTRICITY_PARAM].getValue();
     float s = params[SENSITIVITY_PARAM].getValue();
@@ -317,7 +317,7 @@ void sn_vcv_vcox::recompute() {
     sn.recompute();
 }
 
-sn_vcv_vcoxWidget::sn_vcv_vcoxWidget(sn_vcv_vcox *module) {
+sn_vcoxWidget::sn_vcoxWidget(sn_vcox *module) {
     float left = 7.331;
     float middle = 20.351;
     float right = 35.56;
@@ -357,38 +357,38 @@ sn_vcv_vcoxWidget::sn_vcv_vcoxWidget(sn_vcv_vcox *module) {
     addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     // ... parameters
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_e), module, sn_vcv_vcox::ECCENTRICITY_INPUT));
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_s), module, sn_vcv_vcox::SENSITIVITY_INPUT));
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_θ), module, sn_vcv_vcox::ROTATION_INPUT));
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_A), module, sn_vcv_vcox::AMPLITUDE_INPUT));
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_δx), module, sn_vcv_vcox::DX_INPUT));
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_δy), module, sn_vcv_vcox::DY_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_e), module, sn_vcox::ECCENTRICITY_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_s), module, sn_vcox::SENSITIVITY_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_θ), module, sn_vcox::ROTATION_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_A), module, sn_vcox::AMPLITUDE_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_δx), module, sn_vcox::DX_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_δy), module, sn_vcox::DY_INPUT));
 
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_e), module, sn_vcv_vcox::ECCENTRICITY_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_s), module, sn_vcv_vcox::SENSITIVITY_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_θ), module, sn_vcv_vcox::ROTATION_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_A), module, sn_vcv_vcox::AMPLITUDE_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_δx), module, sn_vcv_vcox::DX_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_δy), module, sn_vcv_vcox::DY_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_m), module, sn_vcv_vcox::M_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_e), module, sn_vcox::ECCENTRICITY_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_s), module, sn_vcox::SENSITIVITY_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_θ), module, sn_vcox::ROTATION_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_A), module, sn_vcox::AMPLITUDE_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_δx), module, sn_vcox::DX_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_δy), module, sn_vcox::DY_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_m), module, sn_vcox::M_PARAM));
 
     // ... ATT
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_att), module, sn_vcv_vcox::ATT_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_att), module, sn_vcox::ATT_PARAM));
 
     // ... aux, VCO and VCO-Σ outputs
-    addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(aux), module, sn_vcv_vcox::AUX_OUTPUT));
-    addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(vco), module, sn_vcv_vcox::VCO_OUTPUT));
-    addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(vcox), module, sn_vcv_vcox::VCO_SUM_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(aux), module, sn_vcox::AUX_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(vco), module, sn_vcox::VCO_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(vcox), module, sn_vcox::VCO_SUM_OUTPUT));
 
     // ... expander indicators
-    addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xll), module, sn_vcv_vcox::XLL_LIGHT));
-    addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xll), module, sn_vcv_vcox::XLR_LIGHT));
-    addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_vcv_vcox::XRL_LIGHT));
-    addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xrr), module, sn_vcv_vcox::XRR_LIGHT));
+    addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xll), module, sn_vcox::XLL_LIGHT));
+    addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xll), module, sn_vcox::XLR_LIGHT));
+    addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_vcox::XRL_LIGHT));
+    addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xrr), module, sn_vcox::XRR_LIGHT));
 }
 
-void sn_vcv_vcoxWidget::appendContextMenu(Menu *menu) {
-    sn_vcv_vcox *module = getModule<sn_vcv_vcox>();
+void sn_vcoxWidget::appendContextMenu(Menu *menu) {
+    sn_vcox *module = getModule<sn_vcox>();
 
     menu->addChild(new MenuSeparator);
     menu->addChild(createMenuLabel("sn-vcox settings"));
@@ -406,4 +406,4 @@ void sn_vcv_vcoxWidget::appendContextMenu(Menu *menu) {
                                              &module->aux.gain));
 }
 
-Model *modelSn_vcv_vcox = createModel<sn_vcv_vcox, sn_vcv_vcoxWidget>("sn-vcv-vcox");
+Model *model_sn_vcox = createModel<sn_vcox, sn_vcoxWidget>("sn-vcox");

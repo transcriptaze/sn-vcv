@@ -1,7 +1,7 @@
 #include "plugin.hpp"
-#include "sn-vcv.hpp"
+#include "sn.hpp"
 
-struct sn_vcv_vco : Module {
+struct sn_vco : Module {
     static const int CHANNELS;
     static const float VELOCITY;
 
@@ -42,7 +42,7 @@ struct sn_vcv_vco : Module {
         LIGHTS_LEN
     };
 
-    sn_vcv_vco();
+    sn_vco();
 
     json_t *dataToJson() override;
     void dataFromJson(json_t *) override;
@@ -106,14 +106,14 @@ struct sn_vcv_vco : Module {
     };
 };
 
-struct sn_vcv_vcoWidget : ModuleWidget {
-    sn_vcv_vcoWidget(sn_vcv_vco *);
+struct sn_vcoWidget : ModuleWidget {
+    sn_vcoWidget(sn_vco *);
 
     void appendContextMenu(Menu *) override;
 };
 
-struct sn_vcv_vco_channels : ChannelsWidget {
-    sn_vcv_vco_channels() {
+struct sn_vco_channels : ChannelsWidget {
+    sn_vco_channels() {
         fontPath = asset::system("res/fonts/DSEG7ClassicMini-BoldItalic.ttf");
         textPos = Vec(22, 20);
         bgText = "18";
@@ -126,5 +126,5 @@ struct sn_vcv_vco_channels : ChannelsWidget {
         text = string::f("%d", channels);
     }
 
-    sn_vcv_vco *module;
+    sn_vco *module;
 };

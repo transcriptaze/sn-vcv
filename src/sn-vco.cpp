@@ -1,10 +1,10 @@
-#include "sn-vcv-vco.hpp"
-#include "sn-vcv-vcox.hpp"
+#include "sn-vco.hpp"
+#include "sn-vcox.hpp"
 
-const int sn_vcv_vco::CHANNELS = 1;
-const float sn_vcv_vco::VELOCITY = 1.0f;
+const int sn_vco::CHANNELS = 1;
+const float sn_vco::VELOCITY = 1.0f;
 
-sn_vcv_vco::sn_vcv_vco() {
+sn_vco::sn_vco() {
     // ... params
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
@@ -39,7 +39,7 @@ sn_vcv_vco::sn_vcv_vco() {
     trigger.reset();
 }
 
-json_t *sn_vcv_vco::dataToJson() {
+json_t *sn_vco::dataToJson() {
     json_t *root = json_object();
 
     json_object_set_new(root, "k-rate", json_integer(update.krate));
@@ -49,7 +49,7 @@ json_t *sn_vcv_vco::dataToJson() {
     return root;
 }
 
-void sn_vcv_vco::dataFromJson(json_t *root) {
+void sn_vco::dataFromJson(json_t *root) {
     json_t *krate = json_object_get(root, "k-rate");
     json_t *aux_mode = json_object_get(root, "aux-mode");
     json_t *gain = json_object_get(root, "aux-gain");
@@ -82,24 +82,24 @@ void sn_vcv_vco::dataFromJson(json_t *root) {
     }
 }
 
-void sn_vcv_vco::onExpanderChange(const ExpanderChangeEvent &e) {
+void sn_vco::onExpanderChange(const ExpanderChangeEvent &e) {
     Module *left = getLeftExpander().module;
     Module *right = getRightExpander().module;
 
-    if (left && left->model == modelSn_vcv_vcox) {
+    if (left && left->model == model_sn_vcox) {
         expanders.left.module = left;
     } else {
         expanders.left.module = NULL;
     }
 
-    if (right && right->model == modelSn_vcv_vcox) {
+    if (right && right->model == model_sn_vcox) {
         expanders.right.module = right;
     } else {
         expanders.right.module = NULL;
     }
 }
 
-void sn_vcv_vco::process(const ProcessArgs &args) {
+void sn_vco::process(const ProcessArgs &args) {
     int channels = this->channels();
 
     // ... expanders
@@ -108,7 +108,7 @@ void sn_vcv_vco::process(const ProcessArgs &args) {
     bool xrr = expanders.right.module != NULL;
 
     if (expanders.left.module != NULL) {
-        sn_vcv_vcox *x = (sn_vcv_vcox *)expanders.left.module;
+        sn_vcox *x = (sn_vcox *)expanders.left.module;
         if (!x->isLinkedLeft()) {
             xll = true;
         }
@@ -145,7 +145,7 @@ void sn_vcv_vco::process(const ProcessArgs &args) {
     }
 }
 
-void sn_vcv_vco::processVCO(const ProcessArgs &args, int channels, bool expanded) {
+void sn_vco::processVCO(const ProcessArgs &args, int channels, bool expanded) {
     bool connected = outputs[VCO_OUTPUT].isConnected();
 
     // ... convert pitch CV to instantaneous frequency
@@ -180,7 +180,7 @@ void sn_vcv_vco::processVCO(const ProcessArgs &args, int channels, bool expanded
     }
 }
 
-void sn_vcv_vco::processAUX(const ProcessArgs &args, bool expanded) {
+void sn_vco::processAUX(const ProcessArgs &args, bool expanded) {
     aux.phase += AUX_FREQUENCY * args.sampleTime;
     while (aux.phase >= 1.f) {
         aux.phase -= 1.f;
@@ -229,7 +229,7 @@ void sn_vcv_vco::processAUX(const ProcessArgs &args, bool expanded) {
     }
 }
 
-void sn_vcv_vco::recompute() {
+void sn_vco::recompute() {
     // ... param values
     float e = params[ECCENTRICITY_PARAM].getValue();
     float s = params[SENSITIVITY_PARAM].getValue();
@@ -263,11 +263,11 @@ void sn_vcv_vco::recompute() {
     sn.recompute();
 }
 
-int sn_vcv_vco::channels() {
+int sn_vco::channels() {
     return inputs[PITCH_INPUT].isConnected() ? inputs[PITCH_INPUT].getChannels() : CHANNELS;
 }
 
-float sn_vcv_vco::velocity(int channel) {
+float sn_vco::velocity(int channel) {
     if (inputs[VELOCITY_INPUT].isConnected()) {
         int N = inputs[VELOCITY_INPUT].getChannels();
 
@@ -281,7 +281,7 @@ float sn_vcv_vco::velocity(int channel) {
     return VELOCITY;
 }
 
-sn_vcv_vcoWidget::sn_vcv_vcoWidget(sn_vcv_vco *module) {
+sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
     float left = 7.331;
     float middle = 20.351;
     float right = 35.56;
@@ -324,54 +324,54 @@ sn_vcv_vcoWidget::sn_vcv_vcoWidget(sn_vcv_vco *module) {
     addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     // ... e
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_e), module, sn_vcv_vco::ECCENTRICITY_INPUT));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_e), module, sn_vcv_vco::ECCENTRICITY_PARAM));
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_e), module, sn_vco::ECCENTRICITY_INPUT));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_e), module, sn_vco::ECCENTRICITY_PARAM));
 
     // ... s
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_s), module, sn_vcv_vco::SENSITIVITY_INPUT));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_s), module, sn_vcv_vco::SENSITIVITY_PARAM));
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_s), module, sn_vco::SENSITIVITY_INPUT));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_s), module, sn_vco::SENSITIVITY_PARAM));
 
     // ... θ
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_θ), module, sn_vcv_vco::ROTATION_INPUT));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_θ), module, sn_vcv_vco::ROTATION_PARAM));
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_θ), module, sn_vco::ROTATION_INPUT));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_θ), module, sn_vco::ROTATION_PARAM));
 
     // ... A
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_A), module, sn_vcv_vco::AMPLITUDE_INPUT));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_A), module, sn_vcv_vco::AMPLITUDE_PARAM));
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_A), module, sn_vco::AMPLITUDE_INPUT));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_A), module, sn_vco::AMPLITUDE_PARAM));
 
     // ... δx
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_δx), module, sn_vcv_vco::DX_INPUT));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_δx), module, sn_vcv_vco::DX_PARAM));
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_δx), module, sn_vco::DX_INPUT));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_δx), module, sn_vco::DX_PARAM));
 
     // ... δy
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_δy), module, sn_vcv_vco::DY_INPUT));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_δy), module, sn_vcv_vco::DY_PARAM));
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_δy), module, sn_vco::DY_INPUT));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_δy), module, sn_vco::DY_PARAM));
 
     // ... m,
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_m), module, sn_vcv_vco::M_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_m), module, sn_vco::M_PARAM));
 
     // ... pitch and velocity inputs
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(pitch), module, sn_vcv_vco::PITCH_INPUT));
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(velocity), module, sn_vcv_vco::VELOCITY_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(pitch), module, sn_vco::PITCH_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(velocity), module, sn_vco::VELOCITY_INPUT));
 
     // ... aux, trigger and VCO outputs
-    addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(aux), module, sn_vcv_vco::AUX_OUTPUT));
-    addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(trigger), module, sn_vcv_vco::AUX_TRIGGER));
-    addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(vco), module, sn_vcv_vco::VCO_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(aux), module, sn_vco::AUX_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(trigger), module, sn_vco::AUX_TRIGGER));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(vco), module, sn_vco::VCO_OUTPUT));
 
     // ... channels
-    sn_vcv_vco_channels *lcd = createWidget<sn_vcv_vco_channels>(mm2px(channels));
+    sn_vco_channels *lcd = createWidget<sn_vco_channels>(mm2px(channels));
     lcd->box.size = mm2px(Vec(8.197, 8.197));
     lcd->module = module;
     addChild(lcd);
 
     // ... expander indicators
-    addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xll), module, sn_vcv_vco::XLL_LIGHT));
-    addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_vcv_vco::XRR_LIGHT));
+    addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xll), module, sn_vco::XLL_LIGHT));
+    addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_vco::XRR_LIGHT));
 }
 
-void sn_vcv_vcoWidget::appendContextMenu(Menu *menu) {
-    sn_vcv_vco *module = getModule<sn_vcv_vco>();
+void sn_vcoWidget::appendContextMenu(Menu *menu) {
+    sn_vco *module = getModule<sn_vco>();
 
     menu->addChild(new MenuSeparator);
     menu->addChild(createMenuLabel("sn-vco settings"));
@@ -389,4 +389,4 @@ void sn_vcv_vcoWidget::appendContextMenu(Menu *menu) {
                                              &module->aux.gain));
 }
 
-Model *modelSn_vcv_vco = createModel<sn_vcv_vco, sn_vcv_vcoWidget>("sn-vcv-vco");
+Model *model_sn_vco = createModel<sn_vco, sn_vcoWidget>("sn-vco");

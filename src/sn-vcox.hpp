@@ -1,7 +1,7 @@
 #include "plugin.hpp"
-#include "sn-vcv.hpp"
+#include "sn.hpp"
 
-struct sn_vcv_vcox : Module {
+struct sn_vcox : Module {
     static const int CHANNELS;
 
     enum ParamId {
@@ -42,7 +42,7 @@ struct sn_vcv_vcox : Module {
         LIGHTS_LEN
     };
 
-    sn_vcv_vcox();
+    sn_vcox();
 
     json_t *dataToJson() override;
     void dataFromJson(json_t *) override;
@@ -109,8 +109,8 @@ struct sn_vcv_vcox : Module {
     };
 };
 
-struct sn_vcv_vcoxWidget : ModuleWidget {
-    sn_vcv_vcoxWidget(sn_vcv_vcox *);
+struct sn_vcoxWidget : ModuleWidget {
+    sn_vcoxWidget(sn_vcox *);
 
     void appendContextMenu(Menu *) override;
 };

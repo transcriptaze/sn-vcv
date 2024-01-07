@@ -1,8 +1,8 @@
 #include <cmath>
 
-#include "sn-vcv-lfo.hpp"
-#include "sn-vcv-lfox.hpp"
-#include "sn-vcv.hpp"
+#include "sn-lfo.hpp"
+#include "sn-lfox.hpp"
+#include "sn.hpp"
 
 // clang-format off
 const range RANGES[] = {
@@ -12,9 +12,9 @@ const range RANGES[] = {
 };
 // clang-format on
 
-const int sn_vcv_lfo::CHANNELS = 1;
+const int sn_lfo::CHANNELS = 1;
 
-sn_vcv_lfo::sn_vcv_lfo() {
+sn_lfo::sn_lfo() {
     // ... params
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
@@ -54,7 +54,7 @@ sn_vcv_lfo::sn_vcv_lfo() {
     trigger.reset();
 }
 
-json_t *sn_vcv_lfo::dataToJson() {
+json_t *sn_lfo::dataToJson() {
     json_t *root = json_object();
 
     json_object_set_new(root, "range", json_integer(getRange()));
@@ -65,7 +65,7 @@ json_t *sn_vcv_lfo::dataToJson() {
     return root;
 }
 
-void sn_vcv_lfo::dataFromJson(json_t *root) {
+void sn_lfo::dataFromJson(json_t *root) {
     json_t *range = json_object_get(root, "range");
     json_t *krate = json_object_get(root, "k-rate");
     json_t *aux_mode = json_object_get(root, "aux-mode");
@@ -107,24 +107,24 @@ void sn_vcv_lfo::dataFromJson(json_t *root) {
     }
 }
 
-void sn_vcv_lfo::onExpanderChange(const ExpanderChangeEvent &e) {
+void sn_lfo::onExpanderChange(const ExpanderChangeEvent &e) {
     Module *left = getLeftExpander().module;
     Module *right = getRightExpander().module;
 
-    if (left && left->model == modelSn_vcv_lfox) {
+    if (left && left->model == model_sn_lfox) {
         expanders.left.module = left;
     } else {
         expanders.left.module = NULL;
     }
 
-    if (right && right->model == modelSn_vcv_lfox) {
+    if (right && right->model == model_sn_lfox) {
         expanders.right.module = right;
     } else {
         expanders.right.module = NULL;
     }
 }
 
-void sn_vcv_lfo::process(const ProcessArgs &args) {
+void sn_lfo::process(const ProcessArgs &args) {
     int channels = this->channels();
     bool resync = sync.process(inputs[SYNCH_INPUT].getVoltage());
 
@@ -134,7 +134,7 @@ void sn_vcv_lfo::process(const ProcessArgs &args) {
     bool xrr = expanders.right.module != NULL;
 
     if (expanders.left.module != NULL) {
-        sn_vcv_lfox *x = (sn_vcv_lfox *)expanders.left.module;
+        sn_lfox *x = (sn_lfox *)expanders.left.module;
 
         if (!x->isLinkedLeft()) {
             xll = true;
@@ -175,7 +175,7 @@ void sn_vcv_lfo::process(const ProcessArgs &args) {
     }
 }
 
-void sn_vcv_lfo::recompute() {
+void sn_lfo::recompute() {
     // ... param values
     float e = params[ECCENTRICITY_PARAM].getValue();
     float s = params[SENSITIVITY_PARAM].getValue();
@@ -198,7 +198,7 @@ void sn_vcv_lfo::recompute() {
     sn.recompute();
 }
 
-void sn_vcv_lfo::processLFO(const ProcessArgs &args, int channels, bool resync, bool expanded, bool recalculate) {
+void sn_lfo::processLFO(const ProcessArgs &args, int channels, bool resync, bool expanded, bool recalculate) {
     // ... update instantaneous phase
     float fv = params[FREQUENCY_PARAM].getValue();
     float f = range.frequency(fv);
@@ -250,7 +250,7 @@ void sn_vcv_lfo::processLFO(const ProcessArgs &args, int channels, bool resync, 
     }
 }
 
-void sn_vcv_lfo::processAUX(const ProcessArgs &args, bool expanded, bool resync) {
+void sn_lfo::processAUX(const ProcessArgs &args, bool expanded, bool resync) {
     // ... update instantaneous phase
     aux.phase += AUX_FREQUENCY * args.sampleTime;
     if (aux.phase >= 1.f) {
@@ -307,15 +307,15 @@ void sn_vcv_lfo::processAUX(const ProcessArgs &args, bool expanded, bool resync)
     }
 }
 
-int sn_vcv_lfo::channels() {
+int sn_lfo::channels() {
     return inputs[FREQUENCY_INPUT].isConnected() ? inputs[FREQUENCY_INPUT].getChannels() : CHANNELS;
 }
 
-int sn_vcv_lfo::getRange() {
+int sn_lfo::getRange() {
     return range.index;
 }
 
-void sn_vcv_lfo::setRange(int v) {
+void sn_lfo::setRange(int v) {
     ParamQuantity *param = getParamQuantity(FREQUENCY_PARAM);
 
     if (v >= 0 && v <= 2) {
@@ -329,7 +329,7 @@ void sn_vcv_lfo::setRange(int v) {
     }
 }
 
-sn_vcv_lfoWidget::sn_vcv_lfoWidget(sn_vcv_lfo *module) {
+sn_lfoWidget::sn_lfoWidget(sn_lfo *module) {
     float left = 8.89;
     float right = 27.94;
     float top = 21.968 + 1.27;
@@ -365,32 +365,32 @@ sn_vcv_lfoWidget::sn_vcv_lfoWidget(sn_vcv_lfo *module) {
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     // ... parameters
-    addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(f), module, sn_vcv_lfo::FREQUENCY_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(e), module, sn_vcv_lfo::ECCENTRICITY_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(s), module, sn_vcv_lfo::SENSITIVITY_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(θ), module, sn_vcv_lfo::ROTATION_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(A), module, sn_vcv_lfo::AMPLITUDE_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(δx), module, sn_vcv_lfo::DX_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(δy), module, sn_vcv_lfo::DY_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(𝜓), module, sn_vcv_lfo::PHI_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(m), module, sn_vcv_lfo::M_PARAM));
+    addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(f), module, sn_lfo::FREQUENCY_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(e), module, sn_lfo::ECCENTRICITY_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(s), module, sn_lfo::SENSITIVITY_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(θ), module, sn_lfo::ROTATION_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(A), module, sn_lfo::AMPLITUDE_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(δx), module, sn_lfo::DX_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(δy), module, sn_lfo::DY_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(𝜓), module, sn_lfo::PHI_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(m), module, sn_lfo::M_PARAM));
 
     // ... inputs
-    addInput(createInputCentered<PJ301MPort>(mm2px(fin), module, sn_vcv_lfo::FREQUENCY_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(synch), module, sn_vcv_lfo::SYNCH_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(fin), module, sn_lfo::FREQUENCY_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(synch), module, sn_lfo::SYNCH_INPUT));
 
     // ... outputs
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(lfo), module, sn_vcv_lfo::LFO_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(aux), module, sn_vcv_lfo::AUX_OUTPUT));
-    addOutput(createOutputCentered<PJ301MPort>(mm2px(trigger), module, sn_vcv_lfo::AUX_TRIGGER));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(lfo), module, sn_lfo::LFO_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(aux), module, sn_lfo::AUX_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(trigger), module, sn_lfo::AUX_TRIGGER));
 
     // ... expander indicators
-    addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xll), module, sn_vcv_lfo::XLL_LIGHT));
-    addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_vcv_lfo::XRR_LIGHT));
+    addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xll), module, sn_lfo::XLL_LIGHT));
+    addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_lfo::XRR_LIGHT));
 }
 
-void sn_vcv_lfoWidget::appendContextMenu(Menu *menu) {
-    sn_vcv_lfo *module = getModule<sn_vcv_lfo>();
+void sn_lfoWidget::appendContextMenu(Menu *menu) {
+    sn_lfo *module = getModule<sn_lfo>();
 
     menu->addChild(new MenuSeparator);
     menu->addChild(createMenuLabel("sn-lfo settings"));
@@ -418,4 +418,4 @@ void sn_vcv_lfoWidget::appendContextMenu(Menu *menu) {
                                              &module->aux.gain));
 }
 
-Model *modelSn_vcv_lfo = createModel<sn_vcv_lfo, sn_vcv_lfoWidget>("sn-vcv-lfo");
+Model *model_sn_lfo = createModel<sn_lfo, sn_lfoWidget>("sn-lfo");

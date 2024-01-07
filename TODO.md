@@ -1,15 +1,15 @@
 # TODO
 
+- [ ] sn-vcox phase parameter jumps
 - [ ] https://github.com/VCVRack/library/issues/784
-      - [ ] sn-vcox phase parameter
       - [x] _plugin.json_
       - [x] _res_
       - [x] _Makefile_
       - [x] github workflow
-      - [ ] `sn-vco`
-      - [ ] `sn-vcox`
-      - [ ] `sn-lfo`
-      - [ ] `sn-lfox`
+      - [x] `sn-vco`
+      - [x] `sn-vcox`
+      - [x] `sn-lfo`
+      - [x] `sn-lfox`
       - [x] README
       - [ ] user guide
       - [ ] images
