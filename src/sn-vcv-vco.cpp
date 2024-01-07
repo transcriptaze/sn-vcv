@@ -315,8 +315,8 @@ sn_vcv_vcoWidget::sn_vcv_vcoWidget(sn_vcv_vco *module) {
     Vec xrr(43.18, 11.43 + 2.54);
 
     setModule(module);
-    setPanel(createPanel(asset::plugin(pluginInstance, "res/sn-vcv-vco.svg"),
-                         asset::plugin(pluginInstance, "res/sn-vcv-vco-dark.svg")));
+    setPanel(createPanel(asset::plugin(pluginInstance, "res/sn-vco.svg"),
+                         asset::plugin(pluginInstance, "res/sn-vco-dark.svg")));
 
     addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, 0)));
     addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));

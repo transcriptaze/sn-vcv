@@ -38,7 +38,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: ${{ env.rack-plugin-toolchain-dir }}/plugin-build
-          name: sn-vcv-2.0.0-${{ matrix.platform }}
+          name: sn-2.0.0-${{ matrix.platform }}
 
   build-mac:
     name: mac
@@ -71,7 +71,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: dist/*.vcvplugin
-          name: sn-vcv-2.0.0-mac-${{ matrix.platform }}
+          name: sn-2.0.0-mac-${{ matrix.platform }}
 
   build-mac-11:
     name: mac
@@ -104,5 +104,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: dist/*.vcvplugin
-          name: sn-vcv-2.0.0-mac-11-${{ matrix.platform }}
+          name: sn-2.0.0-mac-11-${{ matrix.platform }}
 

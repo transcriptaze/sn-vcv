@@ -318,8 +318,8 @@ sn_vcv_lfoxWidget::sn_vcv_lfoxWidget(sn_vcv_lfox *module) {
     Vec xrr(33.02, 13.97);
 
     setModule(module);
-    setPanel(createPanel(asset::plugin(pluginInstance, "res/sn-vcv-lfox.svg"),
-                         asset::plugin(pluginInstance, "res/sn-vcv-lfox-dark.svg")));
+    setPanel(createPanel(asset::plugin(pluginInstance, "res/sn-lfox.svg"),
+                         asset::plugin(pluginInstance, "res/sn-lfox-dark.svg")));
 
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));

@@ -1,34 +1,21 @@
 # TODO
 
-- [x] github tags
-- [x] github workflow
-      - [x] Windows
-      - [x] Linux
-      - [x] Mac
-      - [x] _dist_
-            - [x] Windows
-            - [x] Mac
-            - [x] Linux
-
-- [x] README & Manuals
-      - [x] modules images
-      - [x] sn-lfox logo
-      - [x] CHANGELOG
-
-- [x] Demo patches
-      - [x] sn-vco
-      - [x] sn-vcox
-      - [x] sn-lfo
-      - [x] sn-lfox
-      - [x] Greensleeves
-      - [x] Toccata
-
-- [x] _sn-vcv-osc_
-- [x] _sn-vcv-oscx_
-- [x] _sn-vcv-lfo_
-- [x] _sn-vcv-lfox_
-- [x] Add as snyth submodule
-
+- [ ] https://github.com/VCVRack/library/issues/784
+      - [ ] sn-vcox phase parameter
+      - [x] _plugin.json_
+      - [x] _res_
+      - [x] _Makefile_
+      - [x] github workflow
+      - [ ] `sn-vco`
+      - [ ] `sn-vcox`
+      - [ ] `sn-lfo`
+      - [ ] `sn-lfox`
+      - [x] README
+      - [ ] user guide
+      - [ ] images
+      - [ ] presets
+      - [ ] patches
+      - [ ] CHANGELOG
 
 ## Notes and References
 

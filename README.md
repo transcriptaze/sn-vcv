@@ -1,6 +1,6 @@
 ![build](https://github.com/transcriptaze/sn-vcv/workflows/build/badge.svg)
 
-# sn-vcv
+# sn
 
 A set of [VCV Rack 2](https://vcvrack.com/Rack) plugins for the _sn_ experimental additive synthesizer which
 uses the _sn_ function as the generator function instead of the more usual _sine_. The modules comprise:
@@ -33,7 +33,7 @@ otherwise fairly plain rendering.
 ### Background
 
 Mathematically a _sine_ function is a special case of the Jacobi elliptic _sn_ function (in the same way that
-a circle is a special case of an ellipse). The _sn-vcv_ VCV modules use the _sn_ function rather than the
+a circle is a special case of an ellipse). The _sn_ VCV modules use the _sn_ function rather than the
 _sine_ function to generate harmonically rich waveforms that are also continuous and differentiable.
 
 By modifying the parameters of the _sn_ function it is possible to smoothly morph between a sine wave,
@@ -94,7 +94,7 @@ export RACK_DIR=<Rack SDK folder>
 3. Build and install the _sn-xxx_ plugins:
 ```
 git clone https://github.com/transcriptaze/sn-vcv.git
-cd sn-vcv
+cd sn
 make
 ```
 
@@ -131,7 +131,7 @@ The basic patches have been kept as simple as possible and require only the _VCV
 with _VCV Rack 2_. They are mostly intended just to demonstrate the basic setup and operation of the modules rather
 than as shining examples of the art of synthesis.
 
-#### [sn-vcv-vco](/documentation/patches/sn-vcv-vco.vcv)
+#### [sn-vco](/documentation/patches/sn-vco.vcv)
 
 Hooks up 3 standard LFOs to a single _sn-vco_ module to demonstrate the basic waveshaping operation of the
 _sn-vco_ module. 
@@ -141,7 +141,7 @@ continuously varying waveform. Not very inspired and sounds pretty bland but sho
 idea of the operation of the module.
 
 
-#### [sn-vcv-vcox](/documentation/patches/sn-vcv-vcox.vcv)
+#### [sn-vcox](/documentation/patches/sn-vcox.vcv)
 
 Extends the basic _sn-vco_ patch with two _sn-vcox_ expanders stacked on to the _sn-vco_ module.
 
@@ -151,14 +151,14 @@ of which is shape-shifting in its own particular way. A little more interesting 
 _sn-vco_ patch but it's not going to win any awards.
 
 
-#### [sn-vcv-lfo](/documentation/patches/sn-vcv-lfo.vcv)
+#### [sn-lfo](/documentation/patches/sn-lfo.vcv)
 
 Replaces the LFOs in the basic _sn-vco_ patch with three independent _sn-lfo_ modules each with its own
 waveform. The effect is to make the _sn-vco_ output morph in some weird and unexpected ways - most of
 which don't sound good but at least a bit more perk-up-your-ears interesting.
 
 
-#### [*sn-vcv-lfox*](/documentation/patches/sn-vcv-lfox.vcv)
+#### [*sn-lfox*](/documentation/patches/sn-lfox.vcv)
 
 Replaces the independent LFOs in the basic _sn-lfo_ patch with an _sn-lfo_ module and two stacked 
 _sn-lfox_ expanders for a slightly different effect. Oddly ambient'ish in a way .. maybe with some

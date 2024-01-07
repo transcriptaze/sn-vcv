@@ -356,8 +356,8 @@ sn_vcv_lfoWidget::sn_vcv_lfoWidget(sn_vcv_lfo *module) {
     Vec xrr(33.02, 13.97);
 
     setModule(module);
-    setPanel(createPanel(asset::plugin(pluginInstance, "res/sn-vcv-lfo.svg"),
-                         asset::plugin(pluginInstance, "res/sn-vcv-lfo-dark.svg")));
+    setPanel(createPanel(asset::plugin(pluginInstance, "res/sn-lfo.svg"),
+                         asset::plugin(pluginInstance, "res/sn-lfo-dark.svg")));
 
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));

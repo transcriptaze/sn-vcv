@@ -1,9 +1,8 @@
 {
-  "slug": "sn-vcv",
+  "slug": "sn",
   "name": "sn",
   "version": "2.0.0",
   "license": "GPL-3.0-only",
-  "brand": "sn-vcv",
   "author": "transcriptaze",
   "authorEmail": "transcriptaze.development@gmail.com",
   "authorUrl": "https://github.com/transcriptaze",
@@ -14,7 +13,7 @@
   "donateUrl": "",
   "modules": [
     {
-      "slug": "sn-vcv-vco",
+      "slug": "sn-vco",
       "name": "sn-vco",
       "description": "sn experimental additive synthesizer VCO",
       "tags": [
@@ -24,7 +23,7 @@
       ]
     },
     {
-      "slug": "sn-vcv-vcox",
+      "slug": "sn-vcox",
       "name": "sn-vcox",
       "description": "sn experimental additive synthesizer VCO expander",
       "tags": [
@@ -32,7 +31,7 @@
       ]
     },
     {
-      "slug": "sn-vcv-lfo",
+      "slug": "sn-lfo",
       "name": "sn-lfo",
       "description": "sn experimental additive synthesizer LFO",
       "tags": [
@@ -42,7 +41,7 @@
       ]
     },
     {
-      "slug": "sn-vcv-lfox",
+      "slug": "sn-lfox",
       "name": "sn-lfox",
       "description": "sn experimental additive synthesizer LFO expander",
       "tags": [

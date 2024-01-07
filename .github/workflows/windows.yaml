@@ -34,6 +34,5 @@ jobs:
         run: |
           export RACK_DIR=$HOME/Rack-SDK
           export CC=gcc
-          echo ">>>>>>>>>>> ${RACK_DIR}"
           make dep
           make dist
