@@ -1,6 +1,6 @@
 {
-  "plugin": "sn-vcv",
-  "model": "sn-vcv-vco",
+  "plugin": "sn",
+  "model": "sn-vcox",
   "version": "2.0.0",
   "params": [
     {

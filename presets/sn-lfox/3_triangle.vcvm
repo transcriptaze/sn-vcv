@@ -1,14 +1,14 @@
 {
-  "plugin": "sn-vcv",
-  "model": "sn-vcv-lfo",
+  "plugin": "sn",
+  "model": "sn-lfox",
   "version": "2.0.0",
   "params": [
     {
-      "value": 0.0,
+      "value": 0.175,
       "id": 0
     },
     {
-      "value": 2.5,
+      "value": 5.0,
       "id": 1
     },
     {

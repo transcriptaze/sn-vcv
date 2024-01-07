@@ -1,6 +1,6 @@
 {
-  "plugin": "sn-vcv",
-  "model": "sn-vcv-vcox",
+  "plugin": "sn",
+  "model": "sn-lfox",
   "version": "2.0.0",
   "params": [
     {
@@ -26,6 +26,10 @@
     {
       "value": 0.0,
       "id": 5
+    },
+    {
+      "value": 0.0,
+      "id": 6
     }
   ]
 }

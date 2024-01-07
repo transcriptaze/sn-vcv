@@ -13,9 +13,9 @@
       - [x] README
       - [x] images
       - [x] user guide
-      - [ ] presets
+      - [x] presets
       - [ ] patches
-      - [ ] CHANGELOG
+      - [x] CHANGELOG
 
 ## Notes and References
 
