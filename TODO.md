@@ -11,8 +11,8 @@
       - [x] `sn-lfo`
       - [x] `sn-lfox`
       - [x] README
-      - [ ] user guide
-      - [ ] images
+      - [x] images
+      - [x] user guide
       - [ ] presets
       - [ ] patches
       - [ ] CHANGELOG
