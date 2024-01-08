@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unrelease
+## [2.0.0-prerelease](https://github.com/transcriptaze/sn-vcv/releases/tag/v2.0.0) - 2024-01-07
 
 ### Updated
 1. Renamed all modules from _sn-vcv-xxx_ to _sn-xxx_ (cf. https://github.com/VCVRack/library/issues/784)
