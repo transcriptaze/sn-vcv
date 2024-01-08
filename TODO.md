@@ -1,7 +1,6 @@
 # TODO
 
-- [ ] sn-vcox phase parameter jumps
-- [ ] https://github.com/VCVRack/library/issues/784
+- [x] https://github.com/VCVRack/library/issues/784
       - [x] _plugin.json_
       - [x] _res_
       - [x] _Makefile_
@@ -14,7 +13,7 @@
       - [x] images
       - [x] user guide
       - [x] presets
-      - [ ] patches
+      - [x] patches
       - [x] CHANGELOG
 
 ## Notes and References
