@@ -15,6 +15,7 @@
       - [x] presets
       - [x] patches
       - [x] CHANGELOG
+      - [x] Fix plugin.json CHANGELOG and MANUAL URLs
 
 ## Notes and References
 
