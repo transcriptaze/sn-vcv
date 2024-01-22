@@ -61,7 +61,14 @@ The modules share a common set of parameters that determine the wave shape:
 
 ### VCV Rack Library
 
-_(hopefully one of these days)_
+The _sn_ modules are available in the _VCV Rack 2_ library:
+
+https://library.vcvrack.com/?brand=sn
+
+Installation instructions are the same as for any library module and can be found at the bottom of the page or in the
+[Installing Rack plugins](https://vcvrack.com/manual/Installing#Installing-Rack-plugins) section of the _VCV Rack 2_
+manual.
+
 
 ### Manual
 
