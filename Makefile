@@ -20,4 +20,16 @@ format:
 
 include $(RACK_DIR)/plugin.mk
 
-build: format install
+build: format dist
+
+run: format install
+	/Applications/VCV\ Rack\ 2\ Free.app/Contents/MacOS/Rack
+
+headless: format install
+	/Applications/VCV\ Rack\ 2\ Free.app/Contents/MacOS/Rack --headless
+
+debug: format dist
+	mkdir -p runtime/plugins-mac-x64
+	cp -r dist/*.vcvplugin ./runtime/plugins-mac-x64
+#	cd runtime && /Applications/VCV\ Rack\ 2\ Free.app/Contents/MacOS/Rack --dev
+	/Applications/VCV\ Rack\ 2\ Free.app/Contents/MacOS/Rack --user ~/Development/shapestry/sn-vcv/runtime
