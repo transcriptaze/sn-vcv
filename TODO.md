@@ -9,8 +9,8 @@
       - https://dsp.stackexchange.com/questions/2608/is-there-such-a-thing-as-band-limited-non-linear-distortion/28787#28787
       - https://dsp.stackexchange.com/questions/50716/are-oversampling-and-downsampling-the-same-thing/50725#50725
 
-- [ ] Better blurbs in plugin.json
-- [ ] Fix tags in plugin.json
+- [x] Better blurbs in plugin.json
+- [x] Fix tags in plugin.json
 - [x] Initialise module in sn-vco-channels
 - [x] Invoke parent step() in sn-vc-channels
 
