@@ -1,21 +1,19 @@
 # TODO
 
-- [x] https://github.com/VCVRack/library/issues/784
-      - [x] _plugin.json_
-      - [x] _res_
-      - [x] _Makefile_
-      - [x] github workflow
-      - [x] `sn-vco`
-      - [x] `sn-vcox`
-      - [x] `sn-lfo`
-      - [x] `sn-lfox`
-      - [x] README
-      - [x] images
-      - [x] user guide
-      - [x] presets
-      - [x] patches
-      - [x] CHANGELOG
-      - [x] Fix plugin.json CHANGELOG and MANUAL URLs
+- [ ] Antialiasing
+      - https://github.com/transcriptaze/sn-vcv/issues/3
+      - https://dsp.stackexchange.com/questions/91854/benefit-of-anti-aliasing-for-wideband-finite-time-duration-signals-prior-to-samp
+      - https://dsp.stackexchange.com/questions/15974/digital-anti-aliasing-filter-for-waveform-band-limiting/15975#15975
+      - https://dsp.stackexchange.com/questions/22793/does-msaa-make-sense-in-audio-1d-data-streams/22828#22828
+      - https://dsp.stackexchange.com/questions/9205/can-we-have-a-digital-anti-aliasing-filter/9239#9239
+      - https://dsp.stackexchange.com/questions/2608/is-there-such-a-thing-as-band-limited-non-linear-distortion/28787#28787
+      - https://dsp.stackexchange.com/questions/50716/are-oversampling-and-downsampling-the-same-thing/50725#50725
+
+- [ ] Better blurbs in plugin.json
+- [ ] Fix tags in plugin.json
+- [x] Initialise module in sn-vco-channels
+- [ ] Invoke parent step() in sn-vc-channels
+
 
 ## Notes and References
 

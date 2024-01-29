@@ -118,6 +118,7 @@ struct sn_vco_channels : ChannelsWidget {
         textPos = Vec(22, 20);
         bgText = "18";
         fontSize = 16;
+        module = NULL;
     }
 
     void step() override {
