@@ -122,6 +122,8 @@ struct sn_vco_channels : ChannelsWidget {
     }
 
     void step() override {
+        Widget::step();
+
         int channels = module ? module->channels() : 0;
 
         text = string::f("%d", channels);

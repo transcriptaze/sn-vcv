@@ -12,7 +12,7 @@
 - [ ] Better blurbs in plugin.json
 - [ ] Fix tags in plugin.json
 - [x] Initialise module in sn-vco-channels
-- [ ] Invoke parent step() in sn-vc-channels
+- [x] Invoke parent step() in sn-vc-channels
 
 
 ## Notes and References

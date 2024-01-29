@@ -33,3 +33,4 @@ debug: format dist
 	cp -r dist/*.vcvplugin ./runtime/plugins-mac-x64
 #	cd runtime && /Applications/VCV\ Rack\ 2\ Free.app/Contents/MacOS/Rack --dev
 	/Applications/VCV\ Rack\ 2\ Free.app/Contents/MacOS/Rack --user ~/Development/shapestry/sn-vcv/runtime
+
