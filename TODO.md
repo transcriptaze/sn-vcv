@@ -2,6 +2,7 @@
 
 - [ ] Antialiasing
       - https://github.com/transcriptaze/sn-vcv/issues/3
+      - https://github.com/squinkylabs/Demo/blob/main/docs/aliasing2.md
       - https://dsp.stackexchange.com/questions/91854/benefit-of-anti-aliasing-for-wideband-finite-time-duration-signals-prior-to-samp
       - https://dsp.stackexchange.com/questions/15974/digital-anti-aliasing-filter-for-waveform-band-limiting/15975#15975
       - https://dsp.stackexchange.com/questions/22793/does-msaa-make-sense-in-audio-1d-data-streams/22828#22828

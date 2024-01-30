@@ -39,6 +39,7 @@ struct sn_vco : Module {
     enum LightId {
         XLL_LIGHT,
         XRR_LIGHT,
+        ENUMS(ALIAS_LIGHT, 3),
         LIGHTS_LEN
     };
 

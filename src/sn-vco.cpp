@@ -102,6 +102,10 @@ void sn_vco::onExpanderChange(const ExpanderChangeEvent &e) {
 void sn_vco::process(const ProcessArgs &args) {
     int channels = this->channels();
 
+    lights[ALIAS_LIGHT + 0].setBrightness(1.0); // red
+    lights[ALIAS_LIGHT + 1].setBrightness(0.0); // green
+    lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
+
     // ... expanders
     bool expanded = expanders.left.module != NULL || expanders.right.module != NULL;
     bool xll = false;
@@ -313,6 +317,7 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
 
     Vec xll(2.54, 11.43 + 2.54);
     Vec xrr(43.18, 11.43 + 2.54);
+    Vec antialias(middle, top + 7 * dh);
 
     setModule(module);
     setPanel(createPanel(asset::plugin(pluginInstance, "res/sn-vco.svg"),
@@ -365,9 +370,10 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
     lcd->module = module;
     addChild(lcd);
 
-    // ... expander indicators
+    // ... indicators
     addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xll), module, sn_vco::XLL_LIGHT));
     addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_vco::XRR_LIGHT));
+    addChild(createLightCentered<LargeLight<RedGreenBlueLight>>(mm2px(antialias), module, sn_vco::ALIAS_LIGHT));
 }
 
 void sn_vcoWidget::appendContextMenu(Menu *menu) {
