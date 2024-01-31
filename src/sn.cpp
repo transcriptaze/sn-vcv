@@ -10,6 +10,9 @@ const std::vector<float> AUX_GAIN = {1.f, 0.5f, 0.333f, 0.25f, 0.2f}; // AUX out
 const std::vector<std::string> AUX_MODES = {"OSC", "SUM", "POLY"};    // AUX mode labels
 const std::vector<std::string> AUX_GAINS = {"1", "½", "⅓", "¼", "⅕"}; // AUX gain labels
 
+// anti-aliasing
+const std::vector<std::string> ANTIALIASING = {"None", "LPF"}; // anti-aliasing menu options
+
 // SN
 void SN::recompute() {
     float εʼ = std::sqrt(1.0f - ε * ε);

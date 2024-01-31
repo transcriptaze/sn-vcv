@@ -19,10 +19,18 @@ extern const std::vector<float> AUX_GAIN;        // auxiliary output gains
 extern const std::vector<std::string> AUX_GAINS; // AUX gain labels
 extern const std::vector<std::string> AUX_MODES; // AUX mode labels
 
+// ... anti-aliasing
+extern const std::vector<std::string> ANTIALIASING; // anti-aliasing option labels
+
 enum AUXMODE {
     OSC,
     SUM,
     POLY
+};
+
+enum ANTI_ALIAS {
+    NONE,
+    LPF,
 };
 
 typedef struct VCO {

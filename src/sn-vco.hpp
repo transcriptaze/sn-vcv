@@ -105,6 +105,9 @@ struct sn_vco : Module {
         .left = sn_expander<sn_vco_message>(LEFT),
         .right = sn_expander<sn_vco_message>(RIGHT),
     };
+
+    // ... anti-aliasing
+    ANTI_ALIAS antialias;
 };
 
 struct sn_vcoWidget : ModuleWidget {

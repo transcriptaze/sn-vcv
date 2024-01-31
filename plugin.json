@@ -35,8 +35,9 @@
       "name": "sn-lfo",
       "description": "sn experimental additive synthesizer LFO. Implements continuous smooth morphing between waveshapes.",
       "tags": [
-        "Function generator",
+        "LFO",
         "Low-frequency oscillator",
+        "Function generator",
         "Waveshaper"
       ]
     },

@@ -37,6 +37,10 @@ sn_vco::sn_vco() {
 
     // ... reset trigger
     trigger.reset();
+
+    // ... anti-aliasing
+
+    antialias = NONE;
 }
 
 json_t *sn_vco::dataToJson() {
@@ -45,6 +49,7 @@ json_t *sn_vco::dataToJson() {
     json_object_set_new(root, "k-rate", json_integer(update.krate));
     json_object_set_new(root, "aux-mode", json_integer(aux.mode));
     json_object_set_new(root, "aux-gain", json_integer(aux.gain));
+    json_object_set_new(root, "anti-alias", json_integer(antialias));
 
     return root;
 }
@@ -53,6 +58,7 @@ void sn_vco::dataFromJson(json_t *root) {
     json_t *krate = json_object_get(root, "k-rate");
     json_t *aux_mode = json_object_get(root, "aux-mode");
     json_t *gain = json_object_get(root, "aux-gain");
+    json_t *antialias = json_object_get(root, "anti-alias");
 
     if (krate) {
         int v = json_integer_value(krate);
@@ -80,6 +86,20 @@ void sn_vco::dataFromJson(json_t *root) {
             aux.gain = v;
         }
     }
+
+    if (antialias) {
+        int v = json_integer_value(antialias);
+
+        switch (v) {
+        case NONE:
+            this->antialias = NONE;
+            break;
+
+        case LPF:
+            this->antialias = LPF;
+            break;
+        }
+    }
 }
 
 void sn_vco::onExpanderChange(const ExpanderChangeEvent &e) {
@@ -102,9 +122,26 @@ void sn_vco::onExpanderChange(const ExpanderChangeEvent &e) {
 void sn_vco::process(const ProcessArgs &args) {
     int channels = this->channels();
 
-    lights[ALIAS_LIGHT + 0].setBrightness(1.0); // red
-    lights[ALIAS_LIGHT + 1].setBrightness(0.0); // green
-    lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
+    // ... anti-aliasing indicator
+
+    switch (antialias) {
+    case NONE:
+        lights[ALIAS_LIGHT + 0].setBrightness(0.0); // red
+        lights[ALIAS_LIGHT + 1].setBrightness(0.0); // green
+        lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
+        break;
+
+    case LPF:
+        lights[ALIAS_LIGHT + 0].setBrightness(1.0); // red
+        lights[ALIAS_LIGHT + 1].setBrightness(0.0); // green
+        lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
+        break;
+
+    default:
+        lights[ALIAS_LIGHT + 0].setBrightness(0.0); // red
+        lights[ALIAS_LIGHT + 1].setBrightness(0.0); // green
+        lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
+    }
 
     // ... expanders
     bool expanded = expanders.left.module != NULL || expanders.right.module != NULL;
@@ -393,6 +430,10 @@ void sn_vcoWidget::appendContextMenu(Menu *menu) {
     menu->addChild(createIndexPtrSubmenuItem("aux-gain",
                                              AUX_GAINS,
                                              &module->aux.gain));
+
+    menu->addChild(createIndexPtrSubmenuItem("anti-alias",
+                                             ANTIALIASING,
+                                             &module->antialias));
 }
 
 Model *model_sn_vco = createModel<sn_vco, sn_vcoWidget>("sn-vco");
