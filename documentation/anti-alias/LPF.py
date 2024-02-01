@@ -24,7 +24,7 @@ plt.show()
 
 # Butterworth filter (digital)
 b, a = signal.butter(N, f0, 'lowpass', analog=False, fs=fs)
-w, h = signal.freqz(b, a, whole=True)
+w, h = signal.freqz(b, a, fs=fs)
 
 plt.semilogx(w, 20 * np.log10(abs(h)))
 plt.title('Butterworth filter frequency response')
@@ -33,6 +33,7 @@ plt.ylabel('Amplitude [dB]')
 plt.margins(0, 0.1)
 plt.grid(which='both', axis='both')
 plt.axvline(100, color='green') # cutoff frequency
+plt.axhline(-3, color='red')    # -3dB
 plt.show()
 
 
