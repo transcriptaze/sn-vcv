@@ -4,9 +4,12 @@
       - https://github.com/transcriptaze/sn-vcv/issues/3
       - [x] Indicator
       - [x] Context menu
+      - [ ] Clamp input frequency
       - [ ] _None_
       - [ ] LPF
             - http://jaggedplanet.com/iir/iir-explorer.asp
+            - https://docs.juliadsp.org/stable/filters/#DSP.Filters.PolynomialRatio
+            - https://github.com/JunoLab/Weave.jl
 
 - [x] Better blurbs in plugin.json
 - [x] Fix tags in plugin.json
