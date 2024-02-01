@@ -12,11 +12,11 @@ using DSP,Plots
 
 # ╔═╡ 222aaf8a-c08c-11ee-27ed-33daae5518d2
 begin
-	f0 = 12500;  # 12.5kHz
-	fs = 44100;  # 44.1kHz
+	f0 = 100;  # cutoff frequency (Hz)
+	fs = 500;  # sampling frequency (Hz)
 	fn = fs/(2π);
 		
-	order = 1;
+	N = 8;
 	ripple = 0.25; # dB
 	lpf = Filters.Lowpass(f0,fs=fs);
 end
@@ -24,71 +24,48 @@ end
 # ╔═╡ a6dc930c-ddc4-4429-99d6-590630bb67ae
 begin
 	butterworth = convert(PolynomialRatio,        
-		                  digitalfilter(lpf,Filters.Butterworth(order)));
+		                  digitalfilter(lpf,Filters.Butterworth(N)));
 
-	butterwortha = convert(PolynomialRatio,        
-		                   analogfilter(lpf,Filters.Butterworth(order)));
+	chebyshev1 = convert(PolynomialRatio, 
+		                digitalfilter(lpf, Filters.Chebyshev1(N, ripple)));
 
-	chebyshev = convert(PolynomialRatio, 
-		                digitalfilter(lpf, Filters.Chebyshev1(order, ripple)));
-    
-	a = coefa(chebyshev);
-	b = coefb(chebyshev);
+	chebyshev2 = convert(PolynomialRatio, 
+		                digitalfilter(lpf, Filters.Chebyshev2(N, ripple)));
 
-	println("a: ", a);
-	println("b: ", b);
+	println("Butterworth")
+	println("-----------")
+	println("a: ", coefa(butterworth));
+	println("b: ", coefb(butterworth));
 end
 
 # ╔═╡ d01aed22-de11-407b-b865-bfc836b5ec95
 begin
 	h, w = freqresp(butterworth);
-	H, _ = freqresp(chebyshev);
-	y1 = pow2db.(abs.(h))
-	y2 = pow2db.(abs.(H))
-	f = 0.1.+(fn.*(w))
+	H1, _ = freqresp(chebyshev1);
+	H2, _ = freqresp(chebyshev2);
+
+	# skip w=0
+	y  = amp2db.(abs.(h[2:end]))
+	y1 = amp2db.(abs.(H1[2:end]))
+	y2 = amp2db.(abs.(H2[2:end]))
+	f = fn.*(w[2:end])
+
 	plot(f, 
-		 y1, 
+		 y, 
 		 xlabel = "Frequency (Hz)", 
 		 ylabel = "Magnitude (dB)", 
 		 label="Butterworth", 
 		 xaxis=:log10,
 		 xformatter=:plain,
-		 xlimits=(100,fs),
+		 xlimits=(1,1000),
 		 ylimits=(-60,0));
-	plot!(f, y2, label="Chebyshev1");
+
+	plot!(f, y1, label="Chebyshev1");
+	# plot!(f, y2, label="Chebyshev2");
 	
 	hline!([-3], linestyle=:dash, label="-3dB");
-	hline!([-6], linestyle=:dash, label="-6dB");
 	vline!([f0], linestyle=:dash, label="f0");
 	vline!([fs/2], linestyle=:dash, label="fn");
-end
-
-# ╔═╡ 8b370e53-dc02-41a9-9b63-060718f5d466
-begin
-	ha, wa = freqresp(butterwortha);
-	ya = pow2db.(abs.(ha))
-	fa = 0.1.+(fn.*(wa))
-	plot(fa, 
-		 ya, 
-		 xlabel = "Frequency (Hz)", 
-		 ylabel = "Magnitude (dB)", 
-		 label="Butterworth", 
-		 xaxis=:log10,
-		 xformatter=:plain,
-		 xlimits=(100,fs))
-	
-	hline!([-3], linestyle=:dash, label="-3dB");
-	hline!([-6], linestyle=:dash, label="-6dB");
-	vline!([f0], linestyle=:dash, label="f0");
-	vline!([fs/2], linestyle=:dash, label="fn");
-
-end
-
-# ╔═╡ 45ab6f17-8b69-4ee6-80d0-d085a09f4371
-begin
-		println(ha[1]);
-		println(ya[1]);
-		println(wa[1],"   ",fn*wa[1]);
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -1278,7 +1255,5 @@ version = "1.4.1+1"
 # ╠═222aaf8a-c08c-11ee-27ed-33daae5518d2
 # ╠═a6dc930c-ddc4-4429-99d6-590630bb67ae
 # ╠═d01aed22-de11-407b-b865-bfc836b5ec95
-# ╠═8b370e53-dc02-41a9-9b63-060718f5d466
-# ╠═45ab6f17-8b69-4ee6-80d0-d085a09f4371
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
