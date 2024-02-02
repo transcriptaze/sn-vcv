@@ -1,7 +1,7 @@
 {
   "slug": "sn",
   "name": "sn",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "license": "GPL-3.0-only",
   "author": "transcriptaze",
   "authorEmail": "transcriptaze.development@gmail.com",
@@ -51,6 +51,14 @@
       "manualUrl": "https://github.com/transcriptaze/sn-vcv/blob/main/documentation/MANUAL.md#sn-lfox",
       "tags": [
         "Expander"
+      ]
+    },
+    {
+      "slug": "sn-lpf",
+      "name": "sn-lpf",
+      "description": "LPF for debugging anti-aliasing",
+      "tags": [
+        "Filter"
       ]
     }
   ]
