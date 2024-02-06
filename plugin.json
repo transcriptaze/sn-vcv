@@ -52,14 +52,6 @@
       "tags": [
         "Expander"
       ]
-    },
-    {
-      "slug": "sn-lpf",
-      "name": "sn-lpf",
-      "description": "LPF for debugging anti-aliasing",
-      "tags": [
-        "Filter"
-      ]
     }
   ]
 }
