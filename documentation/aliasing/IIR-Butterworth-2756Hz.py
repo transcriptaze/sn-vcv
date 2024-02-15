@@ -1,5 +1,5 @@
 """
-Generates 4th order Butterworth IIR filter coefficients for all the VCV sampling rates.
+Generates 4th order Butterworth IIR filter coefficients for the LFO.
 """
 
 from scipy import signal
@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 FS = [11025, 12000, 22050, 24000, 44100, 48000, 88200, 96000, 176400, 192000, 352800, 384000, 705600, 768000]
-F0 = 16000  # cutoff frequency (Hz)
-N = 4  # order of filter
+F0 = 2756.25  # cutoff frequency (Hz)
+N = 4         # order of filter
 
 rates = set()
 for fs in FS:
@@ -16,7 +16,7 @@ for fs in FS:
     rates.add(fs*2)
     rates.add(fs*4)
 
-print('const std::map<int, IIR> COEFFICIENTS_16kHz = {')
+print('const std::map<int, IIR> COEFFICIENTS_2756Hz = {')
 
 for fs in sorted(rates):
     f0 = 0.4 * fs if fs < 44100 else 16000
