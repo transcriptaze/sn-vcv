@@ -54,6 +54,9 @@ struct sn_vco : Module {
     void processVCO(const ProcessArgs &args, int, bool);
     void processAUX(const ProcessArgs &args, bool);
 
+    // ... anti-aliasing
+    PV none(float fs, float dt, float frequency, float phase);
+
     int channels();
     float velocity(int);
 

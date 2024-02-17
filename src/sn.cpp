@@ -11,7 +11,7 @@ const std::vector<std::string> AUX_MODES = {"OSC", "SUM", "POLY"};    // AUX mod
 const std::vector<std::string> AUX_GAINS = {"1", "½", "⅓", "¼", "⅕"}; // AUX gain labels
 
 // anti-aliasing
-const std::vector<std::string> ANTIALIASING = {"None", "LPF"}; // anti-aliasing menu options
+const std::vector<std::string> ANTIALIASING = {"None", "1x1f"}; // anti-aliasing menu options
 
 // SN
 void SN::recompute() {

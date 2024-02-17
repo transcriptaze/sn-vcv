@@ -1,6 +1,7 @@
 .DEFAULT_GOAL = build
 
 RACK_DIR ?= ../..
+EXE = "/Applications/VCV Rack 2 Free.app/Contents/MacOS/Rack"
 
 FLAGS +=
 CFLAGS +=
@@ -28,9 +29,7 @@ run: format install
 headless: format install
 	/Applications/VCV\ Rack\ 2\ Free.app/Contents/MacOS/Rack --headless
 
-debug: format dist
+debug: build
 	mkdir -p runtime/plugins-mac-x64
 	cp -r dist/*.vcvplugin ./runtime/plugins-mac-x64
-#	cd runtime && /Applications/VCV\ Rack\ 2\ Free.app/Contents/MacOS/Rack --dev
-	/Applications/VCV\ Rack\ 2\ Free.app/Contents/MacOS/Rack --user ~/Development/shapestry/sn-vcv/runtime
-
+	$(EXE) --user ~/Development/shapestry/sn-vcv/runtime

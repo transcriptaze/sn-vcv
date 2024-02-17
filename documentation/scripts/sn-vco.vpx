@@ -1,0 +1,12 @@
+new module sn-vco 1U 9H
+
+set background fundamental
+
+new guide v1 vertical   7.33mm
+new guide v2 vertical   20.35mm
+new guide v3 vertical   35.56mm
+new guide h0 horizontal 7.62mm
+new guide h1 horizontal 23.238mm
+
+new label 'SN VCO' centre,h0 'RobotoCondensed-Bold' 12pt centre,middle #222222,#ebebeb
+

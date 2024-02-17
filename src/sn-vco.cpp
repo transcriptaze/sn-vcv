@@ -123,7 +123,6 @@ void sn_vco::process(const ProcessArgs &args) {
     int channels = this->channels();
 
     // ... anti-aliasing indicator
-
     switch (antialias) {
     case NONE:
         lights[ALIAS_LIGHT + 0].setBrightness(0.0); // red
@@ -188,28 +187,33 @@ void sn_vco::process(const ProcessArgs &args) {
 
 void sn_vco::processVCO(const ProcessArgs &args, int channels, bool expanded) {
     bool connected = outputs[VCO_OUTPUT].isConnected();
+    float fs = args.sampleRate;
+    float dt = args.sampleTime;
 
-    // ... convert pitch CV to instantaneous frequency
     for (int ch = 0; ch < channels; ch++) {
         float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
         float f = dsp::FREQ_C4 * std::pow(2.f, pitch);
 
-        vco[ch].phase += f * args.sampleTime;
-        while (vco[ch].phase >= 1.f) {
-            vco[ch].phase -= 1.f;
-        }
-    }
+        // vco[ch].phase += f * args.sampleTime;
+        // while (vco[ch].phase >= 1.f) {
+        //     vco[ch].phase -= 1.f;
+        // }
+        //
+        // if (connected || expanded) {
+        //     float α = vco[ch].phase * 2.0f * M_PI;
+        //     float υ = sn.υ(α);
+        //
+        //     vco[ch].out.vco = υ;
+        //     vco[ch].out.sum = sn.A * υ;
+        //     vco[ch].velocity = velocity(ch);
+        // }
 
-    // ... generate
-    if (connected || expanded) {
-        for (int ch = 0; ch < channels; ch++) {
-            float α = vco[ch].phase * 2.0f * M_PI;
-            float υ = sn.υ(α);
+        PV pv = none(fs, dt, f, vco[ch].phase);
 
-            vco[ch].out.vco = υ;
-            vco[ch].out.sum = sn.A * υ;
-            vco[ch].velocity = velocity(ch);
-        }
+        vco[ch].phase = pv.α;
+        vco[ch].out.vco = pv.υ;
+        vco[ch].out.sum = sn.A * pv.υ;
+        vco[ch].velocity = velocity(ch);
     }
 
     if (connected) {
@@ -219,6 +223,21 @@ void sn_vco::processVCO(const ProcessArgs &args, int channels, bool expanded) {
 
         outputs[VCO_OUTPUT].setChannels(channels);
     }
+}
+
+PV sn_vco::none(float fs, float dt, float frequency, float phase) {
+    phase += frequency * dt;
+    while (phase >= 1.f) {
+        phase -= 1.f;
+    }
+
+    float α = 2.0f * M_PI * phase;
+    float υ = sn.υ(α);
+
+    return PV{
+        .α = phase,
+        .υ = υ,
+    };
 }
 
 void sn_vco::processAUX(const ProcessArgs &args, bool expanded) {
