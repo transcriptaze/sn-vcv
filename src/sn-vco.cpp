@@ -41,9 +41,9 @@ sn_vco::sn_vco() {
     trigger.reset();
 
     // ... anti-aliasing
-    const IIR coefficients = COEFFICIENTS_12500Hz.at(44100);
+    const IIR iir = coefficients(COEFFICIENTS_12500Hz, fs);
 
-    lpf.setCoefficients(coefficients.b, coefficients.a);
+    lpf.setCoefficients(iir.b, iir.a);
     lpf.reset();
 
     antialias = NONE;
@@ -167,7 +167,7 @@ void sn_vco::process(const ProcessArgs &args) {
     update.count--;
 
     if (update.count <= 0) {
-        recompute();
+        recompute(args);
         update.count = KRATE[update.krate];
     }
 
@@ -316,7 +316,19 @@ void sn_vco::processAUX(const ProcessArgs &args, bool expanded) {
     }
 }
 
-void sn_vco::recompute() {
+void sn_vco::recompute(const ProcessArgs &args) {
+    // ... filter coefficients
+    float fs = args.sampleRate;
+
+    if (fs != this->fs) {
+        const IIR iir = coefficients(COEFFICIENTS_12500Hz, fs);
+
+        lpf.setCoefficients(iir.b, iir.a);
+        lpf.reset();
+
+        this->fs = fs;
+    }
+
     // ... param values
     float e = params[ECCENTRICITY_PARAM].getValue();
     float s = params[SENSITIVITY_PARAM].getValue();

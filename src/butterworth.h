@@ -247,3 +247,5 @@ const std::map<int, IIR> COEFFICIENTS_16kHz = {
             .b = {0.000000, 0.000000, 0.000000, 0.000000, 0.000000}},
     },
 };
+
+extern IIR coefficients(const std::map<int, IIR>& table, float fs);

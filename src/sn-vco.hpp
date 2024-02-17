@@ -50,7 +50,7 @@ struct sn_vco : Module {
     void onExpanderChange(const ExpanderChangeEvent &) override;
     void process(const ProcessArgs &args) override;
 
-    void recompute();
+    void recompute(const ProcessArgs &args);
     void processVCO(const ProcessArgs &args, int, bool);
     void processAUX(const ProcessArgs &args, bool);
 
@@ -108,6 +108,7 @@ struct sn_vco : Module {
 
     // ... anti-aliasing
     ANTI_ALIAS antialias;
+    float fs = 44100.0;
     dsp::IIRFilter<5, 5, double> lpf;
 
     PV none(float fs, float dt, float frequency, float phase);

@@ -7,7 +7,6 @@
       - [ ] Clamp input frequency
       - [x] _None_
       - [x] 1X1F: 12.5kHz LPF
-            - [ ] Pick coefficients for sampling rate
       - [ ] 1X2F: 2x16kHz LPF
       - [ ] 2X1F
       - [ ] 4X1F
