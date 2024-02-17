@@ -6,7 +6,8 @@ biquad:
 
 
 butterworth:
-	python3 IIR-Butterworth-16kHz.py > workfiles/butterworth_VFO.h
-	python3 IIR-Butterworth-2756Hz.py > workfiles/butterworth_LFO.h
+	python3 IIR-Butterworth-16kHz.py    > workfiles/butterworth_16kHz.h
+	python3 IIR-Butterworth-12.5kHz.py  > workfiles/butterworth_12.5kHz.h
+	python3 IIR-Butterworth-2.756kHz.py > workfiles/butterworth_2.756kHz.h
 
 

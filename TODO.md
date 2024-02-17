@@ -5,11 +5,22 @@
       - [x] Indicator
       - [x] Context menu
       - [ ] Clamp input frequency
-      - [ ] _None_
-      - [ ] LPF
-            - http://jaggedplanet.com/iir/iir-explorer.asp
-            - https://docs.juliadsp.org/stable/filters/#DSP.Filters.PolynomialRatio
-            - https://github.com/JunoLab/Weave.jl
+      - [x] _None_
+      - [x] 1X1F: 12.5kHz LPF
+            - [ ] Pick coefficients for sampling rate
+      - [ ] 1X2F: 2x16kHz LPF
+      - [ ] 2X1F
+      - [ ] 4X1F
+      - [ ] 2X2F
+      - [ ] 4X2F
+      - [ ] PI(d)
+      - [ ] FFT/wavetable
+      - [ ] Anti-aliased AUX
+      - [ ] Anti-aliasing indicator
+           - [ ] enable/disable
+           - [ ] show option + aliasing
+      - [ ] ALIASING.md
+      - [ ] sn-vcox
 
 - [x] Better blurbs in plugin.json
 - [x] Fix tags in plugin.json
@@ -37,3 +48,6 @@
       - https://dsp.stackexchange.com/questions/2608/is-there-such-a-thing-as-band-limited-non-linear-distortion/28787#28787
       - https://dsp.stackexchange.com/questions/50716/are-oversampling-and-downsampling-the-same-thing/50725#50725
       - https://observablehq.com/d/a51954c61a72e1ef
+      - http://jaggedplanet.com/iir/iir-explorer.asp
+      - https://docs.juliadsp.org/stable/filters/#DSP.Filters.PolynomialRatio
+      - https://github.com/JunoLab/Weave.jl

@@ -1,6 +1,8 @@
 #include "sn-vco.hpp"
 #include "sn-vcox.hpp"
 
+#include "butterworth.h"
+
 const int sn_vco::CHANNELS = 1;
 const float sn_vco::VELOCITY = 1.0f;
 
@@ -39,6 +41,10 @@ sn_vco::sn_vco() {
     trigger.reset();
 
     // ... anti-aliasing
+    const IIR coefficients = COEFFICIENTS_12500Hz.at(44100);
+
+    lpf.setCoefficients(coefficients.b, coefficients.a);
+    lpf.reset();
 
     antialias = NONE;
 }
@@ -95,8 +101,8 @@ void sn_vco::dataFromJson(json_t *root) {
             this->antialias = NONE;
             break;
 
-        case LPF:
-            this->antialias = LPF;
+        case X1F1:
+            this->antialias = X1F1;
             break;
         }
     }
@@ -130,9 +136,9 @@ void sn_vco::process(const ProcessArgs &args) {
         lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
         break;
 
-    case LPF:
+    case X1F1:
         lights[ALIAS_LIGHT + 0].setBrightness(1.0); // red
-        lights[ALIAS_LIGHT + 1].setBrightness(0.0); // green
+        lights[ALIAS_LIGHT + 1].setBrightness(1.0); // green
         lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
         break;
 
@@ -190,6 +196,12 @@ void sn_vco::processVCO(const ProcessArgs &args, int channels, bool expanded) {
     float fs = args.sampleRate;
     float dt = args.sampleTime;
 
+    sn_vco::genfn fn = &sn_vco::none;
+
+    if (antialias == X1F1) {
+        fn = &sn_vco::x1f1;
+    }
+
     for (int ch = 0; ch < channels; ch++) {
         float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
         float f = dsp::FREQ_C4 * std::pow(2.f, pitch);
@@ -208,7 +220,7 @@ void sn_vco::processVCO(const ProcessArgs &args, int channels, bool expanded) {
         //     vco[ch].velocity = velocity(ch);
         // }
 
-        PV pv = none(fs, dt, f, vco[ch].phase);
+        PV pv = (this->*fn)(fs, dt, f, vco[ch].phase);
 
         vco[ch].phase = pv.α;
         vco[ch].out.vco = pv.υ;
@@ -233,6 +245,21 @@ PV sn_vco::none(float fs, float dt, float frequency, float phase) {
 
     float α = 2.0f * M_PI * phase;
     float υ = sn.υ(α);
+
+    return PV{
+        .α = phase,
+        .υ = υ,
+    };
+}
+
+PV sn_vco::x1f1(float fs, float dt, float frequency, float phase) {
+    phase += frequency * dt;
+    while (phase >= 1.f) {
+        phase -= 1.f;
+    }
+
+    float α = 2.0f * M_PI * phase;
+    float υ = lpf.process(sn.υ(α));
 
     return PV{
         .α = phase,

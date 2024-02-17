@@ -54,9 +54,6 @@ struct sn_vco : Module {
     void processVCO(const ProcessArgs &args, int, bool);
     void processAUX(const ProcessArgs &args, bool);
 
-    // ... anti-aliasing
-    PV none(float fs, float dt, float frequency, float phase);
-
     int channels();
     float velocity(int);
 
@@ -111,6 +108,12 @@ struct sn_vco : Module {
 
     // ... anti-aliasing
     ANTI_ALIAS antialias;
+    dsp::IIRFilter<5, 5, double> lpf;
+
+    PV none(float fs, float dt, float frequency, float phase);
+    PV x1f1(float fs, float dt, float frequency, float phase);
+
+    typedef PV (sn_vco::*genfn)(float fs, float dt, float frequency, float phase);
 };
 
 struct sn_vcoWidget : ModuleWidget {
