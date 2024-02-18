@@ -1,3 +1,4 @@
+#include "filter.hpp"
 #include "plugin.hpp"
 #include "sn.hpp"
 
@@ -109,12 +110,12 @@ struct sn_vco : Module {
     // ... anti-aliasing
     ANTI_ALIAS antialias;
     float fs = 44100.0;
-    dsp::IIRFilter<5, 5, double> lpf;
+    MultiChannelFilter<5, 5, double> lpf;
 
-    PV none(float fs, float dt, float frequency, float phase);
-    PV x1f1(float fs, float dt, float frequency, float phase);
+    void none(float fs, float dt, int channels);
+    void x1f1(float fs, float dt, int channels);
 
-    typedef PV (sn_vco::*genfn)(float fs, float dt, float frequency, float phase);
+    typedef void (sn_vco::*genfn)(float fs, float dt, int channels);
 };
 
 struct sn_vcoWidget : ModuleWidget {

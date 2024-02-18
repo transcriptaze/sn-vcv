@@ -20,6 +20,7 @@
            - [ ] show option + aliasing
       - [ ] ALIASING.md
       - [ ] sn-vcox
+      - [ ] DC blocking
 
 - [x] Better blurbs in plugin.json
 - [x] Fix tags in plugin.json

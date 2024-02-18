@@ -105,13 +105,6 @@ typedef struct SN {
     float phi(float, float, float, float);
 } SN;
 
-// ... phase-value container for return value from anti-aliasing function
-typedef struct PV {
-    float α;
-    float υ;
-
-} PV;
-
 // ... expanders
 enum DIRECTION {
     LEFT,
