@@ -110,10 +110,12 @@ struct sn_vco : Module {
     // ... anti-aliasing
     ANTI_ALIAS antialias;
     float fs = 44100.0;
-    MultiChannelFilter<5, 5, double> lpf;
+    MultiChannelFilter<5, 5, double> lpfX1;
+    MultiChannelFilter<5, 5, double> lpfX2[2];
 
     void none(float fs, float dt, int channels);
     void x1f1(float fs, float dt, int channels);
+    void x1f2(float fs, float dt, int channels);
 
     typedef void (sn_vco::*genfn)(float fs, float dt, int channels);
 };

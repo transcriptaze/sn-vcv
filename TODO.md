@@ -21,6 +21,7 @@
       - [ ] ALIASING.md
       - [ ] sn-vcox
       - [ ] DC blocking
+      - [ ] https://www.researchgate.net/publication/333688079_Oversampling_for_Nonlinear_Waveshaping_Choosing_the_Right_Filters
 
 - [x] Better blurbs in plugin.json
 - [x] Fix tags in plugin.json

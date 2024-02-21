@@ -31,6 +31,7 @@ enum AUXMODE {
 enum ANTI_ALIAS {
     NONE,
     X1F1,
+    X1F2,
 };
 
 typedef struct VCO {

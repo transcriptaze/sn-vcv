@@ -41,10 +41,22 @@ sn_vco::sn_vco() {
     trigger.reset();
 
     // ... anti-aliasing
-    const IIR iir = coefficients(COEFFICIENTS_12500Hz, fs);
+    {
+        const IIR iir = coefficients(COEFFICIENTS_12500Hz, fs);
 
-    lpf.setCoefficients(iir.b, iir.a);
-    lpf.reset();
+        lpfX1.setCoefficients(iir.b, iir.a);
+        lpfX1.reset();
+    }
+
+    {
+        const IIR iir = coefficients(COEFFICIENTS_16kHz, fs);
+
+        lpfX2[0].setCoefficients(iir.b, iir.a);
+        lpfX2[0].reset();
+
+        lpfX2[1].setCoefficients(iir.b, iir.a);
+        lpfX2[2].reset();
+    }
 
     antialias = NONE;
 }
@@ -103,6 +115,10 @@ void sn_vco::dataFromJson(json_t *root) {
 
         case X1F1:
             this->antialias = X1F1;
+            break;
+
+        case X1F2:
+            this->antialias = X1F2;
             break;
         }
     }
@@ -200,8 +216,17 @@ void sn_vco::processVCO(const ProcessArgs &args, int channels, bool expanded) {
 
     if (antialias == X1F1) {
         fn = &sn_vco::x1f1;
-    } else {
-        lpf.reset();
+    } else if (antialias == X1F2) {
+        fn = &sn_vco::x1f2;
+    }
+
+    if (antialias != X1F1) {
+        lpfX1.reset();
+    }
+
+    if (antialias != X1F2) {
+        lpfX2[0].reset();
+        lpfX2[1].reset();
     }
 
     if (connected || expanded) {
@@ -259,7 +284,42 @@ void sn_vco::x1f1(float fs, float dt, int channels) {
         in[ch] = sn.υ(α);
     }
 
-    lpf.process(in, out, channels);
+    lpfX1.process(in, out, channels);
+
+    for (int ch = 0; ch < channels; ch++) {
+        double υ = out[ch];
+
+        vco[ch].phase = phase[ch];
+        vco[ch].out.vco = υ;
+        vco[ch].out.sum = sn.A * υ;
+        vco[ch].velocity = velocity(ch);
+    }
+}
+
+void sn_vco::x1f2(float fs, float dt, int channels) {
+    double phase[16];
+    double in[16];
+    double intermediate[16];
+    double out[16];
+
+    for (int ch = 0; ch < channels; ch++) {
+        float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
+        float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
+
+        phase[ch] = vco[ch].phase;
+
+        phase[ch] += frequency * dt;
+        while (phase[ch] >= 1.f) {
+            phase[ch] -= 1.f;
+        }
+
+        float α = 2.0f * M_PI * phase[ch];
+
+        in[ch] = sn.υ(α);
+    }
+
+    lpfX2[0].process(in, intermediate, channels);
+    lpfX2[1].process(intermediate, out, channels);
 
     for (int ch = 0; ch < channels; ch++) {
         double υ = out[ch];
@@ -325,10 +385,22 @@ void sn_vco::recompute(const ProcessArgs &args) {
     float fs = args.sampleRate;
 
     if (fs != this->fs) {
-        const IIR iir = coefficients(COEFFICIENTS_12500Hz, fs);
+        {
+            const IIR iir = coefficients(COEFFICIENTS_12500Hz, fs);
 
-        lpf.setCoefficients(iir.b, iir.a);
-        lpf.reset();
+            lpfX1.setCoefficients(iir.b, iir.a);
+            lpfX1.reset();
+        }
+
+        {
+            const IIR iir = coefficients(COEFFICIENTS_16kHz, fs);
+
+            lpfX2[0].setCoefficients(iir.b, iir.a);
+            lpfX2[0].reset();
+
+            lpfX2[1].setCoefficients(iir.b, iir.a);
+            lpfX2[1].reset();
+        }
 
         this->fs = fs;
     }
