@@ -7,10 +7,10 @@
       - [ ] Clamp input frequency
       - [x] _None_
       - [x] 1X1F: 12.5kHz LPF
-      - [ ] 1X2F: 2x16kHz LPF
-      - [ ] 2X1F
-      - [ ] 4X1F
+      - [x] 1X2F: 2x16kHz LPF
+      - [ ] 2X1F: 2x oversampling, 16kHz LPF
       - [ ] 2X2F
+      - [ ] 4X1F
       - [ ] 4X2F
       - [ ] PI(d)
       - [ ] FFT/wavetable

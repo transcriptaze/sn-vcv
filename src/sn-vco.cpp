@@ -41,23 +41,7 @@ sn_vco::sn_vco() {
     trigger.reset();
 
     // ... anti-aliasing
-    {
-        const IIR iir = coefficients(COEFFICIENTS_12500Hz, fs);
-
-        lpfX1.setCoefficients(iir.b, iir.a);
-        lpfX1.reset();
-    }
-
-    {
-        const IIR iir = coefficients(COEFFICIENTS_16kHz, fs);
-
-        lpfX2[0].setCoefficients(iir.b, iir.a);
-        lpfX2[0].reset();
-
-        lpfX2[1].setCoefficients(iir.b, iir.a);
-        lpfX2[2].reset();
-    }
-
+    onFS(fs);
     antialias = NONE;
 }
 
@@ -120,7 +104,40 @@ void sn_vco::dataFromJson(json_t *root) {
         case X1F2:
             this->antialias = X1F2;
             break;
+
+        case X2F1:
+            this->antialias = X2F1;
+            break;
         }
+    }
+}
+
+void sn_vco::onFS(float fs) {
+    // ... X1F1
+    {
+        const IIR iir = coefficients(COEFFICIENTS_12500Hz, fs);
+
+        lpfX1F1.setCoefficients(iir.b, iir.a);
+        lpfX1F1.reset();
+    }
+
+    // ... X1F2
+    {
+        const IIR iir = coefficients(COEFFICIENTS_16kHz, fs);
+
+        lpfX1F2[0].setCoefficients(iir.b, iir.a);
+        lpfX1F2[0].reset();
+
+        lpfX1F2[1].setCoefficients(iir.b, iir.a);
+        lpfX1F2[2].reset();
+    }
+
+    // ... X2F1
+    {
+        const IIR iir = coefficients(COEFFICIENTS_16kHz, fs * 2);
+
+        lpfX2F1.setCoefficients(iir.b, iir.a);
+        lpfX2F1.reset();
     }
 }
 
@@ -154,8 +171,20 @@ void sn_vco::process(const ProcessArgs &args) {
 
     case X1F1:
         lights[ALIAS_LIGHT + 0].setBrightness(1.0); // red
+        lights[ALIAS_LIGHT + 1].setBrightness(0.0); // green
+        lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
+        break;
+
+    case X1F2:
+        lights[ALIAS_LIGHT + 0].setBrightness(0.0); // red
         lights[ALIAS_LIGHT + 1].setBrightness(1.0); // green
         lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
+        break;
+
+    case X2F1:
+        lights[ALIAS_LIGHT + 0].setBrightness(0.0); // red
+        lights[ALIAS_LIGHT + 1].setBrightness(0.0); // green
+        lights[ALIAS_LIGHT + 2].setBrightness(1.0); // blue
         break;
 
     default:
@@ -218,15 +247,21 @@ void sn_vco::processVCO(const ProcessArgs &args, int channels, bool expanded) {
         fn = &sn_vco::x1f1;
     } else if (antialias == X1F2) {
         fn = &sn_vco::x1f2;
+    } else if (antialias == X2F1) {
+        fn = &sn_vco::x2f1;
     }
 
     if (antialias != X1F1) {
-        lpfX1.reset();
+        lpfX1F1.reset();
     }
 
     if (antialias != X1F2) {
-        lpfX2[0].reset();
-        lpfX2[1].reset();
+        lpfX1F2[0].reset();
+        lpfX1F2[1].reset();
+    }
+
+    if (antialias != X2F1) {
+        lpfX2F1.reset();
     }
 
     if (connected || expanded) {
@@ -284,7 +319,7 @@ void sn_vco::x1f1(float fs, float dt, int channels) {
         in[ch] = sn.υ(α);
     }
 
-    lpfX1.process(in, out, channels);
+    lpfX1F1.process(in, out, channels);
 
     for (int ch = 0; ch < channels; ch++) {
         double υ = out[ch];
@@ -318,8 +353,8 @@ void sn_vco::x1f2(float fs, float dt, int channels) {
         in[ch] = sn.υ(α);
     }
 
-    lpfX2[0].process(in, intermediate, channels);
-    lpfX2[1].process(intermediate, out, channels);
+    lpfX1F2[0].process(in, intermediate, channels);
+    lpfX1F2[1].process(intermediate, out, channels);
 
     for (int ch = 0; ch < channels; ch++) {
         double υ = out[ch];
@@ -327,6 +362,48 @@ void sn_vco::x1f2(float fs, float dt, int channels) {
         vco[ch].phase = phase[ch];
         vco[ch].out.vco = υ;
         vco[ch].out.sum = sn.A * υ;
+        vco[ch].velocity = velocity(ch);
+    }
+}
+
+void sn_vco::x2f1(float fs, float dt, int channels) {
+    double in[16];
+    double out[16];
+
+    for (int ch = 0; ch < channels; ch++) {
+        float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
+        float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
+        float phase = vco[ch].phase + frequency * dt / 2;
+        while (phase >= 1.f) {
+            phase -= 1.f;
+        }
+
+        float α = 2.0f * M_PI * phase;
+
+        in[ch] = sn.υ(α);
+    }
+
+    lpfX2F1.process(in, out, channels);
+
+    for (int ch = 0; ch < channels; ch++) {
+        float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
+        float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
+        float phase = vco[ch].phase + frequency * dt;
+        while (phase >= 1.f) {
+            phase -= 1.f;
+        }
+
+        float α = 2.0f * M_PI * phase;
+
+        in[ch] = sn.υ(α);
+        vco[ch].phase = phase;
+    }
+
+    lpfX2F1.process(in, out, channels);
+
+    for (int ch = 0; ch < channels; ch++) {
+        vco[ch].out.vco = out[ch];
+        vco[ch].out.sum = sn.A * out[ch];
         vco[ch].velocity = velocity(ch);
     }
 }
@@ -383,25 +460,8 @@ void sn_vco::processAUX(const ProcessArgs &args, bool expanded) {
 void sn_vco::recompute(const ProcessArgs &args) {
     // ... filter coefficients
     float fs = args.sampleRate;
-
     if (fs != this->fs) {
-        {
-            const IIR iir = coefficients(COEFFICIENTS_12500Hz, fs);
-
-            lpfX1.setCoefficients(iir.b, iir.a);
-            lpfX1.reset();
-        }
-
-        {
-            const IIR iir = coefficients(COEFFICIENTS_16kHz, fs);
-
-            lpfX2[0].setCoefficients(iir.b, iir.a);
-            lpfX2[0].reset();
-
-            lpfX2[1].setCoefficients(iir.b, iir.a);
-            lpfX2[1].reset();
-        }
-
+        onFS(fs);
         this->fs = fs;
     }
 
