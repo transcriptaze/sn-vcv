@@ -114,11 +114,13 @@ struct sn_vco : Module {
     MultiChannelFilter<5, 5, double> lpfX1F1;
     MultiChannelFilter<5, 5, double> lpfX1F2[2];
     MultiChannelFilter<5, 5, double> lpfX2F1;
+    MultiChannelFilter<5, 5, double> lpfX2F2[2];
 
     void none(float fs, float dt, int channels);
     void x1f1(float fs, float dt, int channels);
     void x1f2(float fs, float dt, int channels);
     void x2f1(float fs, float dt, int channels);
+    void x2f2(float fs, float dt, int channels);
 
     typedef void (sn_vco::*genfn)(float fs, float dt, int channels);
 };

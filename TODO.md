@@ -8,8 +8,8 @@
       - [x] _None_
       - [x] 1X1F: 12.5kHz LPF
       - [x] 1X2F: 2x16kHz LPF
-      - [ ] 2X1F: 2x oversampling, 16kHz LPF
-      - [ ] 2X2F
+      - [x] 2X1F: 2x oversampling, 16kHz LPF
+      - [x] 2X2F: 2x oversampling, 2x16kHz LPF
       - [ ] 4X1F
       - [ ] 4X2F
       - [ ] PI(d)
