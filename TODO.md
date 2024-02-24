@@ -5,22 +5,21 @@
       - [x] Indicator
       - [x] Context menu
       - [ ] Clamp input frequency
-      - [ ] Regenerate coefficients for sub 44.1kHZ sample rates
+      - [x] Regenerate coefficients for sub 44.1kHZ sample rates
       - [x] _None_
       - [x] 1X1F: 12.5kHz LPF
       - [x] 1X2F: 2x16kHz LPF
       - [x] 2X1F: 2x oversampling, 16kHz LPF
       - [x] 2X2F: 2x oversampling, 2x16kHz LPF
-      - [ ] 4X1F: 2x oversampling, 16kHz LPF
-      - [ ] 4X2F
+      - [x] 4X1F: 2x oversampling, 16kHz LPF
+      - [ ] 4X2F: 2x oversampling, 2x16kHz LPF
+      - [ ] sn-vcox
       - [ ] PI(d)
       - [ ] FFT/wavetable
-      - [ ] Anti-aliased AUX
       - [ ] Anti-aliasing indicator
            - [ ] enable/disable
            - [ ] show option + aliasing
       - [ ] ALIASING.md
-      - [ ] sn-vcox
       - [ ] DC blocking
       - [ ] https://www.researchgate.net/publication/333688079_Oversampling_for_Nonlinear_Waveshaping_Choosing_the_Right_Filters
 

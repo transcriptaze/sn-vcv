@@ -35,6 +35,7 @@ enum ANTI_ALIAS {
     X2F1,
     X2F2,
     X4F1,
+    X4F2,
 };
 
 typedef struct VCO {
