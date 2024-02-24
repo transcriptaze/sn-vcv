@@ -5,12 +5,13 @@
       - [x] Indicator
       - [x] Context menu
       - [ ] Clamp input frequency
+      - [ ] Regenerate coefficients for sub 44.1kHZ sample rates
       - [x] _None_
       - [x] 1X1F: 12.5kHz LPF
       - [x] 1X2F: 2x16kHz LPF
       - [x] 2X1F: 2x oversampling, 16kHz LPF
       - [x] 2X2F: 2x oversampling, 2x16kHz LPF
-      - [ ] 4X1F
+      - [ ] 4X1F: 2x oversampling, 16kHz LPF
       - [ ] 4X2F
       - [ ] PI(d)
       - [ ] FFT/wavetable

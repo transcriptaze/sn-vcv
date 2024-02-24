@@ -19,7 +19,7 @@ for fs in FS:
 print('const std::map<int, IIR> COEFFICIENTS_12500Hz = {')
 
 for fs in sorted(rates):
-    f0 = 0.4 * fs if fs < 44100 else 12500
+    f0 = 0.25 * fs if fs < 44100 else 12500
     b, a = signal.butter(N, f0, 'lowpass', analog=False, fs=fs)
 
     v = {
