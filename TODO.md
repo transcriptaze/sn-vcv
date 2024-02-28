@@ -1,10 +1,7 @@
 # TODO
 
-- [ ] Antialiasing
-      - https://github.com/transcriptaze/sn-vcv/issues/3
-      - [x] Indicator
+- [ ] [Antialiasing](https://github.com/transcriptaze/sn-vcv/issues/3)
       - [x] Context menu
-      - [ ] Clamp input frequency
       - [x] Regenerate coefficients for sub 44.1kHZ sample rates
       - [x] _None_
       - [x] 1X1F: 12.5kHz LPF
@@ -13,6 +10,7 @@
       - [x] 2X2F: 2x oversampling, 2x16kHz LPF
       - [x] 4X1F: 2x oversampling, 16kHz LPF
       - [x] 4X2F: 2x oversampling, 2x16kHz LPF
+      - [ ] Indicator
       - [ ] sn-vcox
       - [ ] PI(d)
       - [ ] FFT/wavetable
@@ -21,7 +19,7 @@
            - [ ] show option + aliasing
       - [ ] ALIASING.md
       - [ ] DC blocking
-      - [ ] https://www.researchgate.net/publication/333688079_Oversampling_for_Nonlinear_Waveshaping_Choosing_the_Right_Filters
+      - [ ] Clamp input frequency
 
 - [x] Better blurbs in plugin.json
 - [x] Fix tags in plugin.json
@@ -52,3 +50,5 @@
       - http://jaggedplanet.com/iir/iir-explorer.asp
       - https://docs.juliadsp.org/stable/filters/#DSP.Filters.PolynomialRatio
       - https://github.com/JunoLab/Weave.jl
+
+10. https://www.researchgate.net/publication/333688079_Oversampling_for_Nonlinear_Waveshaping_Choosing_the_Right_Filters

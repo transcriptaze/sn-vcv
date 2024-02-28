@@ -1,3 +1,4 @@
+#include "filters/AAF.hpp"
 #include "plugin.hpp"
 #include "sn.hpp"
 

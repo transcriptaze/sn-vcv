@@ -2,6 +2,8 @@
 #include "plugin.hpp"
 #include "sn.hpp"
 
+#include "filters/AAF.hpp"
+
 struct sn_vco : Module {
     static const int CHANNELS;
     static const float VELOCITY;
@@ -118,15 +120,19 @@ struct sn_vco : Module {
     MultiChannelFilter<5, 5, double> lpfX4F1;
     MultiChannelFilter<5, 5, double> lpfX4F2[2];
 
-    void none(float fs, float dt, int channels);
-    void x1f1(float fs, float dt, int channels);
-    void x1f2(float fs, float dt, int channels);
-    void x2f1(float fs, float dt, int channels);
-    void x2f2(float fs, float dt, int channels);
-    void x4f1(float fs, float dt, int channels);
-    void x4f2(float fs, float dt, int channels);
+    struct {
+        AAF<NONE> none;
+    } AA;
 
-    typedef void (sn_vco::*genfn)(float fs, float dt, int channels);
+    void none(float fs, float dt, size_t channels);
+    void x1f1(float fs, float dt, size_t channels);
+    void x1f2(float fs, float dt, size_t channels);
+    void x2f1(float fs, float dt, size_t channels);
+    void x2f2(float fs, float dt, size_t channels);
+    void x4f1(float fs, float dt, size_t channels);
+    void x4f2(float fs, float dt, size_t channels);
+
+    typedef void (sn_vco::*genfn)(float fs, float dt, size_t channels);
 };
 
 struct sn_vcoWidget : ModuleWidget {
