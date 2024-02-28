@@ -113,6 +113,7 @@ void sn_vcox::onExpanderChange(const ExpanderChangeEvent &e) {
 
 void sn_vcox::process(const ProcessArgs &args) {
     int channels = CHANNELS;
+    ANTI_ALIAS antialias = NONE;
     bool expanded = expanders.left.module != NULL || expanders.right.module != NULL;
 
     // ... expanders
@@ -178,6 +179,7 @@ void sn_vcox::process(const ProcessArgs &args) {
     // ... generate
     if (msg) {
         channels = msg->channels;
+        antialias = msg->antialias;
 
         for (int ch = 0; ch < channels; ch++) {
             vco[ch].phase = msg->vco[ch].phase;
@@ -206,13 +208,13 @@ void sn_vcox::process(const ProcessArgs &args) {
 
         if ((msg = expanders.left.producer()) != NULL) {
             bool linked = msgR != NULL && msgR->linked;
-            msg->set(linked, channels, vco, aux);
+            msg->set(linked, channels, antialias, vco, aux);
             expanders.left.flip();
         }
 
         if ((msg = expanders.right.producer()) != NULL) {
             bool linked = msgL != NULL && msgL->linked;
-            msg->set(linked, channels, vco, aux);
+            msg->set(linked, channels, antialias, vco, aux);
             expanders.right.flip();
         }
     }

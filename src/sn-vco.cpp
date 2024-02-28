@@ -285,12 +285,12 @@ void sn_vco::process(const ProcessArgs &args) {
         sn_vco_message *msg;
 
         if ((msg = expanders.left.producer()) != NULL) {
-            msg->set(true, channels, vco, aux);
+            msg->set(true, channels, antialias, vco, aux);
             expanders.left.flip();
         }
 
         if ((msg = expanders.right.producer()) != NULL) {
-            msg->set(true, channels, vco, aux);
+            msg->set(true, channels, antialias, vco, aux);
             expanders.right.flip();
         }
     }

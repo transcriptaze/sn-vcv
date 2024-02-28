@@ -160,6 +160,7 @@ struct sn_expander {
 typedef struct sn_vco_message {
     bool linked = false;
     int channels = 1;
+    ANTI_ALIAS antialias;
 
     struct _VCO {
         float phase;
@@ -192,9 +193,10 @@ typedef struct sn_vco_message {
         .out = 0.f,
     };
 
-    void set(bool linked, int channels, const struct VCO vco[], const struct AUX aux) {
+    void set(bool linked, int channels, ANTI_ALIAS antialias, const struct VCO vco[], const struct AUX aux) {
         this->linked = linked;
         this->channels = channels;
+        this->antialias = antialias;
 
         for (int i = 0; i < channels; i++) {
             this->vco[i].phase = vco[i].phase;
