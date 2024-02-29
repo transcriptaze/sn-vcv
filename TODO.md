@@ -2,7 +2,6 @@
 
 - [ ] [Antialiasing](https://github.com/transcriptaze/sn-vcv/issues/3)
       - [x] Context menu
-      - [x] Regenerate coefficients for sub 44.1kHZ sample rates
       - [x] _None_
       - [x] 1X1F: 12.5kHz LPF
       - [x] 1X2F: 2x16kHz LPF
@@ -10,8 +9,11 @@
       - [x] 2X2F: 2x oversampling, 2x16kHz LPF
       - [x] 4X1F: 2x oversampling, 16kHz LPF
       - [x] 4X2F: 2x oversampling, 2x16kHz LPF
-      - [ ] Indicator
       - [ ] sn-vcox
+            - [x] None
+            - [x] X1F1
+
+      - [ ] Indicator
       - [ ] PI(d)
       - [ ] FFT/wavetable
       - [ ] Anti-aliasing indicator

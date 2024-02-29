@@ -50,8 +50,8 @@ struct sn_vcox : Module {
     void onExpanderChange(const ExpanderChangeEvent &) override;
     void process(const ProcessArgs &args) override;
 
-    void recompute();
-    void processVCO(const ProcessArgs &args, int, bool);
+    void recompute(const ProcessArgs &args);
+    void processVCO(const ProcessArgs &args, size_t, ANTIALIAS, bool);
     void processAUX(const ProcessArgs &args, bool);
 
     int krate();
@@ -107,6 +107,15 @@ struct sn_vcox : Module {
         .linkedRight = false,
         .left = sn_expander<sn_vco_message>(LEFT),
         .right = sn_expander<sn_vco_message>(RIGHT),
+    };
+
+    // ... antialiasing
+    struct {
+        float fs;
+        AAF<X1F1> x1f1;
+    } AA = {
+        .fs = 44100.f,
+        .x1f1 = AAF<X1F1>(44100.f),
     };
 };
 

@@ -17,7 +17,7 @@ DISTRIBUTABLES += $(wildcard LICENSE*)
 DISTRIBUTABLES += $(wildcard presets)
 
 format: 
-	clang-format -i $(SOURCES) -i $(INCLUDES)
+	clang-format -i $(SOURCES) -i $(INCLUDES) -i src/filters/*.hpp
 
 include $(RACK_DIR)/plugin.mk
 

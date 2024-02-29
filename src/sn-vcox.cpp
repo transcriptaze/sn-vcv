@@ -113,7 +113,7 @@ void sn_vcox::onExpanderChange(const ExpanderChangeEvent &e) {
 
 void sn_vcox::process(const ProcessArgs &args) {
     int channels = CHANNELS;
-    ANTI_ALIAS antialias = NONE;
+    ANTIALIAS antialias = NONE;
     bool expanded = expanders.left.module != NULL || expanders.right.module != NULL;
 
     // ... expanders
@@ -172,7 +172,7 @@ void sn_vcox::process(const ProcessArgs &args) {
     update.count--;
 
     if (update.count <= 0) {
-        recompute();
+        recompute(args);
         update.count = KRATE[update.krate];
     }
 
@@ -199,7 +199,7 @@ void sn_vcox::process(const ProcessArgs &args) {
         aux.out.sum = 0.0f;
     }
 
-    processVCO(args, channels, expanded);
+    processVCO(args, channels, antialias, expanded);
     processAUX(args, expanded);
 
     // ... update expanders
@@ -220,22 +220,40 @@ void sn_vcox::process(const ProcessArgs &args) {
     }
 }
 
-void sn_vcox::processVCO(const ProcessArgs &args, int channels, bool expanded) {
+void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS antialias, bool expanded) {
     bool connected = outputs[VCO_OUTPUT].isConnected() | outputs[VCO_SUM_OUTPUT].isConnected();
     float gain = params[ATT_PARAM].getValue();
 
     if (connected || expanded) {
-        for (int ch = 0; ch < channels; ch++) {
+        double in[16];
+        double out[16];
+
+        for (size_t ch = 0; ch < channels; ch++) {
             float α = vco[ch].phase * 2.0f * M_PI;
             float υ = sn.υ(α);
 
-            vco[ch].out.vco = υ;
-            vco[ch].out.sum += sn.A * υ;
+            in[ch] = υ;
+        }
+
+        switch (antialias) {
+        case X1F1:
+            AA.x1f1.process(in, out, channels);
+            break;
+
+        default:
+            for (size_t i = 0; i < channels; i++) {
+                out[i] = in[i];
+            }
+        }
+
+        for (size_t ch = 0; ch < channels; ch++) {
+            vco[ch].out.vco = out[ch];
+            vco[ch].out.sum += sn.A * out[ch];
         }
     }
 
     if (outputs[VCO_OUTPUT].isConnected()) {
-        for (int ch = 0; ch < channels; ch++) {
+        for (size_t ch = 0; ch < channels; ch++) {
             outputs[VCO_OUTPUT].setVoltage(5.f * vco[ch].velocity * vco[ch].out.vco, ch);
         }
 
@@ -243,7 +261,7 @@ void sn_vcox::processVCO(const ProcessArgs &args, int channels, bool expanded) {
     }
 
     if (outputs[VCO_SUM_OUTPUT].isConnected()) {
-        for (int ch = 0; ch < channels; ch++) {
+        for (size_t ch = 0; ch < channels; ch++) {
             outputs[VCO_SUM_OUTPUT].setVoltage(5.f * vco[ch].velocity * gain * vco[ch].out.sum, ch);
         }
 
@@ -285,7 +303,15 @@ void sn_vcox::processAUX(const ProcessArgs &args, bool expanded) {
     }
 }
 
-void sn_vcox::recompute() {
+void sn_vcox::recompute(const ProcessArgs &args) {
+    // ... antialiasing
+
+    if (args.sampleRate != AA.fs) {
+        AA.fs = args.sampleRate;
+
+        AA.x1f1 = AAF<X1F1>(args.sampleRate);
+    }
+
     // ... param values
     float e = params[ECCENTRICITY_PARAM].getValue();
     float s = params[SENSITIVITY_PARAM].getValue();

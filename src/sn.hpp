@@ -28,7 +28,7 @@ enum AUXMODE {
     POLY
 };
 
-enum ANTI_ALIAS {
+enum ANTIALIAS {
     NONE,
     X1F1,
     X1F2,
@@ -160,7 +160,7 @@ struct sn_expander {
 typedef struct sn_vco_message {
     bool linked = false;
     int channels = 1;
-    ANTI_ALIAS antialias;
+    ANTIALIAS antialias;
 
     struct _VCO {
         float phase;
@@ -193,7 +193,7 @@ typedef struct sn_vco_message {
         .out = 0.f,
     };
 
-    void set(bool linked, int channels, ANTI_ALIAS antialias, const struct VCO vco[], const struct AUX aux) {
+    void set(bool linked, int channels, ANTIALIAS antialias, const struct VCO vco[], const struct AUX aux) {
         this->linked = linked;
         this->channels = channels;
         this->antialias = antialias;

@@ -378,7 +378,9 @@ void sn_vco::none(float fs, float dt, size_t channels) {
         in[ch] = sn.υ(α);
     }
 
-    AA.none.process(in, out, channels);
+    for (size_t ch = 0; ch < channels; ch++) {
+        out[ch] = in[ch];
+    }
 
     for (size_t ch = 0; ch < channels; ch++) {
         double υ = out[ch];
