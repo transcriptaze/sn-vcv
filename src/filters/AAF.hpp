@@ -4,37 +4,19 @@
 #include "../plugin.hpp"
 #include "../sn.hpp"
 
-/* Anti-aliasing filter */
-
-template <ANTIALIAS MODE>
 struct AAF {
-    AAF(float fs) {
-        const IIR iir = lookup(fs);
-
-        for (size_t i = 0; i < 16; i++) {
-            lpf[i].setCoefficients(iir.b, iir.a);
-        }
-
-        for (size_t i = 0; i < 16; i++) {
-            lpf[i].reset();
-        }
-    }
-
-    void process(const double *in, double *out, size_t channels) {
-        for (size_t i = 0; i < channels; i++) {
-            out[i] = lpf[i].process(in[i]);
-        }
-    }
-
-    IIR lookup(float fs) {
-        switch (MODE) {
-        case X1F1:
-            return coefficients(COEFFICIENTS_12500Hz, fs);
-
-        default:
-            return coefficients(COEFFICIENTS_12500Hz, fs);
-        }
-    }
+    AAF(ANTIALIAS mode, float fs);
+    void reset();
+    void process(const double *in, double *out, size_t channels);
 
     dsp::IIRFilter<5, 5, double> lpf[16];
 };
+
+typedef struct AA {
+    void reset();
+    void process(ANTIALIAS mode, const double *in, double *out, size_t channels);
+
+    float fs;
+    ANTIALIAS mode;
+    AAF x1f1;
+} AA;

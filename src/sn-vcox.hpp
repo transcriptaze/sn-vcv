@@ -110,12 +110,10 @@ struct sn_vcox : Module {
     };
 
     // ... antialiasing
-    struct {
-        float fs;
-        AAF<X1F1> x1f1;
-    } AA = {
+    struct AA AA = {
         .fs = 44100.f,
-        .x1f1 = AAF<X1F1>(44100.f),
+        .mode = NONE,
+        .x1f1 = AAF(X1F1, 44100.f),
     };
 };
 

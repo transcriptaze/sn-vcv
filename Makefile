@@ -9,8 +9,8 @@ CXXFLAGS +=
 
 LDFLAGS +=
 
-SOURCES += $(wildcard src/*.cpp)
-INCLUDES += $(wildcard src/*.hpp)
+SOURCES += $(wildcard src/*.cpp src/filters/*.cpp)
+INCLUDES += $(wildcard src/*.hpp src/filters/*.hpp)
 
 DISTRIBUTABLES += res
 DISTRIBUTABLES += $(wildcard LICENSE*)

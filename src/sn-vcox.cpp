@@ -235,16 +235,7 @@ void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS ant
             in[ch] = υ;
         }
 
-        switch (antialias) {
-        case X1F1:
-            AA.x1f1.process(in, out, channels);
-            break;
-
-        default:
-            for (size_t i = 0; i < channels; i++) {
-                out[i] = in[i];
-            }
-        }
+        AA.process(antialias, in, out, channels);
 
         for (size_t ch = 0; ch < channels; ch++) {
             vco[ch].out.vco = out[ch];
@@ -309,7 +300,7 @@ void sn_vcox::recompute(const ProcessArgs &args) {
     if (args.sampleRate != AA.fs) {
         AA.fs = args.sampleRate;
 
-        AA.x1f1 = AAF<X1F1>(args.sampleRate);
+        AA.x1f1 = AAF(X1F1, args.sampleRate);
     }
 
     // ... param values
