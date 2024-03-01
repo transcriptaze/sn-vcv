@@ -19,4 +19,5 @@ typedef struct AA {
     float fs;
     ANTIALIAS mode;
     AAF x1f1;
+    AAF x1f2[2];
 } AA;

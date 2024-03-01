@@ -10,9 +10,10 @@
       - [x] 4X1F: 2x oversampling, 16kHz LPF
       - [x] 4X2F: 2x oversampling, 2x16kHz LPF
       - [ ] sn-vcox
+            - [ ] Use unfiltered VCO out in sn-message
             - [x] _None_
             - [x] 1X1F
-            - [ ] 1X2F
+            - [x] 1X2F
 
       - [ ] Indicator
       - [ ] PI(d)
@@ -24,6 +25,7 @@
       - [ ] DC blocking
       - [ ] Clamp input frequency
 
+- [ ] e directions are switched between sn-vco and sn-vcox
 - [x] Better blurbs in plugin.json
 - [x] Fix tags in plugin.json
 - [x] Initialise module in sn-vco-channels

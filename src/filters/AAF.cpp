@@ -9,6 +9,9 @@ IIR lookup(ANTIALIAS mode, float fs) {
     case X1F1:
         return coefficients(COEFFICIENTS_12500Hz, fs);
 
+    case X1F2:
+        return coefficients(COEFFICIENTS_16kHz, fs);
+
     default:
         return coefficients(COEFFICIENTS_12500Hz, fs);
     }
@@ -50,6 +53,10 @@ void AA::reset() {
         break;
 
     case X1F2:
+        x1f2[0].reset();
+        x1f2[1].reset();
+        break;
+
     case X2F1:
     case X2F2:
     case X4F1:
@@ -59,6 +66,8 @@ void AA::reset() {
 }
 
 void AA::process(ANTIALIAS mode, const double *in, double *out, size_t channels) {
+    double intermediate[16];
+
     if (mode != this->mode) {
         this->mode = mode;
         reset();
@@ -67,6 +76,11 @@ void AA::process(ANTIALIAS mode, const double *in, double *out, size_t channels)
     switch (mode) {
     case X1F1:
         x1f1.process(in, out, channels);
+        break;
+
+    case X1F2:
+        x1f2[0].process(in, intermediate, channels);
+        x1f2[1].process(intermediate, out, channels);
         break;
 
     default:

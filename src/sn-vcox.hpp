@@ -114,6 +114,7 @@ struct sn_vcox : Module {
         .fs = 44100.f,
         .mode = NONE,
         .x1f1 = AAF(X1F1, 44100.f),
+        .x1f2 = {AAF(X1F2, 44100.f), AAF(X1F2, 44100.f)},
     };
 };
 
