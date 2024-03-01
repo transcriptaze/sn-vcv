@@ -55,7 +55,7 @@ struct sn_vco : Module {
 
     void recompute(const ProcessArgs &args);
     void onFS(float fs);
-    void processVCO(const ProcessArgs &args, int, bool);
+    void processVCO(const ProcessArgs &args, size_t, bool);
     void processAUX(const ProcessArgs &args, bool);
 
     int channels();
@@ -113,22 +113,25 @@ struct sn_vco : Module {
     // ... anti-aliasing
     ANTIALIAS antialias;
     float fs = 44100.0;
-    MultiChannelFilter<5, 5, double> lpfX1F1;
-    MultiChannelFilter<5, 5, double> lpfX1F2[2];
     MultiChannelFilter<5, 5, double> lpfX2F1;
     MultiChannelFilter<5, 5, double> lpfX2F2[2];
     MultiChannelFilter<5, 5, double> lpfX4F1;
     MultiChannelFilter<5, 5, double> lpfX4F2[2];
 
-    void none(float fs, float dt, size_t channels);
-    void x1f1(float fs, float dt, size_t channels);
-    void x1f2(float fs, float dt, size_t channels);
     void x2f1(float fs, float dt, size_t channels);
     void x2f2(float fs, float dt, size_t channels);
     void x4f1(float fs, float dt, size_t channels);
     void x4f2(float fs, float dt, size_t channels);
 
     typedef void (sn_vco::*genfn)(float fs, float dt, size_t channels);
+
+    // ... antialiasing
+    struct AA AA = {
+        .fs = 44100.f,
+        .mode = NONE,
+        .x1f1 = AAF(X1F1, 44100.f),
+        .x1f2 = {AAF(X1F2, 44100.f), AAF(X1F2, 44100.f)},
+    };
 };
 
 struct sn_vcoWidget : ModuleWidget {

@@ -125,25 +125,6 @@ void sn_vco::dataFromJson(json_t *root) {
 }
 
 void sn_vco::onFS(float fs) {
-    // ... X1F1
-    {
-        const IIR iir = coefficients(COEFFICIENTS_12500Hz, fs);
-
-        lpfX1F1.setCoefficients(iir.b, iir.a);
-        lpfX1F1.reset();
-    }
-
-    // ... X1F2
-    {
-        const IIR iir = coefficients(COEFFICIENTS_16kHz, fs);
-
-        lpfX1F2[0].setCoefficients(iir.b, iir.a);
-        lpfX1F2[0].reset();
-
-        lpfX1F2[1].setCoefficients(iir.b, iir.a);
-        lpfX1F2[2].reset();
-    }
-
     // ... X2F1
     {
         const IIR iir = coefficients(COEFFICIENTS_16kHz, fs * 2);
@@ -203,56 +184,6 @@ void sn_vco::onExpanderChange(const ExpanderChangeEvent &e) {
 void sn_vco::process(const ProcessArgs &args) {
     int channels = this->channels();
 
-    // ... anti-aliasing indicator
-    switch (antialias) {
-    case NONE:
-        lights[ALIAS_LIGHT + 0].setBrightness(0.0); // red
-        lights[ALIAS_LIGHT + 1].setBrightness(0.0); // green
-        lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
-        break;
-
-    case X1F1:
-        lights[ALIAS_LIGHT + 0].setBrightness(1.0); // red
-        lights[ALIAS_LIGHT + 1].setBrightness(0.0); // green
-        lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
-        break;
-
-    case X1F2:
-        lights[ALIAS_LIGHT + 0].setBrightness(0.0); // red
-        lights[ALIAS_LIGHT + 1].setBrightness(1.0); // green
-        lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
-        break;
-
-    case X2F1:
-        lights[ALIAS_LIGHT + 0].setBrightness(0.0); // red
-        lights[ALIAS_LIGHT + 1].setBrightness(0.0); // green
-        lights[ALIAS_LIGHT + 2].setBrightness(1.0); // blue
-        break;
-
-    case X2F2:
-        lights[ALIAS_LIGHT + 0].setBrightness(1.0); // red
-        lights[ALIAS_LIGHT + 1].setBrightness(1.0); // green
-        lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
-        break;
-
-    case X4F1:
-        lights[ALIAS_LIGHT + 0].setBrightness(1.0); // red
-        lights[ALIAS_LIGHT + 1].setBrightness(0.0); // green
-        lights[ALIAS_LIGHT + 2].setBrightness(1.0); // blue
-        break;
-
-    case X4F2:
-        lights[ALIAS_LIGHT + 0].setBrightness(0.0); // red
-        lights[ALIAS_LIGHT + 1].setBrightness(1.0); // green
-        lights[ALIAS_LIGHT + 2].setBrightness(1.0); // blue
-        break;
-
-    default:
-        lights[ALIAS_LIGHT + 0].setBrightness(1.0); // red
-        lights[ALIAS_LIGHT + 1].setBrightness(1.0); // green
-        lights[ALIAS_LIGHT + 2].setBrightness(1.0); // blue
-    }
-
     // ... expanders
     bool expanded = expanders.left.module != NULL || expanders.right.module != NULL;
     bool xll = false;
@@ -296,18 +227,14 @@ void sn_vco::process(const ProcessArgs &args) {
     }
 }
 
-void sn_vco::processVCO(const ProcessArgs &args, int channels, bool expanded) {
+void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded) {
     bool connected = outputs[VCO_OUTPUT].isConnected();
     float fs = args.sampleRate;
     float dt = args.sampleTime;
 
-    sn_vco::genfn fn = &sn_vco::none;
+    sn_vco::genfn fn = NULL;
 
-    if (antialias == X1F1) {
-        fn = &sn_vco::x1f1;
-    } else if (antialias == X1F2) {
-        fn = &sn_vco::x1f2;
-    } else if (antialias == X2F1) {
+    if (antialias == X2F1) {
         fn = &sn_vco::x2f1;
     } else if (antialias == X2F2) {
         fn = &sn_vco::x2f2;
@@ -315,15 +242,36 @@ void sn_vco::processVCO(const ProcessArgs &args, int channels, bool expanded) {
         fn = &sn_vco::x4f1;
     } else if (antialias == X4F2) {
         fn = &sn_vco::x4f2;
-    }
+    } else {
+        double phase[16];
+        double in[16];
+        double out[16];
 
-    if (antialias != X1F1) {
-        lpfX1F1.reset();
-    }
+        for (size_t ch = 0; ch < channels; ch++) {
+            float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
+            float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
 
-    if (antialias != X1F2) {
-        lpfX1F2[0].reset();
-        lpfX1F2[1].reset();
+            phase[ch] = vco[ch].phase + frequency * dt;
+            while (phase[ch] >= 1.f) {
+                phase[ch] -= 1.f;
+            }
+
+            float α = 2.0f * M_PI * phase[ch];
+            float υ = sn.υ(α);
+
+            in[ch] = υ;
+        }
+
+        AA.process(antialias, in, out, channels);
+
+        for (size_t ch = 0; ch < channels; ch++) {
+            double υ = out[ch];
+
+            vco[ch].phase = phase[ch];
+            vco[ch].out.vco = υ;
+            vco[ch].out.sum = sn.A * υ;
+            vco[ch].velocity = velocity(ch);
+        }
     }
 
     if (antialias != X2F1) {
@@ -344,119 +292,16 @@ void sn_vco::processVCO(const ProcessArgs &args, int channels, bool expanded) {
         lpfX4F2[1].reset();
     }
 
-    if (connected || expanded) {
+    if ((connected || expanded) && fn != NULL) {
         (this->*fn)(fs, dt, channels);
     }
 
     if (connected) {
-        for (int ch = 0; ch < channels; ch++) {
+        for (size_t ch = 0; ch < channels; ch++) {
             outputs[VCO_OUTPUT].setVoltage(5.f * vco[ch].velocity * vco[ch].out.vco, ch);
         }
 
         outputs[VCO_OUTPUT].setChannels(channels);
-    }
-}
-
-void sn_vco::none(float fs, float dt, size_t channels) {
-    double phase[16];
-    double in[16];
-    double out[16];
-
-    for (size_t ch = 0; ch < channels; ch++) {
-        float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
-        float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
-
-        phase[ch] = vco[ch].phase;
-
-        phase[ch] += frequency * dt;
-        while (phase[ch] >= 1.f) {
-            phase[ch] -= 1.f;
-        }
-
-        float α = 2.0f * M_PI * phase[ch];
-
-        in[ch] = sn.υ(α);
-    }
-
-    for (size_t ch = 0; ch < channels; ch++) {
-        out[ch] = in[ch];
-    }
-
-    for (size_t ch = 0; ch < channels; ch++) {
-        double υ = out[ch];
-
-        vco[ch].phase = phase[ch];
-        vco[ch].out.vco = υ;
-        vco[ch].out.sum = sn.A * υ;
-        vco[ch].velocity = velocity(ch);
-    }
-}
-
-void sn_vco::x1f1(float fs, float dt, size_t channels) {
-    double phase[16];
-    double in[16];
-    double out[16];
-
-    for (size_t ch = 0; ch < channels; ch++) {
-        float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
-        float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
-
-        phase[ch] = vco[ch].phase;
-
-        phase[ch] += frequency * dt;
-        while (phase[ch] >= 1.f) {
-            phase[ch] -= 1.f;
-        }
-
-        float α = 2.0f * M_PI * phase[ch];
-
-        in[ch] = sn.υ(α);
-    }
-
-    lpfX1F1.process(in, out, channels);
-
-    for (size_t ch = 0; ch < channels; ch++) {
-        double υ = out[ch];
-
-        vco[ch].phase = phase[ch];
-        vco[ch].out.vco = υ;
-        vco[ch].out.sum = sn.A * υ;
-        vco[ch].velocity = velocity(ch);
-    }
-}
-
-void sn_vco::x1f2(float fs, float dt, size_t channels) {
-    double phase[16];
-    double in[16];
-    double intermediate[16];
-    double out[16];
-
-    for (size_t ch = 0; ch < channels; ch++) {
-        float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
-        float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
-
-        phase[ch] = vco[ch].phase;
-
-        phase[ch] += frequency * dt;
-        while (phase[ch] >= 1.f) {
-            phase[ch] -= 1.f;
-        }
-
-        float α = 2.0f * M_PI * phase[ch];
-
-        in[ch] = sn.υ(α);
-    }
-
-    lpfX1F2[0].process(in, intermediate, channels);
-    lpfX1F2[1].process(intermediate, out, channels);
-
-    for (size_t ch = 0; ch < channels; ch++) {
-        double υ = out[ch];
-
-        vco[ch].phase = phase[ch];
-        vco[ch].out.vco = υ;
-        vco[ch].out.sum = sn.A * υ;
-        vco[ch].velocity = velocity(ch);
     }
 }
 
@@ -746,11 +591,19 @@ void sn_vco::processAUX(const ProcessArgs &args, bool expanded) {
 }
 
 void sn_vco::recompute(const ProcessArgs &args) {
-    // ... filter coefficients
+    // ... antialiasing
     float fs = args.sampleRate;
     if (fs != this->fs) {
         onFS(fs);
         this->fs = fs;
+    }
+
+    if (args.sampleRate != AA.fs) {
+        AA.fs = args.sampleRate;
+
+        AA.x1f1 = AAF(X1F1, args.sampleRate);
+        AA.x1f2[0] = AAF(X1F2, args.sampleRate);
+        AA.x1f2[1] = AAF(X1F2, args.sampleRate);
     }
 
     // ... param values
@@ -784,6 +637,56 @@ void sn_vco::recompute(const ProcessArgs &args) {
     sn.m = m;
 
     sn.recompute();
+
+    // ... anti-aliasing indicator
+    switch (antialias) {
+    case NONE:
+        lights[ALIAS_LIGHT + 0].setBrightness(0.0); // red
+        lights[ALIAS_LIGHT + 1].setBrightness(0.0); // green
+        lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
+        break;
+
+    case X1F1:
+        lights[ALIAS_LIGHT + 0].setBrightness(1.0); // red
+        lights[ALIAS_LIGHT + 1].setBrightness(0.0); // green
+        lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
+        break;
+
+    case X1F2:
+        lights[ALIAS_LIGHT + 0].setBrightness(0.0); // red
+        lights[ALIAS_LIGHT + 1].setBrightness(1.0); // green
+        lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
+        break;
+
+    case X2F1:
+        lights[ALIAS_LIGHT + 0].setBrightness(0.0); // red
+        lights[ALIAS_LIGHT + 1].setBrightness(0.0); // green
+        lights[ALIAS_LIGHT + 2].setBrightness(1.0); // blue
+        break;
+
+    case X2F2:
+        lights[ALIAS_LIGHT + 0].setBrightness(1.0); // red
+        lights[ALIAS_LIGHT + 1].setBrightness(1.0); // green
+        lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
+        break;
+
+    case X4F1:
+        lights[ALIAS_LIGHT + 0].setBrightness(1.0); // red
+        lights[ALIAS_LIGHT + 1].setBrightness(0.0); // green
+        lights[ALIAS_LIGHT + 2].setBrightness(1.0); // blue
+        break;
+
+    case X4F2:
+        lights[ALIAS_LIGHT + 0].setBrightness(0.0); // red
+        lights[ALIAS_LIGHT + 1].setBrightness(1.0); // green
+        lights[ALIAS_LIGHT + 2].setBrightness(1.0); // blue
+        break;
+
+    default:
+        lights[ALIAS_LIGHT + 0].setBrightness(1.0); // red
+        lights[ALIAS_LIGHT + 1].setBrightness(1.0); // green
+        lights[ALIAS_LIGHT + 2].setBrightness(1.0); // blue
+    }
 }
 
 int sn_vco::channels() {

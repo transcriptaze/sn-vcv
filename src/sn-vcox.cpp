@@ -296,11 +296,12 @@ void sn_vcox::processAUX(const ProcessArgs &args, bool expanded) {
 
 void sn_vcox::recompute(const ProcessArgs &args) {
     // ... antialiasing
-
     if (args.sampleRate != AA.fs) {
         AA.fs = args.sampleRate;
 
         AA.x1f1 = AAF(X1F1, args.sampleRate);
+        AA.x1f2[0] = AAF(X1F2, args.sampleRate);
+        AA.x1f2[1] = AAF(X1F2, args.sampleRate);
     }
 
     // ... param values
