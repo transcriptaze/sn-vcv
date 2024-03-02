@@ -111,7 +111,10 @@ struct sn_vcox : Module {
     };
 
     // ... antialiasing
-    struct AA AA;
+    struct {
+        AA out;
+        AA sum;
+    } AA;
 };
 
 struct sn_vcoxWidget : ModuleWidget {

@@ -13,11 +13,12 @@ struct AAF {
 };
 
 typedef struct AA {
+    static int oversampling(ANTIALIAS mode);
+
     AA();
 
     void reset();
     void recompute(float fs);
-    int oversampling(ANTIALIAS mode);
     void process(ANTIALIAS mode, const double in[4][16], double out[16], size_t channels);
 
     float fs;

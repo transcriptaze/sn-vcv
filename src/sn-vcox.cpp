@@ -223,41 +223,45 @@ void sn_vcox::process(const ProcessArgs &args) {
 void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS antialias, bool expanded) {
     bool connected = outputs[VCO_OUTPUT].isConnected() | outputs[VCO_SUM_OUTPUT].isConnected();
     float gain = params[ATT_PARAM].getValue();
+    // int oversampling = AA::oversampling(antialias);
+
+    double in[4][16];
+    double sum[4][16];
 
     if (connected || expanded) {
-        double in[4][16];
-        double out[16];
-
         for (size_t ch = 0; ch < channels; ch++) {
             float α = vco[ch].phase * 2.0f * M_PI;
             float υ = sn.υ(α);
 
             in[0][ch] = υ;
+            sum[0][ch] = vco[ch].out.sum[0] + sn.A * υ;
         }
 
-        AA.process(antialias, in, out, channels);
-
         for (size_t ch = 0; ch < channels; ch++) {
-            double υ = out[ch];
-
-            vco[ch].out.vco[0] = υ;
-            vco[ch].out.sum[0] += sn.A * υ;
+            vco[ch].out.vco[0] = in[0][ch];
+            vco[ch].out.sum[0] = sum[0][ch];
         }
     }
 
     if (outputs[VCO_OUTPUT].isConnected()) {
+        double out[16];
+
+        AA.out.process(antialias, in, out, channels);
+
         for (size_t ch = 0; ch < channels; ch++) {
-            double υ = vco[ch].out.vco[0];
-            outputs[VCO_OUTPUT].setVoltage(5.f * vco[ch].velocity * υ, ch);
+            outputs[VCO_OUTPUT].setVoltage(5.f * vco[ch].velocity * out[ch], ch);
         }
 
         outputs[VCO_OUTPUT].setChannels(channels);
     }
 
     if (outputs[VCO_SUM_OUTPUT].isConnected()) {
+        double out[16];
+
+        AA.sum.process(antialias, sum, out, channels);
+
         for (size_t ch = 0; ch < channels; ch++) {
-            double υ = vco[ch].out.sum[0];
-            outputs[VCO_SUM_OUTPUT].setVoltage(5.f * vco[ch].velocity * gain * υ, ch);
+            outputs[VCO_SUM_OUTPUT].setVoltage(5.f * vco[ch].velocity * gain * out[ch], ch);
         }
 
         outputs[VCO_SUM_OUTPUT].setChannels(channels);
@@ -300,7 +304,8 @@ void sn_vcox::processAUX(const ProcessArgs &args, bool expanded) {
 
 void sn_vcox::recompute(const ProcessArgs &args) {
     // ... antialiasing
-    AA.recompute(args.sampleRate);
+    AA.out.recompute(args.sampleRate);
+    AA.sum.recompute(args.sampleRate);
 
     // ... param values
     float e = params[ECCENTRICITY_PARAM].getValue();

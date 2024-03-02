@@ -234,7 +234,7 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
     } else if (antialias == X4F2) {
         fn = &sn_vco::x4f2;
     } else {
-        int oversampling = AA.oversampling(antialias);
+        int oversampling = AA::oversampling(antialias);
 
         double δ[4];
         double phase[4][16];
