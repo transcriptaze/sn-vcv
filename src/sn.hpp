@@ -39,8 +39,9 @@ enum ANTIALIAS {
 };
 
 typedef struct VCO {
-    float phase;
+    float α;
     float velocity;
+    float phase[4];
     struct {
         float vco[4];
         float sum[4];
@@ -199,9 +200,9 @@ typedef struct sn_vco_message {
         this->antialias = antialias;
 
         for (int i = 0; i < channels; i++) {
-            this->vco[i].phase = vco[i].phase;
             this->vco[i].velocity = vco[i].velocity;
             for (int j = 0; j < 4; j++) {
+                this->vco[i].phase = vco[i].phase[i];
                 this->vco[i].out[j] = vco[i].out.sum[j];
             }
         }

@@ -182,7 +182,7 @@ void sn_vcox::process(const ProcessArgs &args) {
         antialias = msg->antialias;
 
         for (int ch = 0; ch < channels; ch++) {
-            vco[ch].phase = msg->vco[ch].phase;
+            vco[ch].α = msg->vco[ch].phase;
             vco[ch].velocity = msg->vco[ch].velocity;
             vco[ch].out.sum[0] = msg->vco[ch].out[0];
         }
@@ -191,7 +191,7 @@ void sn_vcox::process(const ProcessArgs &args) {
         aux.out.sum = msg->aux.out;
     } else {
         for (int ch = 0; ch < 16; ch++) {
-            vco[ch].phase = 0.0f;
+            vco[ch].α = 0.0f;
             vco[ch].velocity = 0.f;
         }
 
@@ -230,7 +230,7 @@ void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS ant
 
     if (connected || expanded) {
         for (size_t ch = 0; ch < channels; ch++) {
-            float α = vco[ch].phase * 2.0f * M_PI;
+            float α = vco[ch].α * 2.0f * M_PI;
             float υ = sn.υ(α);
 
             in[0][ch] = υ;
