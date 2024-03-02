@@ -125,14 +125,6 @@ void sn_vco::dataFromJson(json_t *root) {
 }
 
 void sn_vco::onFS(float fs) {
-    // ... X2F1
-    {
-        const IIR iir = coefficients(COEFFICIENTS_16kHz, fs * 2);
-
-        lpfX2F1.setCoefficients(iir.b, iir.a);
-        lpfX2F1.reset();
-    }
-
     // ... X2F2
     {
         const IIR iir = coefficients(COEFFICIENTS_16kHz, fs * 2);
@@ -287,10 +279,6 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
         }
     }
 
-    if (antialias != X2F1) {
-        lpfX2F1.reset();
-    }
-
     if (antialias != X2F2) {
         lpfX2F2[0].reset();
         lpfX2F2[1].reset();
@@ -315,48 +303,6 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
         }
 
         outputs[VCO_OUTPUT].setChannels(channels);
-    }
-}
-
-void sn_vco::x2f1(float fs, float dt, size_t channels) {
-    double in[16];
-    double out[16];
-
-    for (size_t ch = 0; ch < channels; ch++) {
-        float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
-        float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
-        float phase = vco[ch].phase + frequency * 1 * dt / 2;
-        while (phase >= 1.f) {
-            phase -= 1.f;
-        }
-
-        float α = 2.0f * M_PI * phase;
-
-        in[ch] = sn.υ(α);
-    }
-
-    lpfX2F1.process(in, out, channels);
-
-    for (size_t ch = 0; ch < channels; ch++) {
-        float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
-        float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
-        float phase = vco[ch].phase + frequency * 2 * dt / 2;
-        while (phase >= 1.f) {
-            phase -= 1.f;
-        }
-
-        float α = 2.0f * M_PI * phase;
-
-        in[ch] = sn.υ(α);
-        vco[ch].phase = phase;
-    }
-
-    lpfX2F1.process(in, out, channels);
-
-    for (size_t ch = 0; ch < channels; ch++) {
-        vco[ch].out.vco = out[ch];
-        vco[ch].out.sum = sn.A * out[ch];
-        vco[ch].velocity = velocity(ch);
     }
 }
 
@@ -605,19 +551,12 @@ void sn_vco::processAUX(const ProcessArgs &args, bool expanded) {
 
 void sn_vco::recompute(const ProcessArgs &args) {
     // ... antialiasing
+    AA.recompute(args.sampleRate);
+
     float fs = args.sampleRate;
     if (fs != this->fs) {
         onFS(fs);
         this->fs = fs;
-    }
-
-    if (args.sampleRate != AA.fs) {
-        AA.fs = args.sampleRate;
-
-        AA.x1f1 = AAF(X1F1, args.sampleRate);
-        AA.x1f2[0] = AAF(X1F2, args.sampleRate);
-        AA.x1f2[1] = AAF(X1F2, args.sampleRate);
-        AA.x2f1 = AAF(X2F1, args.sampleRate);
     }
 
     // ... param values

@@ -32,6 +32,14 @@ void AAF::process(const double *in, double *out, size_t channels) {
 }
 
 /* Anti-aliasing processor */
+
+AA::AA() : x1f1(AAF(X1F1, 44100.f)),
+           x1f2{AAF(X1F2, 44100.f), AAF(X1F2, 44100.f)},
+           x2f1(AAF(X2F1, 44100.f)) {
+    fs = 44100.f;
+    mode = NONE;
+}
+
 void AA::reset() {
     switch (mode) {
     case NONE:
@@ -54,6 +62,17 @@ void AA::reset() {
     case X4F1:
     case X4F2:
         break;
+    }
+}
+
+void AA::recompute(float fs) {
+    if (this->fs != fs) {
+        this->fs = fs;
+
+        x1f1 = AAF(X1F1, fs);
+        x1f2[0] = AAF(X1F2, fs);
+        x1f2[1] = AAF(X1F2, fs);
+        x2f1 = AAF(X2F1, fs);
     }
 }
 
