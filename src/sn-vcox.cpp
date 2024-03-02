@@ -225,21 +225,23 @@ void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS ant
     float gain = params[ATT_PARAM].getValue();
 
     if (connected || expanded) {
-        double in[16];
-        double out[16];
+        double in[2][16];
+        double out[2][16];
 
         for (size_t ch = 0; ch < channels; ch++) {
             float α = vco[ch].phase * 2.0f * M_PI;
             float υ = sn.υ(α);
 
-            in[ch] = υ;
+            in[0][ch] = υ;
         }
 
         AA.process(antialias, in, out, channels);
 
         for (size_t ch = 0; ch < channels; ch++) {
-            vco[ch].out.vco = out[ch];
-            vco[ch].out.sum += sn.A * out[ch];
+            double υ = out[0][ch];
+
+            vco[ch].out.vco = υ;
+            vco[ch].out.sum += sn.A * υ;
         }
     }
 
@@ -302,6 +304,7 @@ void sn_vcox::recompute(const ProcessArgs &args) {
         AA.x1f1 = AAF(X1F1, args.sampleRate);
         AA.x1f2[0] = AAF(X1F2, args.sampleRate);
         AA.x1f2[1] = AAF(X1F2, args.sampleRate);
+        AA.x2f1 = AAF(X2F1, args.sampleRate);
     }
 
     // ... param values

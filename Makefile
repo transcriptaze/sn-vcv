@@ -9,15 +9,15 @@ CXXFLAGS +=
 
 LDFLAGS +=
 
-SOURCES += $(wildcard src/*.cpp src/filters/*.cpp)
-INCLUDES += $(wildcard src/*.hpp src/filters/*.hpp)
+SOURCES  += $(wildcard src/*.cpp src/antialias/*.cpp)
+INCLUDES += $(wildcard src/*.hpp src/antialias/*.hpp)
 
 DISTRIBUTABLES += res
 DISTRIBUTABLES += $(wildcard LICENSE*)
 DISTRIBUTABLES += $(wildcard presets)
 
 format: 
-	clang-format -i $(SOURCES) -i $(INCLUDES) -i src/filters/*.hpp
+	clang-format -i $(SOURCES) -i $(INCLUDES)
 
 include $(RACK_DIR)/plugin.mk
 

@@ -10,14 +10,15 @@
       - [x] 4X1F: 2x oversampling, 16kHz LPF
       - [x] 4X2F: 2x oversampling, 2x16kHz LPF
       - [ ] sn-vcox
-            - [ ] Use unfiltered VCO out in sn-message
+            - [ ] Use unfiltered VCO out in sn-message i.e. only AA filter output signals
             - [x] _None_
             - [x] 1X1F
             - [x] 1X2F
+            - [ ] 2x1F
 
       - [ ] Indicator
-      - [ ] PI(d)
-      - [ ] FFT/wavetable
+      - (?) PI(d)
+      - (?) FFT/wavetable
       - [ ] Anti-aliasing indicator
            - [ ] enable/disable
            - [ ] show option + aliasing

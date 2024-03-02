@@ -1,6 +1,7 @@
-#include "filters/AAF.hpp"
 #include "plugin.hpp"
 #include "sn.hpp"
+
+#include "antialias/AAF.hpp"
 
 struct sn_vcox : Module {
     static const int CHANNELS;
@@ -115,6 +116,7 @@ struct sn_vcox : Module {
         .mode = NONE,
         .x1f1 = AAF(X1F1, 44100.f),
         .x1f2 = {AAF(X1F2, 44100.f), AAF(X1F2, 44100.f)},
+        .x2f1 = AAF(X2F1, 44100.f),
     };
 };
 

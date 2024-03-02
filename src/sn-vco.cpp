@@ -234,43 +234,56 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
 
     sn_vco::genfn fn = NULL;
 
-    if (antialias == X2F1) {
-        fn = &sn_vco::x2f1;
-    } else if (antialias == X2F2) {
+    if (antialias == X2F2) {
         fn = &sn_vco::x2f2;
     } else if (antialias == X4F1) {
         fn = &sn_vco::x4f1;
     } else if (antialias == X4F2) {
         fn = &sn_vco::x4f2;
     } else {
-        double phase[16];
-        double in[16];
-        double out[16];
+        int oversampling = AA.oversampling(antialias);
+
+        double δ[2];
+        double phase[2][16];
+        double in[2][16];
+        double out[2][16];
+
+        for (int i = 0; i < oversampling; i++) {
+            δ[i] = (i + 1.0) * dt / double(oversampling);
+        }
 
         for (size_t ch = 0; ch < channels; ch++) {
             float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
             float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
 
-            phase[ch] = vco[ch].phase + frequency * dt;
-            while (phase[ch] >= 1.f) {
-                phase[ch] -= 1.f;
+            for (int i = 0; i < oversampling; i++) {
+                phase[i][ch] = vco[ch].phase + frequency * δ[i];
+                while (phase[i][ch] >= 1.0) {
+                    phase[i][ch] -= 1.0;
+                }
             }
+        }
 
-            float α = 2.0f * M_PI * phase[ch];
-            float υ = sn.υ(α);
+        for (size_t ch = 0; ch < channels; ch++) {
+            for (int i = 0; i < oversampling; i++) {
+                float α = 2.0f * M_PI * phase[i][ch];
+                float υ = sn.υ(α);
 
-            in[ch] = υ;
+                in[i][ch] = υ;
+            }
         }
 
         AA.process(antialias, in, out, channels);
 
         for (size_t ch = 0; ch < channels; ch++) {
-            double υ = out[ch];
+            for (int i = 0; i < oversampling; i++) {
+                double υ = out[i][ch];
 
-            vco[ch].phase = phase[ch];
-            vco[ch].out.vco = υ;
-            vco[ch].out.sum = sn.A * υ;
-            vco[ch].velocity = velocity(ch);
+                vco[ch].phase = phase[i][ch];
+                vco[ch].out.vco = υ;
+                vco[ch].out.sum = sn.A * υ;
+                vco[ch].velocity = velocity(ch);
+            }
         }
     }
 
@@ -312,7 +325,7 @@ void sn_vco::x2f1(float fs, float dt, size_t channels) {
     for (size_t ch = 0; ch < channels; ch++) {
         float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
         float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
-        float phase = vco[ch].phase + frequency * dt / 2;
+        float phase = vco[ch].phase + frequency * 1 * dt / 2;
         while (phase >= 1.f) {
             phase -= 1.f;
         }
@@ -327,7 +340,7 @@ void sn_vco::x2f1(float fs, float dt, size_t channels) {
     for (size_t ch = 0; ch < channels; ch++) {
         float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
         float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
-        float phase = vco[ch].phase + frequency * dt;
+        float phase = vco[ch].phase + frequency * 2 * dt / 2;
         while (phase >= 1.f) {
             phase -= 1.f;
         }
@@ -399,7 +412,7 @@ void sn_vco::x4f1(float fs, float dt, size_t channels) {
     for (size_t ch = 0; ch < channels; ch++) {
         float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
         float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
-        float phase = vco[ch].phase + frequency * dt / 3;
+        float phase = vco[ch].phase + frequency * dt / 4;
         while (phase >= 1.f) {
             phase -= 1.f;
         }
@@ -414,7 +427,7 @@ void sn_vco::x4f1(float fs, float dt, size_t channels) {
     for (size_t ch = 0; ch < channels; ch++) {
         float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
         float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
-        float phase = vco[ch].phase + frequency * dt / 2;
+        float phase = vco[ch].phase + frequency * 2 * dt / 4;
         while (phase >= 1.f) {
             phase -= 1.f;
         }
@@ -604,6 +617,7 @@ void sn_vco::recompute(const ProcessArgs &args) {
         AA.x1f1 = AAF(X1F1, args.sampleRate);
         AA.x1f2[0] = AAF(X1F2, args.sampleRate);
         AA.x1f2[1] = AAF(X1F2, args.sampleRate);
+        AA.x2f1 = AAF(X2F1, args.sampleRate);
     }
 
     // ... param values

@@ -4,18 +4,7 @@
 
 #include "AAF.hpp"
 
-IIR lookup(ANTIALIAS mode, float fs) {
-    switch (mode) {
-    case X1F1:
-        return coefficients(COEFFICIENTS_12500Hz, fs);
-
-    case X1F2:
-        return coefficients(COEFFICIENTS_16kHz, fs);
-
-    default:
-        return coefficients(COEFFICIENTS_12500Hz, fs);
-    }
-}
+IIR lookup(ANTIALIAS mode, float fs);
 
 /* Anti-aliasing filter */
 AAF::AAF(ANTIALIAS mode, float fs) {
@@ -58,6 +47,9 @@ void AA::reset() {
         break;
 
     case X2F1:
+        x2f1.reset();
+        break;
+
     case X2F2:
     case X4F1:
     case X4F2:
@@ -65,7 +57,24 @@ void AA::reset() {
     }
 }
 
-void AA::process(ANTIALIAS mode, const double *in, double *out, size_t channels) {
+int AA::oversampling(ANTIALIAS mode) {
+    switch (mode) {
+    case NONE:
+    case X1F1:
+    case X1F2:
+        return 1;
+
+    case X2F1:
+    case X2F2:
+        return 2;
+
+    case X4F1:
+    case X4F2:
+        return 4;
+    }
+}
+
+void AA::process(ANTIALIAS mode, const double in[2][16], double out[2][16], size_t channels) {
     double intermediate[16];
 
     if (mode != this->mode) {
@@ -75,17 +84,38 @@ void AA::process(ANTIALIAS mode, const double *in, double *out, size_t channels)
 
     switch (mode) {
     case X1F1:
-        x1f1.process(in, out, channels);
+        x1f1.process(in[0], out[0], channels);
         break;
 
     case X1F2:
-        x1f2[0].process(in, intermediate, channels);
-        x1f2[1].process(intermediate, out, channels);
+        x1f2[0].process(in[0], intermediate, channels);
+        x1f2[1].process(intermediate, out[0], channels);
+        break;
+
+    case X2F1:
+        x2f1.process(in[0], out[0], channels);
+        x2f1.process(in[1], out[1], channels);
         break;
 
     default:
         for (size_t i = 0; i < channels; i++) {
-            out[i] = in[i];
+            out[0][i] = in[0][i];
         }
+    }
+}
+
+IIR lookup(ANTIALIAS mode, float fs) {
+    switch (mode) {
+    case X1F1:
+        return coefficients(COEFFICIENTS_12500Hz, fs);
+
+    case X1F2:
+        return coefficients(COEFFICIENTS_16kHz, fs);
+
+    case X2F1:
+        return coefficients(COEFFICIENTS_16kHz, 2 * fs);
+
+    default:
+        return coefficients(COEFFICIENTS_12500Hz, fs);
     }
 }
