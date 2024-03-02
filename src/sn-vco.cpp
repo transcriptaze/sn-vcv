@@ -223,6 +223,7 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
     bool connected = outputs[VCO_OUTPUT].isConnected();
     float fs = args.sampleRate;
     float dt = args.sampleTime;
+    double out[16];
 
     sn_vco::genfn fn = NULL;
 
@@ -238,7 +239,6 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
         double δ[2];
         double phase[2][16];
         double in[2][16];
-        double out[2][16];
 
         for (int i = 0; i < oversampling; i++) {
             δ[i] = (i + 1.0) * dt / double(oversampling);
@@ -265,11 +265,9 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
             }
         }
 
-        AA.process(antialias, in, out, channels);
-
         for (size_t ch = 0; ch < channels; ch++) {
             for (int i = 0; i < oversampling; i++) {
-                double υ = out[i][ch];
+                double υ = in[i][ch];
 
                 vco[ch].phase = phase[i][ch];
                 vco[ch].out.vco = υ;
@@ -277,6 +275,8 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
                 vco[ch].velocity = velocity(ch);
             }
         }
+
+        AA.process(antialias, in, out, channels);
     }
 
     if (antialias != X2F2) {
@@ -295,11 +295,17 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
 
     if ((connected || expanded) && fn != NULL) {
         (this->*fn)(fs, dt, channels);
+
+        for (size_t ch = 0; ch < channels; ch++) {
+            out[ch] = vco[ch].out.vco;
+        }
     }
 
     if (connected) {
         for (size_t ch = 0; ch < channels; ch++) {
-            outputs[VCO_OUTPUT].setVoltage(5.f * vco[ch].velocity * vco[ch].out.vco, ch);
+            double υ = out[ch];
+
+            outputs[VCO_OUTPUT].setVoltage(5.f * vco[ch].velocity * υ, ch);
         }
 
         outputs[VCO_OUTPUT].setChannels(channels);

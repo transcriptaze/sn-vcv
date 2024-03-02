@@ -226,7 +226,7 @@ void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS ant
 
     if (connected || expanded) {
         double in[2][16];
-        double out[2][16];
+        double out[16];
 
         for (size_t ch = 0; ch < channels; ch++) {
             float α = vco[ch].phase * 2.0f * M_PI;
@@ -238,7 +238,7 @@ void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS ant
         AA.process(antialias, in, out, channels);
 
         for (size_t ch = 0; ch < channels; ch++) {
-            double υ = out[0][ch];
+            double υ = out[ch];
 
             vco[ch].out.vco = υ;
             vco[ch].out.sum += sn.A * υ;

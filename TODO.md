@@ -9,8 +9,10 @@
       - [x] 2X2F: 2x oversampling, 2x16kHz LPF
       - [x] 4X1F: 2x oversampling, 16kHz LPF
       - [x] 4X2F: 2x oversampling, 2x16kHz LPF
+      - [ ] sn-vco
+            - [x] Use unfiltered VCO in sn message
       - [ ] sn-vcox
-            - [ ] Use unfiltered VCO out in sn-message i.e. only AA filter output signals
+            - [ ] Use unfiltered VCO out in sn message
             - [x] _None_
             - [x] 1X1F
             - [x] 1X2F

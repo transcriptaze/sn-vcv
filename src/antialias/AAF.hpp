@@ -18,7 +18,7 @@ typedef struct AA {
     void reset();
     void recompute(float fs);
     int oversampling(ANTIALIAS mode);
-    void process(ANTIALIAS mode, const double in[2][16], double out[2][16], size_t channels);
+    void process(ANTIALIAS mode, const double in[2][16], double out[16], size_t channels);
 
     float fs;
     ANTIALIAS mode;

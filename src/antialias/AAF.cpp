@@ -93,7 +93,7 @@ int AA::oversampling(ANTIALIAS mode) {
     }
 }
 
-void AA::process(ANTIALIAS mode, const double in[2][16], double out[2][16], size_t channels) {
+void AA::process(ANTIALIAS mode, const double in[2][16], double out[16], size_t channels) {
     double intermediate[16];
 
     if (mode != this->mode) {
@@ -103,22 +103,22 @@ void AA::process(ANTIALIAS mode, const double in[2][16], double out[2][16], size
 
     switch (mode) {
     case X1F1:
-        x1f1.process(in[0], out[0], channels);
+        x1f1.process(in[0], out, channels);
         break;
 
     case X1F2:
         x1f2[0].process(in[0], intermediate, channels);
-        x1f2[1].process(intermediate, out[0], channels);
+        x1f2[1].process(intermediate, out, channels);
         break;
 
     case X2F1:
-        x2f1.process(in[0], out[0], channels);
-        x2f1.process(in[1], out[1], channels);
+        x2f1.process(in[0], out, channels);
+        x2f1.process(in[1], out, channels);
         break;
 
     default:
         for (size_t i = 0; i < channels; i++) {
-            out[0][i] = in[0][i];
+            out[i] = in[0][i];
         }
     }
 }
