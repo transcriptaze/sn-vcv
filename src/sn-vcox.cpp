@@ -184,7 +184,7 @@ void sn_vcox::process(const ProcessArgs &args) {
         for (int ch = 0; ch < channels; ch++) {
             vco[ch].phase = msg->vco[ch].phase;
             vco[ch].velocity = msg->vco[ch].velocity;
-            vco[ch].out.sum = msg->vco[ch].out;
+            vco[ch].out.sum[0] = msg->vco[ch].out[0];
         }
 
         aux.phase = msg->aux.phase;
@@ -225,7 +225,7 @@ void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS ant
     float gain = params[ATT_PARAM].getValue();
 
     if (connected || expanded) {
-        double in[2][16];
+        double in[4][16];
         double out[16];
 
         for (size_t ch = 0; ch < channels; ch++) {
@@ -240,14 +240,15 @@ void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS ant
         for (size_t ch = 0; ch < channels; ch++) {
             double υ = out[ch];
 
-            vco[ch].out.vco = υ;
-            vco[ch].out.sum += sn.A * υ;
+            vco[ch].out.vco[0] = υ;
+            vco[ch].out.sum[0] += sn.A * υ;
         }
     }
 
     if (outputs[VCO_OUTPUT].isConnected()) {
         for (size_t ch = 0; ch < channels; ch++) {
-            outputs[VCO_OUTPUT].setVoltage(5.f * vco[ch].velocity * vco[ch].out.vco, ch);
+            double υ = vco[ch].out.vco[0];
+            outputs[VCO_OUTPUT].setVoltage(5.f * vco[ch].velocity * υ, ch);
         }
 
         outputs[VCO_OUTPUT].setChannels(channels);
@@ -255,7 +256,8 @@ void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS ant
 
     if (outputs[VCO_SUM_OUTPUT].isConnected()) {
         for (size_t ch = 0; ch < channels; ch++) {
-            outputs[VCO_SUM_OUTPUT].setVoltage(5.f * vco[ch].velocity * gain * vco[ch].out.sum, ch);
+            double υ = vco[ch].out.sum[0];
+            outputs[VCO_SUM_OUTPUT].setVoltage(5.f * vco[ch].velocity * gain * υ, ch);
         }
 
         outputs[VCO_SUM_OUTPUT].setChannels(channels);

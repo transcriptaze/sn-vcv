@@ -63,22 +63,22 @@ struct sn_vcox : Module {
     struct SN sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 
     struct VCO vco[16] = {
-        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {.vco = .0f, .sum = 0.f}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = {0.f, 0.f, 0.f, 0.f}, .sum = {0.f, 0.f, 0.f, 0.f}}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = {0.f, 0.f, 0.f, 0.f}, .sum = {0.f, 0.f, 0.f, 0.f}}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = {0.f, 0.f, 0.f, 0.f}, .sum = {0.f, 0.f, 0.f, 0.f}}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = {0.f, 0.f, 0.f, 0.f}, .sum = {0.f, 0.f, 0.f, 0.f}}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = {0.f, 0.f, 0.f, 0.f}, .sum = {0.f, 0.f, 0.f, 0.f}}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = {0.f, 0.f, 0.f, 0.f}, .sum = {0.f, 0.f, 0.f, 0.f}}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = {0.f, 0.f, 0.f, 0.f}, .sum = {0.f, 0.f, 0.f, 0.f}}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = {0.f, 0.f, 0.f, 0.f}, .sum = {0.f, 0.f, 0.f, 0.f}}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = {0.f, 0.f, 0.f, 0.f}, .sum = {0.f, 0.f, 0.f, 0.f}}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = {0.f, 0.f, 0.f, 0.f}, .sum = {0.f, 0.f, 0.f, 0.f}}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = {0.f, 0.f, 0.f, 0.f}, .sum = {0.f, 0.f, 0.f, 0.f}}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = {0.f, 0.f, 0.f, 0.f}, .sum = {0.f, 0.f, 0.f, 0.f}}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = {0.f, 0.f, 0.f, 0.f}, .sum = {0.f, 0.f, 0.f, 0.f}}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = {0.f, 0.f, 0.f, 0.f}, .sum = {0.f, 0.f, 0.f, 0.f}}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = {0.f, 0.f, 0.f, 0.f}, .sum = {0.f, 0.f, 0.f, 0.f}}},
+        {.phase = 0.f, .velocity = 0.f, .out = {.vco = {0.f, 0.f, 0.f, 0.f}, .sum = {0.f, 0.f, 0.f, 0.f}}},
     };
 
     struct AUX aux = {

@@ -236,9 +236,9 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
     } else {
         int oversampling = AA.oversampling(antialias);
 
-        double δ[2];
-        double phase[2][16];
-        double in[2][16];
+        double δ[4];
+        double phase[4][16];
+        double in[4][16];
 
         for (int i = 0; i < oversampling; i++) {
             δ[i] = (i + 1.0) * dt / double(oversampling);
@@ -270,8 +270,8 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
                 double υ = in[i][ch];
 
                 vco[ch].phase = phase[i][ch];
-                vco[ch].out.vco = υ;
-                vco[ch].out.sum = sn.A * υ;
+                vco[ch].out.vco[i] = υ;
+                vco[ch].out.sum[i] = sn.A * υ;
                 vco[ch].velocity = velocity(ch);
             }
         }
@@ -297,7 +297,7 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
         (this->*fn)(fs, dt, channels);
 
         for (size_t ch = 0; ch < channels; ch++) {
-            out[ch] = vco[ch].out.vco;
+            out[ch] = vco[ch].out.vco[0];
         }
     }
 
@@ -351,8 +351,8 @@ void sn_vco::x2f2(float fs, float dt, size_t channels) {
     lpfX2F2[1].process(intermediate, out, channels);
 
     for (size_t ch = 0; ch < channels; ch++) {
-        vco[ch].out.vco = out[ch];
-        vco[ch].out.sum = sn.A * out[ch];
+        vco[ch].out.vco[0] = out[ch];
+        vco[ch].out.sum[0] = sn.A * out[ch];
         vco[ch].velocity = velocity(ch);
     }
 }
@@ -423,8 +423,8 @@ void sn_vco::x4f1(float fs, float dt, size_t channels) {
     lpfX4F1.process(in, out, channels);
 
     for (size_t ch = 0; ch < channels; ch++) {
-        vco[ch].out.vco = out[ch];
-        vco[ch].out.sum = sn.A * out[ch];
+        vco[ch].out.vco[0] = out[ch];
+        vco[ch].out.sum[0] = sn.A * out[ch];
         vco[ch].velocity = velocity(ch);
     }
 }
@@ -500,8 +500,8 @@ void sn_vco::x4f2(float fs, float dt, size_t channels) {
     lpfX4F2[1].process(intermediate, out, channels);
 
     for (size_t ch = 0; ch < channels; ch++) {
-        vco[ch].out.vco = out[ch];
-        vco[ch].out.sum = sn.A * out[ch];
+        vco[ch].out.vco[0] = out[ch];
+        vco[ch].out.sum[0] = sn.A * out[ch];
         vco[ch].velocity = velocity(ch);
     }
 }
