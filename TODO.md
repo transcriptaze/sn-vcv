@@ -13,11 +13,12 @@
             - [ ] 4X2F: 2x oversampling, 2x16kHz LPF
             - [ ] AA if connected
       - [ ] sn-vcox
-            - [ ] Use unfiltered VCO in sn message
+            - [x] Use unfiltered VCO in sn message
             - [x] _None_
             - [x] 1X1F
             - [x] 1X2F
-            - [ ] 2x1F
+            - [x] 2x1F
+            - [ ] 2x2F
             - [x] AA if connected
 
       - [ ] Anti-aliasing indicator

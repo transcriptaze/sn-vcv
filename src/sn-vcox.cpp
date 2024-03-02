@@ -182,17 +182,22 @@ void sn_vcox::process(const ProcessArgs &args) {
         antialias = msg->antialias;
 
         for (int ch = 0; ch < channels; ch++) {
-            vco[ch].α = msg->vco[ch].phase;
             vco[ch].velocity = msg->vco[ch].velocity;
-            vco[ch].out.sum[0] = msg->vco[ch].out[0];
+
+            for (int i = 0; i < 4; i++) {
+                vco[ch].phase[i] = msg->vco[ch].phase[i];
+                vco[ch].out.sum[i] = msg->vco[ch].out[i];
+            }
         }
 
         aux.phase = msg->aux.phase;
         aux.out.sum = msg->aux.out;
     } else {
         for (int ch = 0; ch < 16; ch++) {
-            vco[ch].α = 0.0f;
             vco[ch].velocity = 0.f;
+            for (int i = 0; i < 4; i++) {
+                vco[ch].phase[i] = 0.f;
+            }
         }
 
         aux.phase = 0.0f;
@@ -223,23 +228,27 @@ void sn_vcox::process(const ProcessArgs &args) {
 void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS antialias, bool expanded) {
     bool connected = outputs[VCO_OUTPUT].isConnected() | outputs[VCO_SUM_OUTPUT].isConnected();
     float gain = params[ATT_PARAM].getValue();
-    // int oversampling = AA::oversampling(antialias);
+    int oversampling = AA::oversampling(antialias);
 
     double in[4][16];
     double sum[4][16];
 
     if (connected || expanded) {
         for (size_t ch = 0; ch < channels; ch++) {
-            float α = vco[ch].α * 2.0f * M_PI;
-            float υ = sn.υ(α);
+            for (int i = 0; i < oversampling; i++) {
+                float α = vco[ch].phase[i] * 2.0f * M_PI;
+                float υ = sn.υ(α);
 
-            in[0][ch] = υ;
-            sum[0][ch] = vco[ch].out.sum[0] + sn.A * υ;
+                in[i][ch] = υ;
+                sum[i][ch] = vco[ch].out.sum[i] + sn.A * υ;
+            }
         }
 
         for (size_t ch = 0; ch < channels; ch++) {
-            vco[ch].out.vco[0] = in[0][ch];
-            vco[ch].out.sum[0] = sum[0][ch];
+            for (int i = 0; i < oversampling; i++) {
+                vco[ch].out.vco[i] = in[i][ch];
+                vco[ch].out.sum[i] = sum[i][ch];
+            }
         }
     }
 

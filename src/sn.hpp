@@ -164,26 +164,26 @@ typedef struct sn_vco_message {
     ANTIALIAS antialias;
 
     struct _VCO {
-        float phase;
         float velocity;
+        float phase[4];
         float out[4];
     } vco[16] = {
-        {.phase = 0.f, .velocity = 0.f, .out = {0.f, 0.f, 0.f, 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {0.f, 0.f, 0.f, 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {0.f, 0.f, 0.f, 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {0.f, 0.f, 0.f, 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {0.f, 0.f, 0.f, 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {0.f, 0.f, 0.f, 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {0.f, 0.f, 0.f, 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {0.f, 0.f, 0.f, 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {0.f, 0.f, 0.f, 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {0.f, 0.f, 0.f, 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {0.f, 0.f, 0.f, 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {0.f, 0.f, 0.f, 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {0.f, 0.f, 0.f, 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {0.f, 0.f, 0.f, 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {0.f, 0.f, 0.f, 0.f}},
-        {.phase = 0.f, .velocity = 0.f, .out = {0.f, 0.f, 0.f, 0.f}},
+        {.velocity = 0.f, .phase = {0.f, 0.f, 0.f, 0.f}, .out = {0.f, 0.f, 0.f, 0.f}},
+        {.velocity = 0.f, .phase = {0.f, 0.f, 0.f, 0.f}, .out = {0.f, 0.f, 0.f, 0.f}},
+        {.velocity = 0.f, .phase = {0.f, 0.f, 0.f, 0.f}, .out = {0.f, 0.f, 0.f, 0.f}},
+        {.velocity = 0.f, .phase = {0.f, 0.f, 0.f, 0.f}, .out = {0.f, 0.f, 0.f, 0.f}},
+        {.velocity = 0.f, .phase = {0.f, 0.f, 0.f, 0.f}, .out = {0.f, 0.f, 0.f, 0.f}},
+        {.velocity = 0.f, .phase = {0.f, 0.f, 0.f, 0.f}, .out = {0.f, 0.f, 0.f, 0.f}},
+        {.velocity = 0.f, .phase = {0.f, 0.f, 0.f, 0.f}, .out = {0.f, 0.f, 0.f, 0.f}},
+        {.velocity = 0.f, .phase = {0.f, 0.f, 0.f, 0.f}, .out = {0.f, 0.f, 0.f, 0.f}},
+        {.velocity = 0.f, .phase = {0.f, 0.f, 0.f, 0.f}, .out = {0.f, 0.f, 0.f, 0.f}},
+        {.velocity = 0.f, .phase = {0.f, 0.f, 0.f, 0.f}, .out = {0.f, 0.f, 0.f, 0.f}},
+        {.velocity = 0.f, .phase = {0.f, 0.f, 0.f, 0.f}, .out = {0.f, 0.f, 0.f, 0.f}},
+        {.velocity = 0.f, .phase = {0.f, 0.f, 0.f, 0.f}, .out = {0.f, 0.f, 0.f, 0.f}},
+        {.velocity = 0.f, .phase = {0.f, 0.f, 0.f, 0.f}, .out = {0.f, 0.f, 0.f, 0.f}},
+        {.velocity = 0.f, .phase = {0.f, 0.f, 0.f, 0.f}, .out = {0.f, 0.f, 0.f, 0.f}},
+        {.velocity = 0.f, .phase = {0.f, 0.f, 0.f, 0.f}, .out = {0.f, 0.f, 0.f, 0.f}},
+        {.velocity = 0.f, .phase = {0.f, 0.f, 0.f, 0.f}, .out = {0.f, 0.f, 0.f, 0.f}},
     };
 
     struct _AUX {
@@ -202,7 +202,7 @@ typedef struct sn_vco_message {
         for (int i = 0; i < channels; i++) {
             this->vco[i].velocity = vco[i].velocity;
             for (int j = 0; j < 4; j++) {
-                this->vco[i].phase = vco[i].phase[i];
+                this->vco[i].phase[j] = vco[i].phase[j];
                 this->vco[i].out[j] = vco[i].out.sum[j];
             }
         }
