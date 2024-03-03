@@ -10,8 +10,16 @@ const std::vector<float> AUX_GAIN = {1.f, 0.5f, 0.333f, 0.25f, 0.2f}; // AUX out
 const std::vector<std::string> AUX_MODES = {"OSC", "SUM", "POLY"};    // AUX mode labels
 const std::vector<std::string> AUX_GAINS = {"1", "½", "⅓", "¼", "⅕"}; // AUX gain labels
 
-// anti-aliasing
-const std::vector<std::string> ANTIALIASING = {"None", "1X1F", "1X2F", "2XF1", "2XF2", "4XF1", "4XF2"}; // anti-aliasing menu options
+// anti-aliasing menu options
+const std::vector<std::string> ANTIALIASING = {
+    "None",
+    "12.5kHz LPF",
+    "2x 16kHz LPF",
+    "2x oversampling, 16kHz LPF",
+    "2x oversampling, 2x 16kHz LPF",
+    "4x oversampling, 16kHz LPF",
+    "4x oversampling, 2x 16kHz LPF",
+}; 
 
 // SN
 void SN::recompute() {

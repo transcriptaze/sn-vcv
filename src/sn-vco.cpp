@@ -90,52 +90,11 @@ void sn_vco::dataFromJson(json_t *root) {
     }
 
     if (antialias) {
-        int v = json_integer_value(antialias);
-
-        switch (v) {
-        case NONE:
-            this->antialias = NONE;
-            break;
-
-        case X1F1:
-            this->antialias = X1F1;
-            break;
-
-        case X1F2:
-            this->antialias = X1F2;
-            break;
-
-        case X2F1:
-            this->antialias = X2F1;
-            break;
-
-        case X2F2:
-            this->antialias = X2F2;
-            break;
-
-        case X4F1:
-            this->antialias = X4F1;
-            break;
-
-        case X4F2:
-            this->antialias = X4F2;
-            break;
-        }
+        this->antialias = AA::int2mode(json_integer_value(antialias), this->antialias);
     }
 }
 
 void sn_vco::onFS(float fs) {
-    // ... X2F2
-    {
-        const IIR iir = coefficients(COEFFICIENTS_16kHz, fs * 2);
-
-        lpfX2F2[0].setCoefficients(iir.b, iir.a);
-        lpfX2F2[0].reset();
-
-        lpfX2F2[1].setCoefficients(iir.b, iir.a);
-        lpfX2F2[1].reset();
-    }
-
     // ... X4F1
     {
         const IIR iir = coefficients(COEFFICIENTS_16kHz, fs * 4);
@@ -227,9 +186,10 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
 
     sn_vco::genfn fn = NULL;
 
-    if (antialias == X2F2) {
-        fn = &sn_vco::x2f2;
-    } else if (antialias == X4F1) {
+    // if (antialias == X2F2) {
+    //     fn = &sn_vco::x2f2;
+    // } else
+    if (antialias == X4F1) {
         fn = &sn_vco::x4f1;
     } else if (antialias == X4F2) {
         fn = &sn_vco::x4f2;
@@ -283,11 +243,6 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
         AA.process(antialias, in, out, channels);
     }
 
-    if (antialias != X2F2) {
-        lpfX2F2[0].reset();
-        lpfX2F2[1].reset();
-    }
-
     if (antialias != X4F1) {
         lpfX4F1.reset();
     }
@@ -313,53 +268,6 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
         }
 
         outputs[VCO_OUTPUT].setChannels(channels);
-    }
-}
-
-void sn_vco::x2f2(float fs, float dt, size_t channels) {
-    double in[16];
-    double intermediate[16];
-    double out[16];
-
-    for (size_t ch = 0; ch < channels; ch++) {
-        float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
-        float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
-        float phase = vco[ch].α + frequency * dt / 2;
-        while (phase >= 1.f) {
-            phase -= 1.f;
-        }
-
-        float α = 2.0f * M_PI * phase;
-
-        in[ch] = sn.υ(α);
-        vco[ch].phase[0] = phase;
-    }
-
-    lpfX2F2[0].process(in, intermediate, channels);
-    lpfX2F2[1].process(intermediate, out, channels);
-
-    for (size_t ch = 0; ch < channels; ch++) {
-        float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
-        float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
-        float phase = vco[ch].α + frequency * dt;
-        while (phase >= 1.f) {
-            phase -= 1.f;
-        }
-
-        float α = 2.0f * M_PI * phase;
-
-        in[ch] = sn.υ(α);
-        vco[ch].phase[1] = phase;
-        vco[ch].α = phase;
-    }
-
-    lpfX2F2[0].process(in, intermediate, channels);
-    lpfX2F2[1].process(intermediate, out, channels);
-
-    for (size_t ch = 0; ch < channels; ch++) {
-        vco[ch].out.vco[0] = out[ch];
-        vco[ch].out.sum[0] = sn.A * out[ch];
-        vco[ch].velocity = velocity(ch);
     }
 }
 

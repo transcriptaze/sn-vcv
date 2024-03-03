@@ -8,7 +8,7 @@
             - [x] 1X1F: 12.5kHz LPF
             - [x] 1X2F: 2x16kHz LPF
             - [x] 2X1F: 2x oversampling, 16kHz LPF
-            - [ ] 2X2F: 2x oversampling, 2x16kHz LPF
+            - [x] 2X2F: 2x oversampling, 2x16kHz LPF
             - [ ] 4X1F: 2x oversampling, 16kHz LPF
             - [ ] 4X2F: 2x oversampling, 2x16kHz LPF
             - [ ] AA if connected
@@ -18,7 +18,7 @@
             - [x] 1X1F
             - [x] 1X2F
             - [x] 2x1F
-            - [ ] 2x2F
+            - [x] 2x2F
             - [x] AA if connected
 
       - [ ] Anti-aliasing indicator

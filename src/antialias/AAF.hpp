@@ -4,8 +4,8 @@
 #include "../plugin.hpp"
 #include "../sn.hpp"
 
-struct AAF {
-    AAF(ANTIALIAS mode, float fs);
+struct LPF {
+    LPF(ANTIALIAS mode, float fs);
     void reset();
     void process(const double *in, double *out, size_t channels);
 
@@ -14,6 +14,7 @@ struct AAF {
 
 typedef struct AA {
     static int oversampling(ANTIALIAS mode);
+    static ANTIALIAS int2mode(int v, ANTIALIAS defval);
 
     AA();
 
@@ -24,7 +25,8 @@ typedef struct AA {
     float fs;
     ANTIALIAS mode;
 
-    AAF x1f1;
-    AAF x1f2[2];
-    AAF x2f1;
+    LPF x1f1;
+    LPF x1f2[2];
+    LPF x2f1;
+    LPF x2f2[2];
 } AA;
