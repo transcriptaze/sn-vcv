@@ -95,14 +95,6 @@ void sn_vco::dataFromJson(json_t *root) {
 }
 
 void sn_vco::onFS(float fs) {
-    // ... X4F1
-    {
-        const IIR iir = coefficients(COEFFICIENTS_16kHz, fs * 4);
-
-        lpfX4F1.setCoefficients(iir.b, iir.a);
-        lpfX4F1.reset();
-    }
-
     // ... X4F2
     {
         const IIR iir = coefficients(COEFFICIENTS_16kHz, fs * 4);
@@ -186,12 +178,7 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
 
     sn_vco::genfn fn = NULL;
 
-    // if (antialias == X2F2) {
-    //     fn = &sn_vco::x2f2;
-    // } else
-    if (antialias == X4F1) {
-        fn = &sn_vco::x4f1;
-    } else if (antialias == X4F2) {
+    if (antialias == X4F2) {
         fn = &sn_vco::x4f2;
     } else {
         int oversampling = AA::oversampling(antialias);
@@ -243,10 +230,6 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
         AA.process(antialias, in, out, channels);
     }
 
-    if (antialias != X4F1) {
-        lpfX4F1.reset();
-    }
-
     if (antialias != X4F2) {
         lpfX4F2[0].reset();
         lpfX4F2[1].reset();
@@ -268,81 +251,6 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
         }
 
         outputs[VCO_OUTPUT].setChannels(channels);
-    }
-}
-
-void sn_vco::x4f1(float fs, float dt, size_t channels) {
-    double in[16];
-    double out[16];
-
-    for (size_t ch = 0; ch < channels; ch++) {
-        float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
-        float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
-        float phase = vco[ch].α + frequency * dt / 4;
-        while (phase >= 1.f) {
-            phase -= 1.f;
-        }
-
-        float α = 2.0f * M_PI * phase;
-
-        in[ch] = sn.υ(α);
-        vco[ch].α = phase;
-    }
-
-    lpfX4F1.process(in, out, channels);
-
-    for (size_t ch = 0; ch < channels; ch++) {
-        float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
-        float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
-        float phase = vco[ch].α + frequency * 2 * dt / 4;
-        while (phase >= 1.f) {
-            phase -= 1.f;
-        }
-
-        float α = 2.0f * M_PI * phase;
-
-        in[ch] = sn.υ(α);
-        vco[ch].α = phase;
-    }
-
-    lpfX4F1.process(in, out, channels);
-
-    for (size_t ch = 0; ch < channels; ch++) {
-        float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
-        float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
-        float phase = vco[ch].α + frequency * 3 * dt / 4;
-        while (phase >= 1.f) {
-            phase -= 1.f;
-        }
-
-        float α = 2.0f * M_PI * phase;
-
-        in[ch] = sn.υ(α);
-        vco[ch].α = phase;
-    }
-
-    lpfX4F1.process(in, out, channels);
-
-    for (size_t ch = 0; ch < channels; ch++) {
-        float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
-        float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
-        float phase = vco[ch].α + frequency * dt;
-        while (phase >= 1.f) {
-            phase -= 1.f;
-        }
-
-        float α = 2.0f * M_PI * phase;
-
-        in[ch] = sn.υ(α);
-        vco[ch].α = phase;
-    }
-
-    lpfX4F1.process(in, out, channels);
-
-    for (size_t ch = 0; ch < channels; ch++) {
-        vco[ch].out.vco[0] = out[ch];
-        vco[ch].out.sum[0] = sn.A * out[ch];
-        vco[ch].velocity = velocity(ch);
     }
 }
 

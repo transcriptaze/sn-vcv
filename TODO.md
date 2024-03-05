@@ -9,7 +9,7 @@
             - [x] 1X2F: 2x16kHz LPF
             - [x] 2X1F: 2x oversampling, 16kHz LPF
             - [x] 2X2F: 2x oversampling, 2x16kHz LPF
-            - [ ] 4X1F: 2x oversampling, 16kHz LPF
+            - [x] 4X1F: 2x oversampling, 16kHz LPF
             - [ ] 4X2F: 2x oversampling, 2x16kHz LPF
             - [ ] AA if connected
       - [ ] sn-vcox
@@ -19,18 +19,20 @@
             - [x] 1X2F
             - [x] 2x1F
             - [x] 2x2F
+            - [x] 4x1F
+            - [ ] 4x2F
             - [x] AA if connected
+            - [ ] Multiple sn-vcox expanders
 
       - [ ] Anti-aliasing indicator
            - [ ] enable/disable
            - [ ] show option + aliasing
+      - [ ] ALIASING.md
       - (?) PI(d)
       - (?) FFT/wavetable
-      - [ ] ALIASING.md
-      - [ ] DC blocking
-      - [ ] Clamp input frequency
 
-- [ ] e directions are switched between sn-vco and sn-vcox
+- [ ] DC blocking
+- [ ] Clamp input frequency
 - [x] Better blurbs in plugin.json
 - [x] Fix tags in plugin.json
 - [x] Initialise module in sn-vco-channels

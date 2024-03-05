@@ -19,7 +19,7 @@ const std::vector<std::string> ANTIALIASING = {
     "2x oversampling, 2x 16kHz LPF",
     "4x oversampling, 16kHz LPF",
     "4x oversampling, 2x 16kHz LPF",
-}; 
+};
 
 // SN
 void SN::recompute() {
