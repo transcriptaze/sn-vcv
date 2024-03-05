@@ -2,7 +2,7 @@
 
 - [ ] [Antialiasing](https://github.com/transcriptaze/sn-vcv/issues/3)
       - [x] Context menu
-      - [ ] sn-vco
+      - [x] sn-vco
             - [x] Use unfiltered VCO in sn message
             - [x] _None_
             - [x] 1X1F: 12.5kHz LPF
@@ -10,9 +10,9 @@
             - [x] 2X1F: 2x oversampling, 16kHz LPF
             - [x] 2X2F: 2x oversampling, 2x16kHz LPF
             - [x] 4X1F: 2x oversampling, 16kHz LPF
-            - [ ] 4X2F: 2x oversampling, 2x16kHz LPF
-            - [ ] AA if connected
-      - [ ] sn-vcox
+            - [x] 4X2F: 2x oversampling, 2x16kHz LPF
+            - [x] AA if connected
+      - [x] sn-vcox
             - [x] Use unfiltered VCO in sn message
             - [x] _None_
             - [x] 1X1F
@@ -20,9 +20,9 @@
             - [x] 2x1F
             - [x] 2x2F
             - [x] 4x1F
-            - [ ] 4x2F
+            - [x] 4x2F
             - [x] AA if connected
-            - [ ] Multiple sn-vcox expanders
+            - [x] Multiple sn-vcox expanders
 
       - [ ] Anti-aliasing indicator
            - [ ] enable/disable

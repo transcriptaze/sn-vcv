@@ -54,7 +54,6 @@ struct sn_vco : Module {
     void process(const ProcessArgs &args) override;
 
     void recompute(const ProcessArgs &args);
-    void onFS(float fs);
     void processVCO(const ProcessArgs &args, size_t, bool);
     void processAUX(const ProcessArgs &args, bool);
 
@@ -92,6 +91,10 @@ struct sn_vco : Module {
         {.α = 0.f, .velocity = 0.f, .phase = {0.f, 0.f, 0.f, 0.f}, .out = {.vco = {0.f, 0.f, 0.f, 0.f}, .sum = {0.f, 0.f, 0.f, 0.f}}},
     };
 
+    // ... anti-aliasing
+    ANTIALIAS antialias; // ... for context submenu
+    struct AA AA;
+
     // ... state update
     struct {
         int krate;
@@ -109,16 +112,6 @@ struct sn_vco : Module {
         .left = sn_expander<sn_vco_message>(LEFT),
         .right = sn_expander<sn_vco_message>(RIGHT),
     };
-
-    // ... anti-aliasing
-    struct AA AA;
-    ANTIALIAS antialias;
-    float fs = 44100.0;
-    MultiChannelFilter<5, 5, double> lpfX4F2[2];
-
-    void x4f2(float fs, float dt, size_t channels);
-
-    typedef void (sn_vco::*genfn)(float fs, float dt, size_t channels);
 };
 
 struct sn_vcoWidget : ModuleWidget {

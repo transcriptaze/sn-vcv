@@ -1,8 +1,9 @@
 #pragma once
 
-#include "../butterworth.h"
 #include "../plugin.hpp"
 #include "../sn.hpp"
+
+#include "butterworth.h"
 
 struct LPF {
     LPF(ANTIALIAS mode, float fs);
@@ -30,4 +31,5 @@ typedef struct AA {
     LPF x2f1;
     LPF x2f2[2];
     LPF x4f1;
+    LPF x4f2[2];
 } AA;

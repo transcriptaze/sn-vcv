@@ -1,4 +1,3 @@
-#include "../butterworth.h"
 #include "../plugin.hpp"
 #include "../sn.hpp"
 
@@ -74,7 +73,8 @@ AA::AA() : x1f1(LPF(X1F1, 44100.f)),
            x1f2{LPF(X1F2, 44100.f), LPF(X1F2, 44100.f)},
            x2f1(LPF(X2F1, 44100.f)),
            x2f2{LPF(X2F2, 44100.f), LPF(X2F2, 44100.f)},
-           x4f1(LPF(X4F1, 44100.f)) {
+           x4f1(LPF(X4F1, 44100.f)),
+           x4f2{LPF(X4F2, 44100.f), LPF(X2F2, 44100.f)} {
     fs = 44100.f;
     mode = NONE;
 }
@@ -107,6 +107,8 @@ void AA::reset() {
         break;
 
     case X4F2:
+        x4f2[0].reset();
+        x4f2[1].reset();
         break;
     }
 }
@@ -118,10 +120,14 @@ void AA::recompute(float fs) {
         x1f1 = LPF(X1F1, fs);
         x1f2[0] = LPF(X1F2, fs);
         x1f2[1] = LPF(X1F2, fs);
+
         x2f1 = LPF(X2F1, fs);
         x2f2[0] = LPF(X2F2, fs);
         x2f2[1] = LPF(X2F2, fs);
+
         x4f1 = LPF(X4F1, fs);
+        x4f2[0] = LPF(X4F2, fs);
+        x4f2[1] = LPF(X4F2, fs);
     }
 }
 
@@ -163,6 +169,17 @@ void AA::process(ANTIALIAS mode, const double in[4][16], double out[16], size_t 
         x4f1.process(in[3], out, channels);
         break;
 
+    case X4F2:
+        x4f2[0].process(in[0], intermediate, channels);
+        x4f2[1].process(intermediate, out, channels);
+        x4f2[0].process(in[1], intermediate, channels);
+        x4f2[1].process(intermediate, out, channels);
+        x4f2[0].process(in[2], intermediate, channels);
+        x4f2[1].process(intermediate, out, channels);
+        x4f2[0].process(in[3], intermediate, channels);
+        x4f2[1].process(intermediate, out, channels);
+        break;
+
     default:
         for (size_t i = 0; i < channels; i++) {
             out[i] = in[0][i];
@@ -185,6 +202,9 @@ IIR lookup(ANTIALIAS mode, float fs) {
         return coefficients(COEFFICIENTS_16kHz, 2 * fs);
 
     case X4F1:
+        return coefficients(COEFFICIENTS_16kHz, 4 * fs);
+
+    case X4F2:
         return coefficients(COEFFICIENTS_16kHz, 4 * fs);
 
     default:
