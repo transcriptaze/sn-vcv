@@ -1,4 +1,3 @@
-#include "filter.hpp"
 #include "plugin.hpp"
 #include "sn.hpp"
 

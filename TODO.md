@@ -1,29 +1,12 @@
 # TODO
 
+- [ ] Optimisation
+      - [ ] Baseline
+
 - [ ] [Antialiasing](https://github.com/transcriptaze/sn-vcv/issues/3)
       - [x] Context menu
       - [x] sn-vco
-            - [x] Use unfiltered VCO in sn message
-            - [x] _None_
-            - [x] 1X1F: 12.5kHz LPF
-            - [x] 1X2F: 2x16kHz LPF
-            - [x] 2X1F: 2x oversampling, 16kHz LPF
-            - [x] 2X2F: 2x oversampling, 2x16kHz LPF
-            - [x] 4X1F: 2x oversampling, 16kHz LPF
-            - [x] 4X2F: 2x oversampling, 2x16kHz LPF
-            - [x] AA if connected
       - [x] sn-vcox
-            - [x] Use unfiltered VCO in sn message
-            - [x] _None_
-            - [x] 1X1F
-            - [x] 1X2F
-            - [x] 2x1F
-            - [x] 2x2F
-            - [x] 4x1F
-            - [x] 4x2F
-            - [x] AA if connected
-            - [x] Multiple sn-vcox expanders
-
       - [ ] Anti-aliasing indicator
            - [ ] enable/disable
            - [ ] show option + aliasing
@@ -37,7 +20,7 @@
 - [x] Fix tags in plugin.json
 - [x] Initialise module in sn-vco-channels
 - [x] Invoke parent step() in sn-vc-channels
-- [ ] Benchmarks
+
 - [ ] Unit tests
 
 
@@ -52,17 +35,3 @@
 7. https://github.com/nullJaX/vcvrack-patchable-devices
 8. https://www.youtube.com/watch?v=yV52TMdGkng
 
-9. Antialiasing
-      - https://github.com/squinkylabs/Demo/blob/main/docs/aliasing2.md
-      - https://dsp.stackexchange.com/questions/91854/benefit-of-anti-aliasing-for-wideband-finite-time-duration-signals-prior-to-samp
-      - https://dsp.stackexchange.com/questions/15974/digital-anti-aliasing-filter-for-waveform-band-limiting/15975#15975
-      - https://dsp.stackexchange.com/questions/22793/does-msaa-make-sense-in-audio-1d-data-streams/22828#22828
-      - https://dsp.stackexchange.com/questions/9205/can-we-have-a-digital-anti-aliasing-filter/9239#9239
-      - https://dsp.stackexchange.com/questions/2608/is-there-such-a-thing-as-band-limited-non-linear-distortion/28787#28787
-      - https://dsp.stackexchange.com/questions/50716/are-oversampling-and-downsampling-the-same-thing/50725#50725
-      - https://observablehq.com/d/a51954c61a72e1ef
-      - http://jaggedplanet.com/iir/iir-explorer.asp
-      - https://docs.juliadsp.org/stable/filters/#DSP.Filters.PolynomialRatio
-      - https://github.com/JunoLab/Weave.jl
-
-10. https://www.researchgate.net/publication/333688079_Oversampling_for_Nonlinear_Waveshaping_Choosing_the_Right_Filters
