@@ -22,6 +22,9 @@ extern const std::vector<std::string> AUX_MODES; // AUX mode labels
 // ... anti-aliasing
 extern const std::vector<std::string> ANTIALIASING; // anti-aliasing option labels
 
+// ... DC blocking
+extern const std::vector<std::string> DCBLOCKING; // DC blocking option labels
+
 enum AUXMODE {
     OSC,
     SUM,
@@ -36,6 +39,11 @@ enum ANTIALIAS {
     X2F2,
     X4F1,
     X4F2,
+};
+
+enum DCBLOCK {
+    DISABLED,
+    ENABLED,
 };
 
 typedef struct VCO {

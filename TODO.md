@@ -15,6 +15,11 @@
       - (?) FFT/wavetable
 
 - [ ] DC blocking
+      - [ ] Context menu
+      - [ ] sn-vco
+      - [ ] sn-vcox
+      
+
 - [ ] Clamp input frequency
 - [x] Better blurbs in plugin.json
 - [x] Fix tags in plugin.json

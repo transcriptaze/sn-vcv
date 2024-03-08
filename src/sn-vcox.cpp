@@ -429,11 +429,11 @@ void sn_vcoxWidget::appendContextMenu(Menu *menu) {
                                              KRATES,
                                              &module->update.krate));
 
-    menu->addChild(createIndexPtrSubmenuItem("aux-mode",
+    menu->addChild(createIndexPtrSubmenuItem("AUX mode",
                                              AUX_MODES,
                                              &module->aux.mode));
 
-    menu->addChild(createIndexPtrSubmenuItem("aux-gain",
+    menu->addChild(createIndexPtrSubmenuItem("AUX gain",
                                              AUX_GAINS,
                                              &module->aux.gain));
 }

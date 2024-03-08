@@ -21,6 +21,12 @@ const std::vector<std::string> ANTIALIASING = {
     "4x oversampling, 2x 16kHz LPF",
 };
 
+// DC blocking menu options
+const std::vector<std::string> DCBLOCKING = {
+    "OFF",
+    "ON",
+};
+
 // SN
 void SN::recompute() {
     float εʼ = std::sqrt(1.0f - ε * ε);

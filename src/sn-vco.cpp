@@ -40,6 +40,9 @@ sn_vco::sn_vco() {
 
     // ... anti-aliasing
     antialias = NONE;
+
+    // ... DC blocking
+    dcblocking = ENABLED;
 }
 
 json_t *sn_vco::dataToJson() {
@@ -49,6 +52,7 @@ json_t *sn_vco::dataToJson() {
     json_object_set_new(root, "aux-mode", json_integer(aux.mode));
     json_object_set_new(root, "aux-gain", json_integer(aux.gain));
     json_object_set_new(root, "anti-alias", json_integer(antialias));
+    json_object_set_new(root, "dc-blocking", json_integer(dcblocking));
 
     return root;
 }
@@ -58,6 +62,7 @@ void sn_vco::dataFromJson(json_t *root) {
     json_t *aux_mode = json_object_get(root, "aux-mode");
     json_t *gain = json_object_get(root, "aux-gain");
     json_t *antialias = json_object_get(root, "anti-alias");
+    json_t *dcblocking = json_object_get(root, "dc-blocking");
 
     if (krate) {
         int v = json_integer_value(krate);
@@ -88,6 +93,16 @@ void sn_vco::dataFromJson(json_t *root) {
 
     if (antialias) {
         this->antialias = AA::int2mode(json_integer_value(antialias), this->antialias);
+    }
+
+    if (dcblocking) {
+        int v = json_integer_value(dcblocking);
+
+        if (v == 0) {
+            this->dcblocking = DISABLED;
+        } else if (v == 1) {
+            this->dcblocking = ENABLED;
+        }
     }
 }
 
@@ -472,17 +487,21 @@ void sn_vcoWidget::appendContextMenu(Menu *menu) {
                                              KRATES,
                                              &module->update.krate));
 
-    menu->addChild(createIndexPtrSubmenuItem("aux-mode",
+    menu->addChild(createIndexPtrSubmenuItem("AUX mode",
                                              AUX_MODES,
                                              &module->aux.mode));
 
-    menu->addChild(createIndexPtrSubmenuItem("aux-gain",
+    menu->addChild(createIndexPtrSubmenuItem("AUX gain",
                                              AUX_GAINS,
                                              &module->aux.gain));
 
-    menu->addChild(createIndexPtrSubmenuItem("anti-alias",
+    menu->addChild(createIndexPtrSubmenuItem("Antialias",
                                              ANTIALIASING,
                                              &module->antialias));
+
+    menu->addChild(createIndexPtrSubmenuItem("DC blocking",
+                                             DCBLOCKING,
+                                             &module->dcblocking));
 }
 
 Model *model_sn_vco = createModel<sn_vco, sn_vcoWidget>("sn-vco");
