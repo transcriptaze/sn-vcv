@@ -42,7 +42,7 @@ sn_vco::sn_vco() {
     antialias = NONE;
 
     // ... DC blocking
-    dcblocking = ENABLED;
+    dcblocking = DCBLOCK_ON;
 }
 
 json_t *sn_vco::dataToJson() {
@@ -96,13 +96,7 @@ void sn_vco::dataFromJson(json_t *root) {
     }
 
     if (dcblocking) {
-        int v = json_integer_value(dcblocking);
-
-        if (v == 0) {
-            this->dcblocking = DISABLED;
-        } else if (v == 1) {
-            this->dcblocking = ENABLED;
-        }
+        this->dcblocking = DCF::int2mode(json_integer_value(dcblocking), this->dcblocking);
     }
 }
 
@@ -222,12 +216,8 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
     if (connected) {
         double buffer[16];
 
-        if (dcblocking == ENABLED) {
-            AA.process(antialias, in, buffer, channels);
-            dcf.process(buffer, out, channels);
-        } else {
-            AA.process(antialias, in, out, channels);
-        }
+        AA.process(antialias, in, buffer, channels);
+        dcf.process(dcblocking, buffer, out, channels);
 
         for (size_t ch = 0; ch < channels; ch++) {
             double υ = out[ch];

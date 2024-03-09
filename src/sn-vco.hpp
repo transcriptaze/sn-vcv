@@ -96,7 +96,7 @@ struct sn_vco : Module {
     struct AA AA;
 
     // ... DC  blocking
-    DCBLOCK dcblocking = ENABLED; // ... for context submenu
+    DCBLOCK dcblocking = DCBLOCK_ON; // ... for context submenu
     struct DCF dcf;
 
     // ... state update

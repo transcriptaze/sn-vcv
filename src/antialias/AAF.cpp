@@ -3,8 +3,6 @@
 
 #include "AAF.hpp"
 
-IIR lookup(ANTIALIAS mode, float fs);
-
 /* Anti-aliasing filter */
 LPF::LPF(ANTIALIAS mode, float fs) {
     const IIR iir = lookup(mode, fs);
@@ -30,45 +28,32 @@ void LPF::process(const double *in, double *out, size_t channels) {
     }
 }
 
-/* Anti-aliasing processor */
-int AA::oversampling(ANTIALIAS mode) {
+IIR LPF::lookup(ANTIALIAS mode, float fs) {
     switch (mode) {
-    case NONE:
     case X1F1:
+        return coefficients(COEFFICIENTS_12500Hz, fs);
+
     case X1F2:
-        return 1;
+        return coefficients(COEFFICIENTS_16kHz, fs);
 
     case X2F1:
+        return coefficients(COEFFICIENTS_16kHz, 2 * fs);
+
     case X2F2:
-        return 2;
+        return coefficients(COEFFICIENTS_16kHz, 2 * fs);
 
     case X4F1:
-    case X4F2:
-        return 4;
-    }
-}
+        return coefficients(COEFFICIENTS_16kHz, 4 * fs);
 
-ANTIALIAS AA::int2mode(int v, ANTIALIAS defval) {
-    switch (v) {
-    case NONE:
-        return NONE;
-    case X1F1:
-        return X1F1;
-    case X1F2:
-        return X1F2;
-    case X2F1:
-        return X2F1;
-    case X2F2:
-        return X2F2;
-    case X4F1:
-        return X4F1;
     case X4F2:
-        return X4F2;
+        return coefficients(COEFFICIENTS_16kHz, 4 * fs);
+
     default:
-        return defval;
+        return coefficients(COEFFICIENTS_12500Hz, fs);
     }
 }
 
+/* Anti-aliasing processor */
 AA::AA() : x1f1(LPF(X1F1, 44100.f)),
            x1f2{LPF(X1F2, 44100.f), LPF(X1F2, 44100.f)},
            x2f1(LPF(X2F1, 44100.f)),
@@ -187,27 +172,40 @@ void AA::process(ANTIALIAS mode, const double in[4][16], double out[16], size_t 
     }
 }
 
-IIR lookup(ANTIALIAS mode, float fs) {
+int AA::oversampling(ANTIALIAS mode) {
     switch (mode) {
+    case NONE:
     case X1F1:
-        return coefficients(COEFFICIENTS_12500Hz, fs);
-
     case X1F2:
-        return coefficients(COEFFICIENTS_16kHz, fs);
+        return 1;
 
     case X2F1:
-        return coefficients(COEFFICIENTS_16kHz, 2 * fs);
-
     case X2F2:
-        return coefficients(COEFFICIENTS_16kHz, 2 * fs);
+        return 2;
 
     case X4F1:
-        return coefficients(COEFFICIENTS_16kHz, 4 * fs);
-
     case X4F2:
-        return coefficients(COEFFICIENTS_16kHz, 4 * fs);
+        return 4;
+    }
+}
 
+ANTIALIAS AA::int2mode(int v, ANTIALIAS defval) {
+    switch (v) {
+    case NONE:
+        return NONE;
+    case X1F1:
+        return X1F1;
+    case X1F2:
+        return X1F2;
+    case X2F1:
+        return X2F1;
+    case X2F2:
+        return X2F2;
+    case X4F1:
+        return X4F1;
+    case X4F2:
+        return X4F2;
     default:
-        return coefficients(COEFFICIENTS_12500Hz, fs);
+        return defval;
     }
 }

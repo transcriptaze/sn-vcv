@@ -18,9 +18,8 @@
       - [x] Context menu
       - [x] sn-vco
       - [ ] sn-vcox
-      - [x] fs => β and G
-      - (?) softstart
-            - maybe keep internal x,y when not blocking
+      - [x] softstart
+      - [x] fs => β, G and κ
 
 - [ ] Clamp input frequency
 - [x] Better blurbs in plugin.json

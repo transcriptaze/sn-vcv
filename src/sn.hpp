@@ -42,8 +42,8 @@ enum ANTIALIAS {
 };
 
 enum DCBLOCK {
-    DISABLED,
-    ENABLED,
+    DCBLOCK_OFF,
+    DCBLOCK_ON,
 };
 
 typedef struct VCO {
