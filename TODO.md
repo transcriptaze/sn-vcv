@@ -15,10 +15,12 @@
       - (?) FFT/wavetable
 
 - [ ] DC blocking
-      - [ ] Context menu
-      - [ ] sn-vco
+      - [x] Context menu
+      - [x] sn-vco
       - [ ] sn-vcox
-      
+      - [x] fs => β and G
+      - (?) softstart
+            - maybe keep internal x,y when not blocking
 
 - [ ] Clamp input frequency
 - [x] Better blurbs in plugin.json

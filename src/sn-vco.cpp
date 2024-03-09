@@ -220,7 +220,14 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
     }
 
     if (connected) {
-        AA.process(antialias, in, out, channels);
+        double buffer[16];
+
+        if (dcblocking == ENABLED) {
+            AA.process(antialias, in, buffer, channels);
+            dcf.process(buffer, out, channels);
+        } else {
+            AA.process(antialias, in, out, channels);
+        }
 
         for (size_t ch = 0; ch < channels; ch++) {
             double υ = out[ch];
@@ -284,6 +291,7 @@ void sn_vco::processAUX(const ProcessArgs &args, bool expanded) {
 void sn_vco::recompute(const ProcessArgs &args) {
     // ... antialiasing
     AA.recompute(args.sampleRate);
+    dcf.recompute(args.sampleRate);
 
     // ... param values
     float e = params[ECCENTRICITY_PARAM].getValue();

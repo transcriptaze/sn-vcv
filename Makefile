@@ -9,8 +9,8 @@ CXXFLAGS +=
 
 LDFLAGS +=
 
-SOURCES  += $(wildcard src/*.cpp src/antialias/*.cpp)
-INCLUDES += $(wildcard src/*.hpp src/antialias/*.hpp)
+SOURCES  += $(wildcard src/*.cpp src/antialias/*.cpp src/dc-blocking/*.cpp)
+INCLUDES += $(wildcard src/*.hpp src/antialias/*.hpp src/dc-blocking/*.hpp)
 
 DISTRIBUTABLES += res
 DISTRIBUTABLES += $(wildcard LICENSE*)

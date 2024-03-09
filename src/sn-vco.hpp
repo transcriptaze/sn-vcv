@@ -2,6 +2,7 @@
 #include "sn.hpp"
 
 #include "antialias/AAF.hpp"
+#include "dc-blocking/DCF.hpp"
 
 struct sn_vco : Module {
     static const int CHANNELS;
@@ -96,6 +97,7 @@ struct sn_vco : Module {
 
     // ... DC  blocking
     DCBLOCK dcblocking = ENABLED; // ... for context submenu
+    struct DCF dcf;
 
     // ... state update
     struct {
