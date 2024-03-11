@@ -170,6 +170,7 @@ typedef struct sn_vco_message {
     bool linked = false;
     int channels = 1;
     ANTIALIAS antialias;
+    DCBLOCK dcblocking;
 
     struct _VCO {
         float velocity;
@@ -202,10 +203,11 @@ typedef struct sn_vco_message {
         .out = 0.f,
     };
 
-    void set(bool linked, int channels, ANTIALIAS antialias, const struct VCO vco[], const struct AUX aux) {
+    void set(bool linked, int channels, ANTIALIAS antialias, DCBLOCK dcblocking, const struct VCO vco[], const struct AUX aux) {
         this->linked = linked;
         this->channels = channels;
         this->antialias = antialias;
+        this->dcblocking = dcblocking;
 
         for (int i = 0; i < channels; i++) {
             this->vco[i].velocity = vco[i].velocity;

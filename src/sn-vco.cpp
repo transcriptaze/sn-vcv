@@ -152,12 +152,12 @@ void sn_vco::process(const ProcessArgs &args) {
         sn_vco_message *msg;
 
         if ((msg = expanders.left.producer()) != NULL) {
-            msg->set(true, channels, antialias, vco, aux);
+            msg->set(true, channels, antialias, dcblocking, vco, aux);
             expanders.left.flip();
         }
 
         if ((msg = expanders.right.producer()) != NULL) {
-            msg->set(true, channels, antialias, vco, aux);
+            msg->set(true, channels, antialias, dcblocking, vco, aux);
             expanders.right.flip();
         }
     }
@@ -171,7 +171,6 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
     double δ[4];
     double phase[4][16];
     double in[4][16];
-    double out[16];
 
     for (int i = 0; i < oversampling; i++) {
         δ[i] = (i + 1.0) * dt / double(oversampling);
@@ -215,6 +214,7 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
 
     if (connected) {
         double buffer[16];
+        double out[16];
 
         AA.process(antialias, in, buffer, channels);
         dcf.process(dcblocking, buffer, out, channels);

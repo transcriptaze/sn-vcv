@@ -2,6 +2,7 @@
 #include "sn.hpp"
 
 #include "antialias/AAF.hpp"
+#include "dc-blocking/DCF.hpp"
 
 struct sn_vcox : Module {
     static const int CHANNELS;
@@ -52,7 +53,7 @@ struct sn_vcox : Module {
     void process(const ProcessArgs &args) override;
 
     void recompute(const ProcessArgs &args);
-    void processVCO(const ProcessArgs &args, size_t, ANTIALIAS, bool);
+    void processVCO(const ProcessArgs &args, size_t, ANTIALIAS, DCBLOCK, bool);
     void processAUX(const ProcessArgs &args, bool);
 
     int krate();
@@ -115,6 +116,12 @@ struct sn_vcox : Module {
         AA out;
         AA sum;
     } AA;
+
+    // ... DC  blocking
+    struct {
+        DCF out;
+        DCF sum;
+    } dcf;
 };
 
 struct sn_vcoxWidget : ModuleWidget {

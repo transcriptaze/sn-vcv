@@ -14,10 +14,10 @@
       - (?) PI(d)
       - (?) FFT/wavetable
 
-- [ ] DC blocking
+- [x] DC blocking
       - [x] Context menu
       - [x] sn-vco
-      - [ ] sn-vcox
+      - [x] sn-vcox
       - [x] softstart
       - [x] fs => β, G and κ
 

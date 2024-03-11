@@ -114,6 +114,7 @@ void sn_vcox::onExpanderChange(const ExpanderChangeEvent &e) {
 void sn_vcox::process(const ProcessArgs &args) {
     int channels = CHANNELS;
     ANTIALIAS antialias = NONE;
+    DCBLOCK dcblocking = DCBLOCK_OFF;
     bool expanded = expanders.left.module != NULL || expanders.right.module != NULL;
 
     // ... expanders
@@ -180,6 +181,7 @@ void sn_vcox::process(const ProcessArgs &args) {
     if (msg) {
         channels = msg->channels;
         antialias = msg->antialias;
+        dcblocking = msg->dcblocking;
 
         for (int ch = 0; ch < channels; ch++) {
             vco[ch].velocity = msg->vco[ch].velocity;
@@ -204,7 +206,7 @@ void sn_vcox::process(const ProcessArgs &args) {
         aux.out.sum = 0.0f;
     }
 
-    processVCO(args, channels, antialias, expanded);
+    processVCO(args, channels, antialias, dcblocking, expanded);
     processAUX(args, expanded);
 
     // ... update expanders
@@ -213,19 +215,19 @@ void sn_vcox::process(const ProcessArgs &args) {
 
         if ((msg = expanders.left.producer()) != NULL) {
             bool linked = msgR != NULL && msgR->linked;
-            msg->set(linked, channels, antialias, vco, aux);
+            msg->set(linked, channels, antialias, dcblocking, vco, aux);
             expanders.left.flip();
         }
 
         if ((msg = expanders.right.producer()) != NULL) {
             bool linked = msgL != NULL && msgL->linked;
-            msg->set(linked, channels, antialias, vco, aux);
+            msg->set(linked, channels, antialias, dcblocking, vco, aux);
             expanders.right.flip();
         }
     }
 }
 
-void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS antialias, bool expanded) {
+void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS antialias, DCBLOCK dcblocking, bool expanded) {
     bool connected = outputs[VCO_OUTPUT].isConnected() | outputs[VCO_SUM_OUTPUT].isConnected();
     float gain = params[ATT_PARAM].getValue();
     int oversampling = AA::oversampling(antialias);
@@ -253,9 +255,11 @@ void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS ant
     }
 
     if (outputs[VCO_OUTPUT].isConnected()) {
+        double buffer[16];
         double out[16];
 
-        AA.out.process(antialias, in, out, channels);
+        AA.out.process(antialias, in, buffer, channels);
+        dcf.out.process(dcblocking, buffer, out, channels);
 
         for (size_t ch = 0; ch < channels; ch++) {
             outputs[VCO_OUTPUT].setVoltage(5.f * vco[ch].velocity * out[ch], ch);
@@ -265,9 +269,11 @@ void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS ant
     }
 
     if (outputs[VCO_SUM_OUTPUT].isConnected()) {
+        double buffer[16];
         double out[16];
 
         AA.sum.process(antialias, sum, out, channels);
+        dcf.sum.process(dcblocking, buffer, out, channels);
 
         for (size_t ch = 0; ch < channels; ch++) {
             outputs[VCO_SUM_OUTPUT].setVoltage(5.f * vco[ch].velocity * gain * out[ch], ch);
@@ -315,6 +321,10 @@ void sn_vcox::recompute(const ProcessArgs &args) {
     // ... antialiasing
     AA.out.recompute(args.sampleRate);
     AA.sum.recompute(args.sampleRate);
+
+    // ... DC blocking
+    dcf.out.recompute(args.sampleRate);
+    dcf.sum.recompute(args.sampleRate);
 
     // ... param values
     float e = params[ECCENTRICITY_PARAM].getValue();
