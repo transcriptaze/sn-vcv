@@ -2,6 +2,10 @@
 
 - [ ] Optimisation
       - [ ] Baseline
+      - https://stackoverflow.com/questions/11445619/profiling-c-on-mac-os-x
+      - https://stackoverflow.com/questions/3764978/why-hypot-function-is-so-slow
+      - https://mattkretz.github.io/2019/01/18/optimizing-hypot-for-simd.html
+
 
 - [ ] [Antialiasing](https://github.com/transcriptaze/sn-vcv/issues/3)
       - [x] Context menu
@@ -14,14 +18,9 @@
       - (?) PI(d)
       - (?) FFT/wavetable
 
-- [x] DC blocking
-      - [x] Context menu
-      - [x] sn-vco
-      - [x] sn-vcox
-      - [x] softstart
-      - [x] fs => β, G and κ
 
-- [ ] Clamp input frequency
+- [x] Clamp input frequency
+- [x] DC blocking
 - [x] Better blurbs in plugin.json
 - [x] Fix tags in plugin.json
 - [x] Initialise module in sn-vco-channels

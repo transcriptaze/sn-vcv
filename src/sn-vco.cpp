@@ -177,7 +177,7 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
     }
 
     for (size_t ch = 0; ch < channels; ch++) {
-        float pitch = inputs[PITCH_INPUT].getPolyVoltage(ch);
+        float pitch = clamp(inputs[PITCH_INPUT].getPolyVoltage(ch), -3.f,5.f); // C1 to C8
         float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
 
         for (int i = 0; i < oversampling; i++) {
