@@ -8,6 +8,9 @@ struct sn_vco : Module {
     static const int CHANNELS;
     static const float VELOCITY;
 
+    static const size_t FFT_SAMPLES;
+    static const float FFT_FREQUENCY;
+
     enum ParamId {
         ECCENTRICITY_PARAM,
         SENSITIVITY_PARAM,
@@ -56,6 +59,7 @@ struct sn_vco : Module {
     void recompute(const ProcessArgs &args, size_t);
     void processVCO(const ProcessArgs &args, size_t, bool);
     void processAUX(const ProcessArgs &args, bool);
+    void processFFT(const ProcessArgs &args, size_t);
 
     int channels();
     float velocity(int);
@@ -113,6 +117,16 @@ struct sn_vco : Module {
     // ... anti-aliasing
     ANTIALIAS antialias = NONE; // ... for context submenu
     struct AA AA;
+
+    struct {
+        unsigned ix;
+        float phase;
+        double buffer[2048];
+    } fft = {
+        .ix = 0,
+        .phase = 0.f,
+        .buffer = {0.0},
+    };
 
     // ... DC  blocking
     DCBLOCK dcblocking = DCBLOCK_ON; // ... for context submenu

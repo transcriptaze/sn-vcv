@@ -1,8 +1,12 @@
 #include "sn-vco.hpp"
 #include "sn-vcox.hpp"
 
+#include "antialias/dft.hpp"
+
 const int sn_vco::CHANNELS = 1;
 const float sn_vco::VELOCITY = 1.0f;
+const size_t sn_vco::FFT_SAMPLES = 2048;
+const float sn_vco::FFT_FREQUENCY = 16.0f;
 
 sn_vco::sn_vco() {
     // ... params
@@ -139,20 +143,19 @@ void sn_vco::process(const ProcessArgs &args) {
     recompute(args, channels);
     processVCO(args, channels, expanded);
     processAUX(args, expanded);
+    processFFT(args, channels);
 
     // ... update expanders
-    {
-        sn_vco_message *msg;
+    sn_vco_message *msg;
 
-        if ((msg = expanders.left.producer()) != NULL) {
-            msg->set(true, channels, antialias, dcblocking, vco, aux);
-            expanders.left.flip();
-        }
+    if ((msg = expanders.left.producer()) != NULL) {
+        msg->set(true, channels, antialias, dcblocking, vco, aux);
+        expanders.left.flip();
+    }
 
-        if ((msg = expanders.right.producer()) != NULL) {
-            msg->set(true, channels, antialias, dcblocking, vco, aux);
-            expanders.right.flip();
-        }
+    if ((msg = expanders.right.producer()) != NULL) {
+        msg->set(true, channels, antialias, dcblocking, vco, aux);
+        expanders.right.flip();
     }
 }
 
@@ -268,6 +271,42 @@ void sn_vco::processAUX(const ProcessArgs &args, bool expanded) {
             outputs[AUX_OUTPUT].setChannels(1);
         }
     }
+}
+
+void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
+
+    if (fft.ix < FFT_SAMPLES) {
+        fft.phase += sn_vco::FFT_FREQUENCY / FFT_SAMPLES;
+
+        while (fft.phase >= 1.f) {
+            fft.phase -= 1.f;
+        }
+
+        // fft.buffer[fft.ix] = sin(2.0 * M_PI * fft.phase);
+        fft.buffer[fft.ix] = sn.A * sn.υ(2.0 * M_PI * fft.phase);
+    }
+
+    if (fft.ix == FFT_SAMPLES) {
+        double real[2048];
+        double imag[2048] = {0.0};
+
+        memmove(real, fft.buffer, 2048 * sizeof(double));
+        Fft_transformRadix2(real, imag, 2048);
+
+        // FILE *f = fopen("/tmp/sn-vco-fft.tsv", "wt");
+        // const double fs = (double)(FFT_SAMPLES) / FFT_FREQUENCY;
+        //
+        // fprintf(f, "i\tsn.υ\tf\tFFT\n");
+        //
+        // for (size_t i = 0; i < FFT_SAMPLES; i++) {
+        //     double freq = i * fs / FFT_SAMPLES;
+        //     fprintf(f, "%-4lu\t%.5f\t%.3f\t%12.5f\n", i, fft.buffer[i], freq, real[i]);
+        // }
+        //
+        // fclose(f);
+    }
+
+    fft.ix++;
 }
 
 void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
