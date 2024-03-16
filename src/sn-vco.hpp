@@ -53,7 +53,7 @@ struct sn_vco : Module {
     void onExpanderChange(const ExpanderChangeEvent &) override;
     void process(const ProcessArgs &args) override;
 
-    void recompute(const ProcessArgs &args);
+    void recompute(const ProcessArgs &args, size_t);
     void processVCO(const ProcessArgs &args, size_t, bool);
     void processAUX(const ProcessArgs &args, bool);
 
@@ -68,6 +68,25 @@ struct sn_vco : Module {
         .gain = 0,
         .phase = 0.f,
         .out = {.osc = 0.f, .sum = 0.f},
+    };
+
+    float frequency[16] = {
+        dsp::FREQ_C4,
+        dsp::FREQ_C4,
+        dsp::FREQ_C4,
+        dsp::FREQ_C4,
+        dsp::FREQ_C4,
+        dsp::FREQ_C4,
+        dsp::FREQ_C4,
+        dsp::FREQ_C4,
+        dsp::FREQ_C4,
+        dsp::FREQ_C4,
+        dsp::FREQ_C4,
+        dsp::FREQ_C4,
+        dsp::FREQ_C4,
+        dsp::FREQ_C4,
+        dsp::FREQ_C4,
+        dsp::FREQ_C4,
     };
 
     struct SN sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);

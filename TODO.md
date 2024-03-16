@@ -11,14 +11,16 @@
       - [x] Context menu
       - [x] sn-vco
       - [x] sn-vcox
-      - [ ] Anti-aliasing indicator
-           - [ ] enable/disable
-           - [ ] show option + aliasing
       - [ ] ALIASING.md
       - (?) PI(d)
       - (?) FFT/wavetable
 
+- [ ] Anti-aliasing indicator
+      - [ ] enable/disable
+      - [ ] show option + aliasing
 
+
+- [ ] 1/32 k-rate
 - [x] Clamp input frequency
 - [x] DC blocking
 - [x] Better blurbs in plugin.json

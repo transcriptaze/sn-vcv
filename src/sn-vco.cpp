@@ -135,15 +135,8 @@ void sn_vco::process(const ProcessArgs &args) {
     lights[XLL_LIGHT].setBrightnessSmooth(xll ? 1.0 : 0.f, args.sampleTime);
     lights[XRR_LIGHT].setBrightnessSmooth(xrr ? 1.0 : 0.f, args.sampleTime);
 
-    // ... get params and recompute transform matrix
-    update.count--;
-
-    if (update.count <= 0) {
-        recompute(args);
-        update.count = KRATE[update.krate];
-    }
-
     // ... generate
+    recompute(args, channels);
     processVCO(args, channels, expanded);
     processAUX(args, expanded);
 
@@ -177,11 +170,10 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
     }
 
     for (size_t ch = 0; ch < channels; ch++) {
-        float pitch = clamp(inputs[PITCH_INPUT].getPolyVoltage(ch), -3.f, 5.f); // C1 to C8
-        float frequency = dsp::FREQ_C4 * std::pow(2.f, pitch);
+        float freq = frequency[ch];
 
         for (int i = 0; i < oversampling; i++) {
-            phase[i][ch] = vco[ch].α + frequency * δ[i];
+            phase[i][ch] = vco[ch].α + freq * δ[i];
             while (phase[i][ch] >= 1.0) {
                 phase[i][ch] -= 1.0;
             }
@@ -278,7 +270,22 @@ void sn_vco::processAUX(const ProcessArgs &args, bool expanded) {
     }
 }
 
-void sn_vco::recompute(const ProcessArgs &args) {
+void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
+    // ... update parameters?
+    update.count--;
+    if (update.count > 0) {
+        return;
+    }
+
+    update.count = KRATE[update.krate];
+
+    // ... frequency
+    for (size_t ch = 0; ch < channels; ch++) {
+        float pitch = clamp(inputs[PITCH_INPUT].getPolyVoltage(ch), -3.f, 5.f); // C1 to C8
+
+        frequency[ch] = dsp::FREQ_C4 * std::pow(2.f, pitch);
+    }
+
     // ... antialiasing
     AA.recompute(args.sampleRate);
     dcf.recompute(args.sampleRate);

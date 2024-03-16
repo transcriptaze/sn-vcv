@@ -169,15 +169,9 @@ void sn_vcox::process(const ProcessArgs &args) {
     lights[XRL_LIGHT].setBrightnessSmooth(xrl ? 1.f : 0.f, args.sampleTime);
     lights[XRR_LIGHT].setBrightnessSmooth(xrr ? 1.f : 0.f, args.sampleTime);
 
-    // ... get params and recompute transform matrix
-    update.count--;
-
-    if (update.count <= 0) {
-        recompute(args);
-        update.count = KRATE[update.krate];
-    }
-
     // ... generate
+    recompute(args);
+
     if (msg) {
         channels = msg->channels;
         antialias = msg->antialias;
@@ -318,6 +312,13 @@ void sn_vcox::processAUX(const ProcessArgs &args, bool expanded) {
 }
 
 void sn_vcox::recompute(const ProcessArgs &args) {
+    update.count--;
+    if (update.count > 0) {
+        return;
+    }
+
+    update.count = KRATE[update.krate];
+
     // ... antialiasing
     AA.out.recompute(args.sampleRate);
     AA.sum.recompute(args.sampleRate);
