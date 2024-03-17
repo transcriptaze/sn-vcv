@@ -23,8 +23,10 @@ const std::vector<std::string> ANTIALIASING = {
 
 // DC blocking menu options
 const std::vector<std::string> DCBLOCKING = {
-    "OFF",
-    "ON",
+    "Off",
+    "Slow",
+    "Medium",
+    "Fast",
 };
 
 // SN

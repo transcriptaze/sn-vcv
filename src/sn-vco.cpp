@@ -46,7 +46,7 @@ sn_vco::sn_vco() {
     antialias = NONE;
 
     // ... DC blocking
-    dcblocking = DCBLOCK_ON;
+    dcblocking = DCBLOCK_NONE;
 }
 
 json_t *sn_vco::dataToJson() {
@@ -212,7 +212,7 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
         double out[16];
 
         AA.process(antialias, in, buffer, channels);
-        dcf.process(dcblocking, buffer, out, channels);
+        dcf.process(buffer, out, channels);
 
         for (size_t ch = 0; ch < channels; ch++) {
             double υ = out[ch];
@@ -339,7 +339,7 @@ void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
 
     // ... antialiasing
     AA.recompute(args.sampleRate);
-    dcf.recompute(args.sampleRate);
+    dcf.recompute(dcblocking, args.sampleRate);
 
     // ... param values
     float e = params[ECCENTRICITY_PARAM].getValue();

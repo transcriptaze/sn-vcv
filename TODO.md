@@ -2,6 +2,7 @@
 
 - [ ] Optimisation
       - [ ] Baseline
+      - https://github.com/grafana/pyroscope
       - https://stackoverflow.com/questions/11445619/profiling-c-on-mac-os-x
       - https://stackoverflow.com/questions/3764978/why-hypot-function-is-so-slow
       - https://mattkretz.github.io/2019/01/18/optimizing-hypot-for-simd.html
@@ -12,16 +13,21 @@
       - [x] sn-vco
       - [x] sn-vcox
       - [ ] ALIASING.md
-      - (?) PI(d)
+      - (?) PID
       - (?) FFT/wavetable
 
 - [ ] Anti-aliasing indicator
       - [ ] enable/disable
       - [ ] show option + aliasing
 
-- [ ] Set k-rate in ms
-- [x] Clamp input frequency
 - [x] DC blocking
+      - [x] slow   0.999
+      - [x] medium 0.995
+      - [x] fast   0.991
+
+- [ ] Set k-rate in ms
+
+- [x] Clamp input frequency
 - [x] Better blurbs in plugin.json
 - [x] Fix tags in plugin.json
 - [x] Initialise module in sn-vco-channels

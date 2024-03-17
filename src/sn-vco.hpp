@@ -129,8 +129,8 @@ struct sn_vco : Module {
     };
 
     // ... DC  blocking
-    DCBLOCK dcblocking = DCBLOCK_ON; // ... for context submenu
-    struct DCF dcf;
+    DCBLOCK dcblocking = DCBLOCK_NONE; // ... for context submenu
+    struct DCF dcf = DCF(DCBLOCK_NONE);
 
     // ... state update
     struct {

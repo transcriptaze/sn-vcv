@@ -6,12 +6,13 @@
 struct DCF {
     static DCBLOCK int2mode(int v, DCBLOCK defval);
 
-    DCF();
-    DCF(float fs);
+    DCF(DCBLOCK block);
+    DCF(DCBLOCK block, float fs);
 
-    void recompute(float fs);
-    void process(DCBLOCK block, const double *in, double *out, size_t channels);
+    void recompute(DCBLOCK block, float fs);
+    void process(const double *in, double *out, size_t channels);
 
+    DCBLOCK block;
     float fs;
     double κ = 0.001;
     double α = 1.0;

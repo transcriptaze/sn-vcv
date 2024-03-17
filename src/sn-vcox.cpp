@@ -114,7 +114,7 @@ void sn_vcox::onExpanderChange(const ExpanderChangeEvent &e) {
 void sn_vcox::process(const ProcessArgs &args) {
     int channels = CHANNELS;
     ANTIALIAS antialias = NONE;
-    DCBLOCK dcblocking = DCBLOCK_OFF;
+    DCBLOCK dcblocking = DCBLOCK_NONE;
     bool expanded = expanders.left.module != NULL || expanders.right.module != NULL;
 
     // ... expanders
@@ -170,13 +170,15 @@ void sn_vcox::process(const ProcessArgs &args) {
     lights[XRR_LIGHT].setBrightnessSmooth(xrr ? 1.f : 0.f, args.sampleTime);
 
     // ... generate
-    recompute(args);
-
     if (msg) {
         channels = msg->channels;
         antialias = msg->antialias;
         dcblocking = msg->dcblocking;
+    }
 
+    recompute(args, dcblocking);
+
+    if (msg) {
         for (int ch = 0; ch < channels; ch++) {
             vco[ch].velocity = msg->vco[ch].velocity;
 
@@ -253,7 +255,7 @@ void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS ant
         double out[16];
 
         AA.out.process(antialias, in, buffer, channels);
-        dcf.out.process(dcblocking, buffer, out, channels);
+        dcf.out.process(buffer, out, channels);
 
         for (size_t ch = 0; ch < channels; ch++) {
             outputs[VCO_OUTPUT].setVoltage(5.f * vco[ch].velocity * out[ch], ch);
@@ -267,7 +269,7 @@ void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS ant
         double out[16];
 
         AA.sum.process(antialias, sum, out, channels);
-        dcf.sum.process(dcblocking, buffer, out, channels);
+        dcf.sum.process(buffer, out, channels);
 
         for (size_t ch = 0; ch < channels; ch++) {
             outputs[VCO_SUM_OUTPUT].setVoltage(5.f * vco[ch].velocity * gain * out[ch], ch);
@@ -311,7 +313,7 @@ void sn_vcox::processAUX(const ProcessArgs &args, bool expanded) {
     }
 }
 
-void sn_vcox::recompute(const ProcessArgs &args) {
+void sn_vcox::recompute(const ProcessArgs &args, DCBLOCK dcblocking) {
     update.count--;
     if (update.count > 0) {
         return;
@@ -324,8 +326,8 @@ void sn_vcox::recompute(const ProcessArgs &args) {
     AA.sum.recompute(args.sampleRate);
 
     // ... DC blocking
-    dcf.out.recompute(args.sampleRate);
-    dcf.sum.recompute(args.sampleRate);
+    dcf.out.recompute(dcblocking, args.sampleRate);
+    dcf.sum.recompute(dcblocking, args.sampleRate);
 
     // ... param values
     float e = params[ECCENTRICITY_PARAM].getValue();

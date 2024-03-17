@@ -52,7 +52,7 @@ struct sn_vcox : Module {
     void onExpanderChange(const ExpanderChangeEvent &) override;
     void process(const ProcessArgs &args) override;
 
-    void recompute(const ProcessArgs &args);
+    void recompute(const ProcessArgs &args, DCBLOCK dcblocking);
     void processVCO(const ProcessArgs &args, size_t, ANTIALIAS, DCBLOCK, bool);
     void processAUX(const ProcessArgs &args, bool);
 
@@ -121,7 +121,10 @@ struct sn_vcox : Module {
     struct {
         DCF out;
         DCF sum;
-    } dcf;
+    } dcf = {
+        .out = DCF(DCBLOCK_NONE),
+        .sum = DCF(DCBLOCK_NONE),
+    };
 };
 
 struct sn_vcoxWidget : ModuleWidget {
