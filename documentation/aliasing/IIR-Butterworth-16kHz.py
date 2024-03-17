@@ -13,8 +13,8 @@ N = 4  # order of filter
 rates = set()
 for fs in FS:
     rates.add(fs)
-    rates.add(fs*2)
-    rates.add(fs*4)
+    rates.add(fs * 2)
+    rates.add(fs * 4)
 
 print('const std::map<int, IIR> COEFFICIENTS_16kHz = {')
 

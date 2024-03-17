@@ -19,15 +19,14 @@ plt.semilogx(w, 20 * np.log10(abs(h)))
 plt.title('4th order 12.5kHz Butterworth LPF (44.1kHz)')
 plt.xlabel('Frequency [Hz]')
 plt.ylabel('Amplitude [dB]')
-plt.xlim(left=1,right=44100)
+plt.xlim(left=1, right=44100)
 plt.ylim(top=10, bottom=-100)
 plt.margins(0, 0.1)
 plt.grid(which='both', axis='both')
 plt.show()
 
-
 # 1x oversampling, 16kHz 4th order Butterworth LPF
-N = 4       # order of filter
+N = 4  # order of filter
 f0 = 16000  # cutoff frequency (Hz)
 fs = 44100  # sampling frequency (Hz)
 
@@ -39,38 +38,36 @@ plt.semilogx(w, 20 * np.log10(abs(h)))
 plt.title('4th order 16kHz Butterworth LPF (44.1kHz)')
 plt.xlabel('Frequency [Hz]')
 plt.ylabel('Amplitude [dB]')
-plt.xlim(left=1,right=44100)
+plt.xlim(left=1, right=44100)
 plt.ylim(top=10, bottom=-100)
 plt.margins(0, 0.1)
 plt.grid(which='both', axis='both')
 plt.show()
 
-
 # 1x oversampling, 2x16kHz 4th order Butterworth LPF
-N = 4       # order of filter
+N = 4  # order of filter
 f0 = 16000  # cutoff frequency (Hz)
 fs = 44100  # sampling frequency (Hz)
 
 b, a = signal.butter(N, f0, 'lowpass', analog=False, fs=fs)
 w, h = signal.freqz(b, a, fs=fs, whole=True)
-h = h*h
+h = h * h
 
 plt.figure('2x16kHz')
 plt.semilogx(w, 20 * np.log10(abs(h)))
 plt.title('2x4th order 16kHz Butterworth LPF (44.1kHz)')
 plt.xlabel('Frequency [Hz]')
 plt.ylabel('Amplitude [dB]')
-plt.xlim(left=1,right=44100)
+plt.xlim(left=1, right=44100)
 plt.ylim(top=10, bottom=-100)
 plt.margins(0, 0.1)
 plt.grid(which='both', axis='both')
 plt.show()
 
-
 # 2x oversampling, 16kHz 4th order Butterworth LPF
-N = 4       # order of filter
+N = 4  # order of filter
 f0 = 16000  # cutoff frequency (Hz)
-fs = 2*44100  # sampling frequency (Hz)
+fs = 2 * 44100  # sampling frequency (Hz)
 
 b, a = signal.butter(N, f0, 'lowpass', analog=False, fs=fs)
 w, h = signal.freqz(b, a, fs=fs, whole=True)
@@ -80,38 +77,36 @@ plt.semilogx(w, 20 * np.log10(abs(h)))
 plt.title('2x oversampling, 4th order 16kHz Butterworth LPF (44.1kHz)')
 plt.xlabel('Frequency [Hz]')
 plt.ylabel('Amplitude [dB]')
-plt.xlim(left=1,right=44100)
+plt.xlim(left=1, right=44100)
 plt.ylim(top=10, bottom=-100)
 plt.margins(0, 0.1)
 plt.grid(which='both', axis='both')
 plt.show()
 
-
 # 2x oversampling, 2x16kHz 4th order Butterworth LPF
-N = 4       # order of filter
+N = 4  # order of filter
 f0 = 16000  # cutoff frequency (Hz)
-fs = 2*44100  # sampling frequency (Hz)
+fs = 2 * 44100  # sampling frequency (Hz)
 
 b, a = signal.butter(N, f0, 'lowpass', analog=False, fs=fs)
 w, h = signal.freqz(b, a, fs=fs, whole=True)
-h = h*h
+h = h * h
 
 plt.figure('2x2f')
 plt.semilogx(w, 20 * np.log10(abs(h)))
 plt.title('2x oversampling, 2x4th order 16kHz Butterworth LPF (44.1kHz)')
 plt.xlabel('Frequency [Hz]')
 plt.ylabel('Amplitude [dB]')
-plt.xlim(left=1,right=44100)
+plt.xlim(left=1, right=44100)
 plt.ylim(top=10, bottom=-100)
 plt.margins(0, 0.1)
 plt.grid(which='both', axis='both')
 plt.show()
 
-
 # 4x oversampling, 16kHz 4th order Butterworth LPF
-N = 4       # order of filter
+N = 4  # order of filter
 f0 = 16000  # cutoff frequency (Hz)
-fs = 4*44100  # sampling frequency (Hz)
+fs = 4 * 44100  # sampling frequency (Hz)
 
 b, a = signal.butter(N, f0, 'lowpass', analog=False, fs=fs)
 w, h = signal.freqz(b, a, fs=fs, whole=True)
@@ -121,28 +116,27 @@ plt.semilogx(w, 20 * np.log10(abs(h)))
 plt.title('4x oversampling, 4th order 16kHz Butterworth LPF (44.1kHz)')
 plt.xlabel('Frequency [Hz]')
 plt.ylabel('Amplitude [dB]')
-plt.xlim(left=1,right=44100)
+plt.xlim(left=1, right=44100)
 plt.ylim(top=10, bottom=-100)
 plt.margins(0, 0.1)
 plt.grid(which='both', axis='both')
 plt.show()
 
-
 # 4x oversampling, 2x16kHz 4th order Butterworth LPF
-N = 4       # order of filter
+N = 4  # order of filter
 f0 = 16000  # cutoff frequency (Hz)
-fs = 4*44100  # sampling frequency (Hz)
+fs = 4 * 44100  # sampling frequency (Hz)
 
 b, a = signal.butter(N, f0, 'lowpass', analog=False, fs=fs)
 w, h = signal.freqz(b, a, fs=fs, whole=True)
-h = h*h
+h = h * h
 
 plt.figure('4x2f')
 plt.semilogx(w, 20 * np.log10(abs(h)))
 plt.title('4x oversampling, 2x4th order 16kHz Butterworth LPF (44.1kHz)')
 plt.xlabel('Frequency [Hz]')
 plt.ylabel('Amplitude [dB]')
-plt.xlim(left=1,right=44100)
+plt.xlim(left=1, right=44100)
 plt.ylim(top=10, bottom=-100)
 plt.margins(0, 0.1)
 plt.grid(which='both', axis='both')
