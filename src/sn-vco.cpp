@@ -5,8 +5,8 @@
 
 const int sn_vco::CHANNELS = 1;
 const float sn_vco::VELOCITY = 1.0f;
-const size_t sn_vco::FFT_SAMPLES = 2048;
-const float sn_vco::FFT_FREQUENCY = 16.0f;
+const size_t sn_vco::FFT_SAMPLES = 512;
+const float sn_vco::FFT_FREQUENCY = 1.0f;
 
 sn_vco::sn_vco() {
     // ... params
@@ -291,31 +291,31 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
         double imag[2048] = {0.0};
 
         memmove(real, fft.buffer, 2048 * sizeof(double));
-        fft_transformRadix2(real, imag, 2048);
+        fft_transformRadix2(real, imag, FFT_SAMPLES);
 
-        // FILE *f = fopen("/tmp/sn-vco-fft.tsv", "wt");
-        // const double fs = (double)(FFT_SAMPLES) / FFT_FREQUENCY;
-        // 
+        FILE *f = fopen("/tmp/sn-vco-fft.tsv", "wt");
+        const double fs = (double)(FFT_SAMPLES) / FFT_FREQUENCY;
+
         // // fprintf(f, "i\tsn.υ\tf\treal\timaginary\n");
-        // 
+        //
         // // for (size_t i = 0; i < FFT_SAMPLES; i++) {
         // //     double freq = i * fs / FFT_SAMPLES;
         // //     fprintf(f, "%-4lu\t%.5f\t%.3f\t%12.5f\t%12.5f\n", i, fft.buffer[i], freq, real[i], imag[i]);
         // // }
-        // 
-        // // for (size_t i = 0; i < FFT_SAMPLES; i += 8) {
-        // //     fprintf(f, "%8.5f, %8.5f, %8.5f, %8.5f, %8.5f, %8.5f, %8.5f, %8.5f,\n",
-        // //             fft.buffer[i],
-        // //             fft.buffer[i + 1],
-        // //             fft.buffer[i + 2],
-        // //             fft.buffer[i + 3],
-        // //             fft.buffer[i + 4],
-        // //             fft.buffer[i + 5],
-        // //             fft.buffer[i + 6],
-        // //             fft.buffer[i + 7]);
-        // // }
-        // 
-        // fclose(f);
+
+        for (size_t i = 0; i < FFT_SAMPLES; i += 8) {
+            fprintf(f, "             %8.5f, %8.5f, %8.5f, %8.5f, %8.5f, %8.5f, %8.5f, %8.5f,\n",
+                    fft.buffer[i],
+                    fft.buffer[i + 1],
+                    fft.buffer[i + 2],
+                    fft.buffer[i + 3],
+                    fft.buffer[i + 4],
+                    fft.buffer[i + 5],
+                    fft.buffer[i + 6],
+                    fft.buffer[i + 7]);
+        }
+
+        fclose(f);
     }
 
     fft.ix++;
