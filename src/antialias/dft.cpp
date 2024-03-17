@@ -28,10 +28,9 @@
 
 #include "dft.hpp"
 
-// Private function prototypes
 static size_t reverse_bits(size_t val, int width);
 
-bool Fft_transformRadix2(double real[], double imag[], size_t n) {
+bool fft_transformRadix2(double real[], double imag[], size_t n) {
     // Length variables
     bool status = false;
     int levels = 0; // Compute levels = floor(log2(n))

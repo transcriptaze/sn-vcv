@@ -1,5 +1,8 @@
 """
 Frequency response using VCV biquad filter coefficients
+
+cutoff: 16kHz
+fs:     44.1kHz 
 """
 
 from scipy import signal

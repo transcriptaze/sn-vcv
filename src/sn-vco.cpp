@@ -291,7 +291,7 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
         double imag[2048] = {0.0};
 
         memmove(real, fft.buffer, 2048 * sizeof(double));
-        Fft_transformRadix2(real, imag, 2048);
+        fft_transformRadix2(real, imag, 2048);
 
         // FILE *f = fopen("/tmp/sn-vco-fft.tsv", "wt");
         // const double fs = (double)(FFT_SAMPLES) / FFT_FREQUENCY;

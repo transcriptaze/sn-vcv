@@ -1,3 +1,10 @@
+"""
+Frequency response scipy 4th order IIR Butterworth filter
+
+cutoff: 16kHz
+fs:     44.1kHz 
+"""
+
 from scipy import signal
 import matplotlib.pyplot as plt
 import numpy as np
