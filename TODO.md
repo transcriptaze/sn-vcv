@@ -17,8 +17,15 @@
       - (?) FFT/wavetable
 
 - [ ] Anti-aliasing indicator
+      - [x] FFT
+      - [ ] logarithmic indicator brightness
+      - [ ] aliasing for filtered signal
+      - [ ] aliasing for 16 channels
+      - [ ] scale by relative velocity
+      - [ ] quick rise, slow decay
       - [ ] enable/disable
-      - [ ] show option + aliasing
+      - [ ] AAF indicator
+      - [ ] label
 
 - [x] DC blocking
       - [x] slow   0.999

@@ -282,43 +282,71 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
             fft.phase -= 1.f;
         }
 
-        // fft.buffer[fft.ix] = sin(2.0 * M_PI * fft.phase);
         fft.buffer[fft.ix] = sn.A * sn.υ(2.0 * M_PI * fft.phase);
     }
 
     if (fft.ix == FFT_SAMPLES) {
-        double real[2048];
-        double imag[2048] = {0.0};
+        memmove(fft.real, fft.buffer, FFT_SAMPLES * sizeof(double));
+        memset(fft.imag, 0, FFT_SAMPLES * sizeof(double));
 
-        memmove(real, fft.buffer, 2048 * sizeof(double));
-        fft_transformRadix2(real, imag, FFT_SAMPLES);
+        fft_transformRadix2(fft.real, fft.imag, FFT_SAMPLES);
+    }
 
-        FILE *f = fopen("/tmp/sn-vco-fft.tsv", "wt");
-        const double fs = (double)(FFT_SAMPLES) / FFT_FREQUENCY;
+    if (fft.ix == FFT_SAMPLES + 1) {
+        double sum = 0.0;
+        double sum20 = 0.0;
+        int i20 = round(0.5 + 20000.0 / frequency[0]);
 
-        // // fprintf(f, "i\tsn.υ\tf\treal\timaginary\n");
-        //
-        // // for (size_t i = 0; i < FFT_SAMPLES; i++) {
-        // //     double freq = i * fs / FFT_SAMPLES;
-        // //     fprintf(f, "%-4lu\t%.5f\t%.3f\t%12.5f\t%12.5f\n", i, fft.buffer[i], freq, real[i], imag[i]);
-        // // }
-
-        for (size_t i = 0; i < FFT_SAMPLES; i += 8) {
-            fprintf(f, "             %8.5f, %8.5f, %8.5f, %8.5f, %8.5f, %8.5f, %8.5f, %8.5f,\n",
-                    fft.buffer[i],
-                    fft.buffer[i + 1],
-                    fft.buffer[i + 2],
-                    fft.buffer[i + 3],
-                    fft.buffer[i + 4],
-                    fft.buffer[i + 5],
-                    fft.buffer[i + 6],
-                    fft.buffer[i + 7]);
+        for (int i = 0; i < 256; i++) {
+            sum += fft.real[i] * fft.real[i];
         }
 
-        fclose(f);
+        for (int i = i20; i < 256; i++) {
+            sum20 += fft.real[i] * fft.real[i];
+        }
+
+        double power = sqrt(sum);
+        double power20 = sqrt(sum20);
+        double ratio = power20 / power;
+        double q = ratio / 0.845;
+
+        INFO(">>>>>>>>>>>>>>>>>>>>> sn-vco: f:%.1f  N:%d  P:%.3f   P(20kHz+):%.3f  ratio:%.3f  Q:%.0f", frequency[0], i20, power, power20, ratio, 100.0 * q);
+
+        lights[ALIAS_LIGHT].setBrightness(q);
     }
 
     fft.ix++;
+
+    if (fft.ix > 0.2 * args.sampleRate) {
+        fft.ix = 0;
+    }
+}
+
+void sn_vco::dump() {
+    const double fs = (double)(FFT_SAMPLES) / FFT_FREQUENCY;
+    FILE *f = fopen("/tmp/sn-vco-fft.tsv", "wt");
+
+    // fprintf(f, "i\tsn.υ\tf\treal\timaginary\n");
+
+    for (size_t i = 0; i < FFT_SAMPLES; i++) {
+        const double freq = i * fs / FFT_SAMPLES;
+
+        fprintf(f, "%-4lu\t%.5f\t%.3f\t%12.5f\t%12.5f\n", i, fft.buffer[i], freq, fft.real[i], fft.imag[i]);
+    }
+
+    // for (size_t i = 0; i < FFT_SAMPLES; i += 8) {
+    //     fprintf(f, "             %8.5f, %8.5f, %8.5f, %8.5f, %8.5f, %8.5f, %8.5f, %8.5f,\n",
+    //             fft.buffer[i],
+    //             fft.buffer[i + 1],
+    //             fft.buffer[i + 2],
+    //             fft.buffer[i + 3],
+    //             fft.buffer[i + 4],
+    //             fft.buffer[i + 5],
+    //             fft.buffer[i + 6],
+    //             fft.buffer[i + 7]);
+    // }
+
+    fclose(f);
 }
 
 void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
@@ -372,56 +400,6 @@ void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
     sn.m = m;
 
     sn.recompute();
-
-    // ... anti-aliasing indicator
-    switch (antialias) {
-    case NONE:
-        lights[ALIAS_LIGHT + 0].setBrightness(0.0); // red
-        lights[ALIAS_LIGHT + 1].setBrightness(0.0); // green
-        lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
-        break;
-
-    case X1F1:
-        lights[ALIAS_LIGHT + 0].setBrightness(1.0); // red
-        lights[ALIAS_LIGHT + 1].setBrightness(0.0); // green
-        lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
-        break;
-
-    case X1F2:
-        lights[ALIAS_LIGHT + 0].setBrightness(0.0); // red
-        lights[ALIAS_LIGHT + 1].setBrightness(1.0); // green
-        lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
-        break;
-
-    case X2F1:
-        lights[ALIAS_LIGHT + 0].setBrightness(0.0); // red
-        lights[ALIAS_LIGHT + 1].setBrightness(0.0); // green
-        lights[ALIAS_LIGHT + 2].setBrightness(1.0); // blue
-        break;
-
-    case X2F2:
-        lights[ALIAS_LIGHT + 0].setBrightness(1.0); // red
-        lights[ALIAS_LIGHT + 1].setBrightness(1.0); // green
-        lights[ALIAS_LIGHT + 2].setBrightness(0.0); // blue
-        break;
-
-    case X4F1:
-        lights[ALIAS_LIGHT + 0].setBrightness(1.0); // red
-        lights[ALIAS_LIGHT + 1].setBrightness(0.0); // green
-        lights[ALIAS_LIGHT + 2].setBrightness(1.0); // blue
-        break;
-
-    case X4F2:
-        lights[ALIAS_LIGHT + 0].setBrightness(0.0); // red
-        lights[ALIAS_LIGHT + 1].setBrightness(1.0); // green
-        lights[ALIAS_LIGHT + 2].setBrightness(1.0); // blue
-        break;
-
-    default:
-        lights[ALIAS_LIGHT + 0].setBrightness(1.0); // red
-        lights[ALIAS_LIGHT + 1].setBrightness(1.0); // green
-        lights[ALIAS_LIGHT + 2].setBrightness(1.0); // blue
-    }
 }
 
 int sn_vco::channels() {
@@ -474,7 +452,7 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
 
     Vec xll(2.54, 11.43 + 2.54);
     Vec xrr(43.18, 11.43 + 2.54);
-    Vec antialias(middle, top + 7 * dh);
+    Vec alias(middle, top + 7 * dh);
 
     setModule(module);
     setPanel(createPanel(asset::plugin(pluginInstance, "res/sn-vco.svg"),
@@ -530,7 +508,7 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
     // ... indicators
     addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xll), module, sn_vco::XLL_LIGHT));
     addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_vco::XRR_LIGHT));
-    addChild(createLightCentered<LargeLight<RedGreenBlueLight>>(mm2px(antialias), module, sn_vco::ALIAS_LIGHT));
+    addChild(createLightCentered<LargeLight<BrightRedLight>>(mm2px(alias), module, sn_vco::ALIAS_LIGHT));
 }
 
 void sn_vcoWidget::appendContextMenu(Menu *menu) {

@@ -45,7 +45,7 @@ struct sn_vco : Module {
     enum LightId {
         XLL_LIGHT,
         XRR_LIGHT,
-        ENUMS(ALIAS_LIGHT, 3),
+        ALIAS_LIGHT,
         LIGHTS_LEN
     };
 
@@ -60,6 +60,7 @@ struct sn_vco : Module {
     void processVCO(const ProcessArgs &args, size_t, bool);
     void processAUX(const ProcessArgs &args, bool);
     void processFFT(const ProcessArgs &args, size_t);
+    void dump();
 
     int channels();
     float velocity(int);
@@ -122,10 +123,14 @@ struct sn_vco : Module {
         unsigned ix;
         float phase;
         double buffer[2048];
+        double real[512];
+        double imag[512];
     } fft = {
         .ix = 0,
         .phase = 0.f,
         .buffer = {0.0},
+        .real = {0.0},
+        .imag = {0.0},
     };
 
     // ... DC  blocking
