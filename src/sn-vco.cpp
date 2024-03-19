@@ -309,10 +309,11 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
         double power20 = sqrt(sum20);
         double ratio = power20 / power;
         double q = ratio / 0.845;
+        float brightness = 1.f - std::exp(-q / 0.15);
 
-        INFO(">>>>>>>>>>>>>>>>>>>>> sn-vco: f:%.1f  N:%d  P:%.3f   P(20kHz+):%.3f  ratio:%.3f  Q:%.0f", frequency[0], i20, power, power20, ratio, 100.0 * q);
+        // INFO(">>>>>>>>>>>>>>>>>>>>> sn-vco: f:%.1f  N:%d  P:%.3f   P(20kHz+):%.3f  ratio:%.3f  Q:%.0f (%.2f)", frequency[0], i20, power, power20, ratio, q, brightness);
 
-        lights[ALIAS_LIGHT].setBrightness(q);
+        lights[ALIAS_LIGHT].setBrightness(brightness);
     }
 
     fft.ix++;

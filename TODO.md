@@ -18,7 +18,7 @@
 
 - [ ] Anti-aliasing indicator
       - [x] FFT
-      - [ ] logarithmic indicator brightness
+      - [x] logarithmic indicator brightness
       - [ ] aliasing for filtered signal
       - [ ] aliasing for 16 channels
       - [ ] scale by relative velocity
