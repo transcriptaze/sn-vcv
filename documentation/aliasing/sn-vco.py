@@ -12,7 +12,12 @@ f0 = 12500  # cutoff frequency (Hz)
 fs = 44100  # sampling frequency (Hz)
 
 b, a = signal.butter(N, f0, 'lowpass', analog=False, fs=fs)
-w, h = signal.freqz(b, a, fs=fs, whole=True)
+w, h = signal.freqz(b, a, fs=fs, worN=128, whole=False)
+
+for i in range(128):
+	print(f'{{ {w[i]:.5f}, {abs(h[i]):.5f} }},')
+# print(w)
+# print([f'{abs(v):.5f}' for v in h])
 
 plt.figure('12.5kHz')
 plt.semilogx(w, 20 * np.log10(abs(h)))

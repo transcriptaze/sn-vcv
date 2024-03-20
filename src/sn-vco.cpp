@@ -293,16 +293,22 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
     }
 
     if (fft.ix == FFT_SAMPLES + 1) {
+        double freq = frequency[0];
         double sum = 0.0;
         double sum20 = 0.0;
-        int i20 = round(0.5 + 20000.0 / frequency[0]);
+        int i20 = round(0.5 + 20000.0 / freq);
+        double amplitude[256];
 
         for (int i = 0; i < 256; i++) {
-            sum += fft.real[i] * fft.real[i];
+            amplitude[i] = AA::interpolate(antialias, i * f) * fft.real[i];
+        }
+
+        for (int i = 0; i < 256; i++) {
+            sum += amplitude[i] * amplitude[i];
         }
 
         for (int i = i20; i < 256; i++) {
-            sum20 += fft.real[i] * fft.real[i];
+            sum20 += amplitude[i] * amplitude[i];
         }
 
         double power = sqrt(sum);
@@ -311,14 +317,14 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
         double q = ratio / 0.845;
         float brightness = 1.f - std::exp(-q / 0.15);
 
-        // INFO(">>>>>>>>>>>>>>>>>>>>> sn-vco: f:%.1f  N:%d  P:%.3f   P(20kHz+):%.3f  ratio:%.3f  Q:%.0f (%.2f)", frequency[0], i20, power, power20, ratio, q, brightness);
+        // INFO(">>>>>>>>>>>>>>>>>>>>> sn-vco: f:%.1f  N:%d  P:%.3f   P(20kHz+):%.3f  ratio:%.3f  Q:%.0f (%.2f)", freq, i20, power, power20, ratio, q, brightness);
 
         lights[ALIAS_LIGHT].setBrightness(brightness);
     }
 
     fft.ix++;
 
-    if (fft.ix > 0.2 * args.sampleRate) {
+    if (fft.ix > 0.25 * args.sampleRate) {
         fft.ix = 0;
     }
 }

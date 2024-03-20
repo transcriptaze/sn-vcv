@@ -20,6 +20,14 @@
       - [x] FFT
       - [x] logarithmic indicator brightness
       - [ ] aliasing for filtered signal
+            - [ ] TF: use whole=True - avoids having to reflect freq
+            - [ ] None
+            - [ ] x1f1
+            - [ ] x1f2
+            - [ ] x2f1
+            - [ ] x2f2
+            - [ ] x4f1
+            - [ ] x4f2
       - [ ] aliasing for 16 channels
       - [ ] scale by relative velocity
       - [ ] quick rise, slow decay

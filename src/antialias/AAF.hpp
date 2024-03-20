@@ -18,6 +18,7 @@ struct LPF {
 typedef struct AA {
     static int oversampling(ANTIALIAS mode);
     static ANTIALIAS int2mode(int v, ANTIALIAS defval);
+    static double interpolate(ANTIALIAS mode, double f);
 
     AA();
 

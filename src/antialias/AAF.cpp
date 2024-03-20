@@ -209,3 +209,16 @@ ANTIALIAS AA::int2mode(int v, ANTIALIAS defval) {
         return defval;
     }
 }
+
+double AA::interpolate(ANTIALIAS mode, const double f) {
+    switch (mode) {
+    case NONE:
+        return 1.0;
+
+    case X1F1:
+        return 1.0;
+
+    default:
+        return 1.0;
+    }
+}
