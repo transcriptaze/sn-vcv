@@ -300,7 +300,7 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
         double amplitude[256];
 
         for (int i = 0; i < 256; i++) {
-            amplitude[i] = AA::interpolate(antialias, i * f) * fft.real[i];
+            amplitude[i] = AA::interpolate(antialias, i * freq) * fft.real[i];
         }
 
         for (int i = 0; i < 256; i++) {
