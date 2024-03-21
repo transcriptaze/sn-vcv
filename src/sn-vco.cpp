@@ -300,7 +300,7 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
         double amplitude[256];
 
         for (int i = 0; i < 256; i++) {
-            amplitude[i] = AA::interpolate(antialias, i * freq) * fft.real[i];
+            amplitude[i] = LPF::interpolate(antialias, i * freq) * fft.real[i];
         }
 
         for (int i = 0; i < 256; i++) {
@@ -324,7 +324,8 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
 
     fft.ix++;
 
-    if (fft.ix > 0.25 * args.sampleRate) {
+    // FIXME: 0.25*args.sampleRate
+    if (fft.ix > 0.5 * args.sampleRate) {
         fft.ix = 0;
     }
 }

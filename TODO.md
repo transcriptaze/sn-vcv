@@ -2,6 +2,7 @@
 
 - [ ] Optimisation
       - [ ] Baseline
+      - https://wordsandbuttons.online/challenge_your_performance_intuition_with_cpp_sine.html
       - https://github.com/grafana/pyroscope
       - https://stackoverflow.com/questions/11445619/profiling-c-on-mac-os-x
       - https://stackoverflow.com/questions/3764978/why-hypot-function-is-so-slow
@@ -19,10 +20,10 @@
 - [ ] Anti-aliasing indicator
       - [x] FFT
       - [x] logarithmic indicator brightness
-      - [ ] aliasing for filtered signal
-            - [ ] TF: use whole=True - avoids having to reflect freq
-            - [ ] None
-            - [ ] x1f1
+      - [ ] apply LPF transfer function
+            - [x] use whole=True to avoids having to reflect freq
+            - [x] None
+            - [x] x1f1
             - [ ] x1f2
             - [ ] x2f1
             - [ ] x2f2

@@ -53,6 +53,40 @@ IIR LPF::lookup(ANTIALIAS mode, float fs) {
     }
 }
 
+double LPF::interpolate(ANTIALIAS mode, const double f) {
+    double f0;
+    int ix;
+    int jx;
+
+    switch (mode) {
+    case NONE:
+        return 1.0;
+
+    case X1F1:
+        f0 = std::fmod(f, 44100.0);
+        ix = std::floor(f0 / 172.26562);
+        jx = std::ceil(f0 / 172.26562);
+
+        if (ix == jx) {
+            return std::get<1>(TF_12500Hz[ix]);
+        } else {
+            auto u = TF_12500Hz[ix];
+            auto v = TF_12500Hz[jx];
+
+            double f1 = std::get<0>(u);
+            double f2 = std::get<0>(v);
+            double p = std::get<1>(u);
+            double q = std::get<1>(v);
+
+            return p + (q - p) * (f0 - f1) / (f2 - f1);
+        }
+        break;
+
+    default:
+        return 1.0;
+    }
+}
+
 /* Anti-aliasing processor */
 AA::AA() : x1f1(LPF(X1F1, 44100.f)),
            x1f2{LPF(X1F2, 44100.f), LPF(X1F2, 44100.f)},
@@ -207,18 +241,5 @@ ANTIALIAS AA::int2mode(int v, ANTIALIAS defval) {
         return X4F2;
     default:
         return defval;
-    }
-}
-
-double AA::interpolate(ANTIALIAS mode, const double f) {
-    switch (mode) {
-    case NONE:
-        return 1.0;
-
-    case X1F1:
-        return 1.0;
-
-    default:
-        return 1.0;
     }
 }
