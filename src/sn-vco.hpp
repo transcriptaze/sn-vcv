@@ -1,7 +1,7 @@
 #include "plugin.hpp"
 #include "sn.hpp"
 
-#include "antialias/AAF.hpp"
+#include "antialias/AA.hpp"
 #include "dc-blocking/DCF.hpp"
 
 struct sn_vco : Module {

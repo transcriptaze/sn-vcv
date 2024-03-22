@@ -1,7 +1,7 @@
 #include "sn-vco.hpp"
 #include "sn-vcox.hpp"
 
-#include "antialias/dft.hpp"
+#include "dsp/dft.hpp"
 
 const int sn_vco::CHANNELS = 1;
 const float sn_vco::VELOCITY = 1.0f;
