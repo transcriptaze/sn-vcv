@@ -5,7 +5,7 @@
 
 const int sn_vco::CHANNELS = 1;
 const float sn_vco::VELOCITY = 1.0f;
-const size_t sn_vco::FFT_SAMPLES = 512;
+const unsigned sn_vco::FFT_SAMPLES = 512;
 const float sn_vco::FFT_FREQUENCY = 1.0f;
 
 sn_vco::sn_vco() {
@@ -339,7 +339,7 @@ void sn_vco::dump() {
     for (size_t i = 0; i < FFT_SAMPLES; i++) {
         const double freq = i * fs / FFT_SAMPLES;
 
-        fprintf(f, "%-4llu\t%.5f\t%.3f\t%12.5f\t%12.5f\n", i, fft.buffer[i], freq, fft.real[i], fft.imag[i]);
+        fprintf(f, "%-4lu\t%.5f\t%.3f\t%12.5f\t%12.5f\n", i, fft.buffer[i], freq, fft.real[i], fft.imag[i]);
     }
 
     // for (size_t i = 0; i < FFT_SAMPLES; i += 8) {

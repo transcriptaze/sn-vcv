@@ -8,7 +8,7 @@ struct sn_vco : Module {
     static const int CHANNELS;
     static const float VELOCITY;
 
-    static const size_t FFT_SAMPLES;
+    static const unsigned FFT_SAMPLES;
     static const float FFT_FREQUENCY;
 
     enum ParamId {

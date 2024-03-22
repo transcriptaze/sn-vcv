@@ -30,7 +30,7 @@
 
 static size_t reverse_bits(size_t val, int width);
 
-bool fft_transformRadix2(double real[], double imag[], size_t n) {
+bool fft_transformRadix2(double real[], double imag[], unsigned n) {
     // Length variables
     bool status = false;
     int levels = 0; // Compute levels = floor(log2(n))
@@ -40,8 +40,9 @@ bool fft_transformRadix2(double real[], double imag[], size_t n) {
         return false; // n is not a power of 2
 
     // Trigonometric tables
-    if (SIZE_MAX / sizeof(double) < n / 2)
-        return false;
+    // if (SIZE_MAX / sizeof(double) < n / 2)
+    //     return false;
+
     size_t size = (n / 2) * sizeof(double);
     double *cos_table = (double *)malloc(size);
     double *sin_table = (double *)malloc(size);

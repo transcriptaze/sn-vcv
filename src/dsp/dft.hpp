@@ -31,4 +31,4 @@
  * The vector's length must be a power of 2. Uses the Cooley-Tukey decimation-in-time radix-2 algorithm.
  * Returns true if successful, false otherwise (n is not a power of 2, or out of memory).
  */
-bool fft_transformRadix2(double real[], double imag[], size_t n);
+bool fft_transformRadix2(double real[], double imag[], unsigned n);
