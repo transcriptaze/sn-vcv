@@ -136,6 +136,9 @@ int AA::oversampling(ANTIALIAS mode) {
     case X4F1:
     case X4F2:
         return 4;
+
+    default:
+        return 1;
     }
 }
 
