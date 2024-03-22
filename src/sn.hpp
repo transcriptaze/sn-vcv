@@ -398,3 +398,13 @@ struct TBrightRedLight : TBase {
 };
 
 using BrightRedLight = TBrightRedLight<>;
+
+struct AliasingWidget : Widget {
+    AliasingWidget();
+
+    void draw(const DrawArgs &args) override;
+    void drawLayer(const DrawArgs &args, int layer) override;
+    void step() override;
+
+    Module *module;
+};

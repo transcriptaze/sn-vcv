@@ -461,6 +461,7 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
     Vec xll(2.54, 11.43 + 2.54);
     Vec xrr(43.18, 11.43 + 2.54);
     Vec alias(middle, top + 7 * dh);
+    Vec bar(left, top + 6.5 * dh);
 
     setModule(module);
     setPanel(createPanel(asset::plugin(pluginInstance, "res/sn-vco.svg"),
@@ -517,6 +518,12 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
     addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xll), module, sn_vco::XLL_LIGHT));
     addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_vco::XRR_LIGHT));
     addChild(createLightCentered<LargeLight<BrightRedLight>>(mm2px(alias), module, sn_vco::ALIAS_LIGHT));
+
+    // ... aliasing
+    AliasingWidget *widget = createWidget<AliasingWidget>(mm2px(bar));
+    widget->box.size = mm2px(Vec(5.08, 10.16));
+    widget->module = module;
+    addChild(widget);
 }
 
 void sn_vcoWidget::appendContextMenu(Menu *menu) {

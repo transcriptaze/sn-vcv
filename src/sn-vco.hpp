@@ -46,6 +46,7 @@ struct sn_vco : Module {
         XLL_LIGHT,
         XRR_LIGHT,
         ALIAS_LIGHT,
+        ALIAS_BAR,
         LIGHTS_LEN
     };
 
@@ -118,6 +119,7 @@ struct sn_vco : Module {
     // ... anti-aliasing
     ANTIALIAS antialias = NONE; // ... for context submenu
     struct AA AA;
+    AliasingWidget *aawidget = NULL;
 
     struct {
         unsigned ix;

@@ -117,3 +117,29 @@ void ChannelsWidget::prepareFont(const DrawArgs &args) {
     nvgTextLetterSpacing(args.vg, 0.0);
     nvgTextAlign(args.vg, NVG_ALIGN_RIGHT);
 }
+
+// Aliasing widget
+AliasingWidget::AliasingWidget() {
+    module = NULL;
+}
+
+void AliasingWidget::draw(const DrawArgs &args) {
+    // ... background
+    nvgBeginPath(args.vg);
+    nvgRoundedRect(args.vg, 0, 0, box.size.x, box.size.y, 2);
+    nvgFillColor(args.vg, nvgRGB(0x19, 0x19, 0x19));
+    nvgFill(args.vg);
+
+    Widget::draw(args);
+}
+
+void AliasingWidget::drawLayer(const DrawArgs &args, int layer) {
+    if (layer == 1) {
+    }
+
+    Widget::drawLayer(args, layer);
+}
+
+void AliasingWidget::step() {
+    Widget::step();
+}
