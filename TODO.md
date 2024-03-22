@@ -24,7 +24,7 @@
             - [x] use whole=True to avoids having to reflect freq
             - [x] None
             - [x] x1f1
-            - [ ] x1f2
+            - [x] x1f2
             - [ ] x2f1
             - [ ] x2f2
             - [ ] x4f1
@@ -35,6 +35,7 @@
       - [ ] enable/disable
       - [ ] AAF indicator
       - [ ] label
+      - [ ] bar graph
 
 - [x] DC blocking
       - [x] slow   0.999

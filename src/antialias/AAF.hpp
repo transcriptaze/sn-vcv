@@ -6,6 +6,8 @@
 #include "butterworth.h"
 
 struct LPF {
+    static const double Δf;
+
     static IIR lookup(ANTIALIAS mode, float fs);
     static double interpolate(ANTIALIAS mode, double f);
 
