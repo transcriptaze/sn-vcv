@@ -47,8 +47,6 @@ struct sn_vco : Module {
     enum LightId {
         XLL_LIGHT,
         XRR_LIGHT,
-        ALIAS_LIGHT,
-        ALIAS_BAR,
         LIGHTS_LEN
     };
 
@@ -189,12 +187,24 @@ struct sn_vco_channels : ChannelsWidget {
 struct sn_vco_aliasing : AliasingWidget {
     sn_vco_aliasing() {
         module = NULL;
+
+        fontPath = asset::system("res/fonts/Nunito-Bold.ttf");
+        textPos = Vec(38.1, 15.24);
+        text = "0.00";
+        fontSize = 12;
     }
 
     void step() override {
         Widget::step();
 
-        level = module ? module->aliasing : 0.f;
+        if (module != NULL) {
+            char s[16];
+
+            level = clamp(module->aliasing, 0.f, 1.f);
+
+            snprintf(s, sizeof(s), "%0.2f", level);
+            text = s;
+        }
     }
 
     sn_vco *module;

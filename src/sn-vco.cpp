@@ -315,19 +315,16 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
         double power20 = sqrt(sum20);
         double ratio = power20 / power;
         double q = ratio / 0.845;
-        float brightness = 1.f - std::exp(-q / 0.15);
 
         this->aliasing = q;
 
-        // INFO(">>>>>>>>>>>>>>>>>>>>> sn-vco: f:%.1f  N:%d  P:%.3f   P(20kHz+):%.3f  ratio:%.3f  Q:%.0f (%.2f)", freq, i20, power, power20, ratio, q, brightness);
-
-        lights[ALIAS_LIGHT].setBrightness(brightness);
+        // INFO(">>>>>>>>>>>>>>>>>>>>> sn-vcv: f:%.1f  N:%d  P:%.3f   P(20kHz+):%.3f  ratio:%.3f  Q:%.2f", freq, i20, power, power20, ratio, q);
     }
 
     fft.ix++;
 
     // FIXME: 0.25*args.sampleRate
-    if (fft.ix > 0.5 * args.sampleRate) {
+    if (fft.ix > 1.0 * args.sampleRate) {
         fft.ix = 0;
     }
 }
@@ -462,8 +459,7 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
 
     Vec xll(2.54, 11.43 + 2.54);
     Vec xrr(43.18, 11.43 + 2.54);
-    Vec alias(middle, top + 7 * dh);
-    Vec bar(left, top + 6.5 * dh);
+    Vec alias(left, top + 6.5 * dh);
 
     setModule(module);
     setPanel(createPanel(asset::plugin(pluginInstance, "res/sn-vco.svg"),
@@ -519,10 +515,9 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
     // ... indicators
     addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xll), module, sn_vco::XLL_LIGHT));
     addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_vco::XRR_LIGHT));
-    addChild(createLightCentered<LargeLight<BrightRedLight>>(mm2px(alias), module, sn_vco::ALIAS_LIGHT));
 
     // ... aliasing
-    sn_vco_aliasing *widget = createWidget<sn_vco_aliasing>(mm2px(bar));
+    sn_vco_aliasing *widget = createWidget<sn_vco_aliasing>(mm2px(alias));
     widget->box.size = mm2px(Vec(5.08, 10.16));
     widget->module = module;
     addChild(widget);
