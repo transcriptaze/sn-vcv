@@ -3,6 +3,8 @@
 
 #include "antialias/AA.hpp"
 #include "dc-blocking/DCF.hpp"
+#include "widgets/aliasing.hpp"
+#include "widgets/xlight.hpp"
 
 struct sn_vco : Module {
     static const int CHANNELS;
@@ -119,7 +121,7 @@ struct sn_vco : Module {
     // ... anti-aliasing
     ANTIALIAS antialias = NONE; // ... for context submenu
     struct AA AA;
-    AliasingWidget *aawidget = NULL;
+    float aliasing = 0.f;
 
     struct {
         unsigned ix;
@@ -179,6 +181,20 @@ struct sn_vco_channels : ChannelsWidget {
         int channels = module ? module->channels() : 0;
 
         text = string::f("%d", channels);
+    }
+
+    sn_vco *module;
+};
+
+struct sn_vco_aliasing : AliasingWidget {
+    sn_vco_aliasing() {
+        module = NULL;
+    }
+
+    void step() override {
+        Widget::step();
+
+        level = module ? module->aliasing : 0.f;
     }
 
     sn_vco *module;

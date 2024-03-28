@@ -2,6 +2,7 @@
 
 #include "plugin.hpp"
 #include "sn.hpp"
+#include "widgets/xlight.hpp"
 
 struct sn_lfox : Module {
     static const int CHANNELS;

@@ -317,6 +317,8 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
         double q = ratio / 0.845;
         float brightness = 1.f - std::exp(-q / 0.15);
 
+        this->aliasing = q;
+
         // INFO(">>>>>>>>>>>>>>>>>>>>> sn-vco: f:%.1f  N:%d  P:%.3f   P(20kHz+):%.3f  ratio:%.3f  Q:%.0f (%.2f)", freq, i20, power, power20, ratio, q, brightness);
 
         lights[ALIAS_LIGHT].setBrightness(brightness);
@@ -520,7 +522,7 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
     addChild(createLightCentered<LargeLight<BrightRedLight>>(mm2px(alias), module, sn_vco::ALIAS_LIGHT));
 
     // ... aliasing
-    AliasingWidget *widget = createWidget<AliasingWidget>(mm2px(bar));
+    sn_vco_aliasing *widget = createWidget<sn_vco_aliasing>(mm2px(bar));
     widget->box.size = mm2px(Vec(5.08, 10.16));
     widget->module = module;
     addChild(widget);

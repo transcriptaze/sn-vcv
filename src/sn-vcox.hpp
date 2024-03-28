@@ -3,6 +3,7 @@
 
 #include "antialias/AA.hpp"
 #include "dc-blocking/DCF.hpp"
+#include "widgets/xlight.hpp"
 
 struct sn_vcox : Module {
     static const int CHANNELS;
