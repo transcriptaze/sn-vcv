@@ -2,6 +2,7 @@
 
 - [ ] Optimisation
       - [ ] Baseline
+      - https://community.vcvrack.com/t/anyone-has-done-profiling-on-a-module-code/7537/4
       - https://wordsandbuttons.online/challenge_your_performance_intuition_with_cpp_sine.html
       - https://github.com/grafana/pyroscope
       - https://stackoverflow.com/questions/11445619/profiling-c-on-mac-os-x
