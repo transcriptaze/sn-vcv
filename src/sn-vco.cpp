@@ -35,6 +35,8 @@ sn_vco::sn_vco() {
     configInput(PITCH_INPUT, "1V/octave pitch");
     configInput(VELOCITY_INPUT, "0-10V velocity");
 
+    configInput(DEBUG_INPUT, "debug");
+
     // ... outputs
     configOutput(VCO_OUTPUT, "VCO");
     configOutput(AUX_OUTPUT, "AUX");
@@ -124,6 +126,11 @@ void sn_vco::onExpanderChange(const ExpanderChangeEvent &e) {
 
 void sn_vco::process(const ProcessArgs &args) {
     int channels = this->channels();
+
+    // ... debug
+    if (debug.processEvent(inputs[DEBUG_INPUT].getVoltage(), 0.f, 1.f) == dsp::TSchmittTrigger<float>::Event::TRIGGERED) {
+        dumpFFT = true;
+    }
 
     // ... expanders
     bool expanded = expanders.left.module != NULL || expanders.right.module != NULL;
@@ -294,6 +301,11 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
     }
 
     if (fft.ix == FFT_SAMPLES + 1) {
+        if (dumpFFT) {
+            dump();
+            dumpFFT = false;
+        }
+
         double freq = frequency[0];
         double sum = 0.0;
         double sum20 = 0.0;
@@ -331,6 +343,8 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
 }
 
 void sn_vco::dump() {
+    INFO(">>>>>>>>>>>>>>>>>>>>> sn-vcv: dumping FFT to /tmp/sn-vco-fft.tsv");
+
     const double fs = (double)(FFT_SAMPLES) / FFT_FREQUENCY;
     FILE *f = fopen("/tmp/sn-vco-fft.tsv", "wt");
 
@@ -460,7 +474,8 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
 
     Vec xll(2.54, 11.43 + 2.54);
     Vec xrr(43.18, 11.43 + 2.54);
-    Vec alias(left, top + 6.5 * dh);
+    Vec alias(left + 7.62, top + 6.6 * dh);
+    Vec debug(left, top + 7 * dh);
 
     setModule(module);
     setPanel(createPanel(asset::plugin(pluginInstance, "res/sn-vco.svg"),
@@ -522,6 +537,9 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
     widget->box.size = mm2px(Vec(5.08, 10.16));
     widget->module = module;
     addChild(widget);
+
+    // ... debug
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(debug), module, sn_vco::DEBUG_INPUT));
 }
 
 void sn_vcoWidget::appendContextMenu(Menu *menu) {

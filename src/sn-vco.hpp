@@ -34,6 +34,7 @@ struct sn_vco : Module {
         DY_INPUT,
         PITCH_INPUT,
         VELOCITY_INPUT,
+        DEBUG_INPUT,
         INPUTS_LEN
     };
 
@@ -156,6 +157,11 @@ struct sn_vco : Module {
         .left = sn_expander<sn_vco_message>(LEFT),
         .right = sn_expander<sn_vco_message>(RIGHT),
     };
+
+    // ... debug
+
+    dsp::SchmittTrigger debug;
+    bool dumpFFT = false;
 };
 
 struct sn_vcoWidget : ModuleWidget {
