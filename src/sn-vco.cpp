@@ -1,6 +1,7 @@
 #include "sn-vco.hpp"
 #include "sn-vcox.hpp"
 
+#include "antialias/TF.hpp"
 #include "dsp/dft.hpp"
 
 const int sn_vco::CHANNELS = 1;
@@ -300,7 +301,7 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
         double amplitude[256];
 
         for (int i = 0; i < 256; i++) {
-            amplitude[i] = LPF::interpolate(antialias, i * freq) * fft.real[i];
+            amplitude[i] = TF::interpolate(antialias, i * freq) * fft.real[i];
         }
 
         for (int i = 0; i < 256; i++) {

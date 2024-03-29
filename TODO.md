@@ -2,7 +2,7 @@
 
 - [ ] Optimisation
       - [ ] Baseline
-      - https://community.vcvrack.com/t/anyone-has-done-profiling-on-a-module-code/7537/4
+      - https://community.vcvrack.com/t/anyone-has-done-profiling-on-a-module-code/7537/
       - https://wordsandbuttons.online/challenge_your_performance_intuition_with_cpp_sine.html
       - https://github.com/grafana/pyroscope
       - https://stackoverflow.com/questions/11445619/profiling-c-on-mac-os-x
@@ -21,6 +21,8 @@
 - [ ] Anti-aliasing indicator
       - [x] FFT
       - [x] logarithmic indicator brightness
+      - [ ] Aliasing widget
+      - [ ] label
       - [ ] apply LPF transfer function
             - [x] use whole=True to avoids having to reflect freq
             - [x] None
@@ -30,13 +32,12 @@
             - [ ] x2f2
             - [ ] x4f1
             - [ ] x4f2
+            - [ ] use 48kHz sampling
+            - [ ] uint32 frequencies
       - [ ] aliasing for 16 channels
       - [ ] scale by relative velocity
       - [ ] quick rise, slow decay
       - [ ] enable/disable
-      - [ ] AAF indicator
-      - [ ] label
-      - [ ] bar graph
 
 - [x] DC blocking
       - [x] slow   0.999

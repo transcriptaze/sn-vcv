@@ -7,14 +7,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def main():
-    worN = np.linspace(0,131072, 256)
+    worN = np.linspace(0,512*256, num=256, endpoint=False)
     X1F1(worN)
     X1F2(worN)
     X2F1(worN)
     X2F2(worN)
     X4F1(worN)
     X4F2(worN)
-    pass
 
 # 1x oversampling, 12.5kHz 4th order Butterworth LPF
 def X1F1(worN):
@@ -24,7 +23,7 @@ def X1F1(worN):
     fs = 44100  # sampling frequency (Hz)
 
     b, a = signal.butter(N, f0, 'lowpass', analog=False, fs=fs)
-    w, h = signal.freqz(b, a, fs=fs, worN=worN, whole=True)
+    w, h = signal.freqz(b, a, fs=fs, worN=worN)
 
     export('X1F1', w,h, legend)
     plot(legend,w,h,'1x1f')
@@ -67,7 +66,7 @@ def X2F2(worN):
     w, h = signal.freqz(b, a, fs=fs, worN=worN, whole=True)
     h = h * h
 
-    export('X1F2', w,h, legend)
+    export('X2F2', w,h, legend)
     plot(legend,w,h,'1x2f')
 
 # 4x oversampling, 16kHz 4th order Butterworth LPF
@@ -106,7 +105,7 @@ def export(name, w, h, comment):
     while ix < len(w):
         print(f'    ', end='')
         for j in range(4):
-            print(f'{{ {w[ix]:11.5f}, {abs(h[ix]):7.5f} }},', end='')
+            print(f'{{ {w[ix]:8.1f}, {abs(h[ix]):7.5f} }},', end='')
             ix = ix+1
         print()
     print('};')

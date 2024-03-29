@@ -3,13 +3,10 @@
 #include "../plugin.hpp"
 #include "../sn.hpp"
 
-#include "butterworth.h"
+#include "IIR.hpp"
 
 struct LPF {
-    static const double Δf;
-
     static IIR lookup(ANTIALIAS mode, float fs);
-    static double interpolate(ANTIALIAS mode, double f);
 
     LPF(ANTIALIAS mode, float fs);
     void reset();

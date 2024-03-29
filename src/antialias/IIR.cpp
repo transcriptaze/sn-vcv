@@ -1,7 +1,8 @@
 #include <limits>
 
-#include "butterworth.h"
 #include "plugin.hpp"
+
+#include "IIR.hpp"
 
 IIR coefficients(const std::map<int, IIR> &table, float fs) {
     int f = static_cast<int>(std::round(fs));
