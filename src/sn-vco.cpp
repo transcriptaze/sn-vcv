@@ -280,63 +280,17 @@ void sn_vco::processAUX(const ProcessArgs &args, bool expanded) {
 }
 
 void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
+    std::function<float(float)> lambda = [this](float phase) {
+        return this->sn.A * this->sn.υ(2.0 * M_PI * phase);
+    };
 
-    if (fft.ix < FFT::SAMPLES) {
-        fft.phase += FFT::FREQUENCY / FFT::SAMPLES;
-
-        while (fft.phase >= 1.f) {
-            fft.phase -= 1.f;
-        }
-
-        fft.buffer[fft.ix] = sn.A * sn.υ(2.0 * M_PI * fft.phase);
-    }
-
-    if (fft.ix == FFT::SAMPLES) {
-        memmove(fft.real, fft.buffer, FFT::SAMPLES * sizeof(double));
-        memset(fft.imag, 0, FFT::SAMPLES * sizeof(double));
-
-        fft_transformRadix2(fft.real, fft.imag, FFT::SAMPLES);
-    }
+    fft.process(antialias, args.sampleRate, channels, frequency, lambda);
 
     if (fft.ix == FFT::SAMPLES + 1) {
         if (dumpFFT) {
             fft.dump();
             dumpFFT = false;
         }
-
-        double freq = frequency[0];
-        double sum = 0.0;
-        double sum20 = 0.0;
-        int i20 = round(0.5 + 20000.0 / freq);
-        double amplitude[256];
-
-        for (int i = 0; i < 256; i++) {
-            amplitude[i] = TF::interpolate(antialias, i * freq) * fft.real[i];
-        }
-
-        for (int i = 0; i < 256; i++) {
-            sum += amplitude[i] * amplitude[i];
-        }
-
-        for (int i = i20; i < 256; i++) {
-            sum20 += amplitude[i] * amplitude[i];
-        }
-
-        double power = sqrt(sum);
-        double power20 = sqrt(sum20);
-        double ratio = power20 / power;
-        double q = ratio / 0.845;
-
-        this->aliasing = q;
-
-        INFO(">>>>>>>>>>>>>>>>>>>>> sn-vcv: f:%.1f  N:%d  P:%.3f   P(20kHz+):%.3f  ratio:%.3f  Q:%.3f", freq, i20, power, power20, ratio, q);
-    }
-
-    fft.ix++;
-
-    // FIXME: 0.25*args.sampleRate
-    if (fft.ix > 1.0 * args.sampleRate) {
-        fft.ix = 0;
     }
 }
 
