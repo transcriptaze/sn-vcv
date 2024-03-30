@@ -2,6 +2,7 @@
 #include "sn.hpp"
 
 #include "antialias/AA.hpp"
+#include "antialias/FFT.hpp"
 #include "dc-blocking/DCF.hpp"
 #include "widgets/aliasing.hpp"
 #include "widgets/xlight.hpp"
@@ -9,9 +10,6 @@
 struct sn_vco : Module {
     static const int CHANNELS;
     static const float VELOCITY;
-
-    static const unsigned FFT_SAMPLES;
-    static const float FFT_FREQUENCY;
 
     enum ParamId {
         ECCENTRICITY_PARAM,
@@ -62,7 +60,6 @@ struct sn_vco : Module {
     void processVCO(const ProcessArgs &args, size_t, bool);
     void processAUX(const ProcessArgs &args, bool);
     void processFFT(const ProcessArgs &args, size_t);
-    void dump();
 
     int channels();
     float velocity(int);
@@ -120,21 +117,8 @@ struct sn_vco : Module {
     // ... anti-aliasing
     ANTIALIAS antialias = NONE; // ... for context submenu
     struct AA AA;
+    struct FFT fft;
     float aliasing = 0.f;
-
-    struct {
-        unsigned ix;
-        float phase;
-        double buffer[2048];
-        double real[512];
-        double imag[512];
-    } fft = {
-        .ix = 0,
-        .phase = 0.f,
-        .buffer = {0.0},
-        .real = {0.0},
-        .imag = {0.0},
-    };
 
     // ... DC  blocking
     DCBLOCK dcblocking = DCBLOCK_NONE; // ... for context submenu

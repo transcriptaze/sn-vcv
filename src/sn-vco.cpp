@@ -6,8 +6,6 @@
 
 const int sn_vco::CHANNELS = 1;
 const float sn_vco::VELOCITY = 1.0f;
-const unsigned sn_vco::FFT_SAMPLES = 512;
-const float sn_vco::FFT_FREQUENCY = 1.0f;
 
 sn_vco::sn_vco() {
     // ... params
@@ -283,8 +281,8 @@ void sn_vco::processAUX(const ProcessArgs &args, bool expanded) {
 
 void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
 
-    if (fft.ix < FFT_SAMPLES) {
-        fft.phase += sn_vco::FFT_FREQUENCY / FFT_SAMPLES;
+    if (fft.ix < FFT::SAMPLES) {
+        fft.phase += FFT::FREQUENCY / FFT::SAMPLES;
 
         while (fft.phase >= 1.f) {
             fft.phase -= 1.f;
@@ -293,16 +291,16 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
         fft.buffer[fft.ix] = sn.A * sn.υ(2.0 * M_PI * fft.phase);
     }
 
-    if (fft.ix == FFT_SAMPLES) {
-        memmove(fft.real, fft.buffer, FFT_SAMPLES * sizeof(double));
-        memset(fft.imag, 0, FFT_SAMPLES * sizeof(double));
+    if (fft.ix == FFT::SAMPLES) {
+        memmove(fft.real, fft.buffer, FFT::SAMPLES * sizeof(double));
+        memset(fft.imag, 0, FFT::SAMPLES * sizeof(double));
 
-        fft_transformRadix2(fft.real, fft.imag, FFT_SAMPLES);
+        fft_transformRadix2(fft.real, fft.imag, FFT::SAMPLES);
     }
 
-    if (fft.ix == FFT_SAMPLES + 1) {
+    if (fft.ix == FFT::SAMPLES + 1) {
         if (dumpFFT) {
-            dump();
+            fft.dump();
             dumpFFT = false;
         }
 
@@ -340,33 +338,6 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
     if (fft.ix > 1.0 * args.sampleRate) {
         fft.ix = 0;
     }
-}
-
-void sn_vco::dump() {
-    const double fs = (double)(FFT_SAMPLES) / FFT_FREQUENCY;
-    FILE *f = fopen("/tmp/sn-vco-fft.tsv", "wt");
-
-    fprintf(f, "i\tsn.υ\tf\treal\timaginary\n");
-
-    for (size_t i = 0; i < FFT_SAMPLES; i++) {
-        const double freq = i * fs / FFT_SAMPLES;
-
-        fprintf(f, "%-4lu\t%.5f\t%.3f\t%12.5f\t%12.5f\n", i, fft.buffer[i], freq, fft.real[i], fft.imag[i]);
-    }
-
-    // for (size_t i = 0; i < FFT_SAMPLES; i += 8) {
-    //     fprintf(f, "             %8.5f, %8.5f, %8.5f, %8.5f, %8.5f, %8.5f, %8.5f, %8.5f,\n",
-    //             fft.buffer[i],
-    //             fft.buffer[i + 1],
-    //             fft.buffer[i + 2],
-    //             fft.buffer[i + 3],
-    //             fft.buffer[i + 4],
-    //             fft.buffer[i + 5],
-    //             fft.buffer[i + 6],
-    //             fft.buffer[i + 7]);
-    // }
-
-    fclose(f);
 }
 
 void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
