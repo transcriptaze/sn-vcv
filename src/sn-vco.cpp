@@ -127,7 +127,7 @@ void sn_vco::process(const ProcessArgs &args) {
 
     // ... debug
     if (debug.processEvent(inputs[DEBUG_INPUT].getVoltage(), 0.f, 1.f) == dsp::TSchmittTrigger<float>::Event::TRIGGERED) {
-        dumpFFT = true;
+        fft.debug = true;
     }
 
     // ... expanders
@@ -285,13 +285,6 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
     };
 
     fft.process(antialias, args.sampleRate, channels, frequency, lambda);
-
-    if (fft.ix == FFT::SAMPLES + 1) {
-        if (dumpFFT) {
-            fft.dump();
-            dumpFFT = false;
-        }
-    }
 }
 
 void sn_vco::recompute(const ProcessArgs &args, size_t channels) {

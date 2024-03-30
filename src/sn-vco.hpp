@@ -146,7 +146,6 @@ struct sn_vco : Module {
     // ... debug
 
     dsp::SchmittTrigger debug;
-    bool dumpFFT = false;
 };
 
 struct sn_vcoWidget : ModuleWidget {
@@ -191,7 +190,7 @@ struct sn_vco_aliasing : AliasingWidget {
         if (module != NULL) {
             char s[16];
 
-            level = clamp(module->fft.aliasing, 0.f, 1.f);
+            level = clamp(module->fft.q, 0.f, 1.f);
 
             snprintf(s, sizeof(s), "%0.2f", level);
             text = s;
@@ -200,14 +199,3 @@ struct sn_vco_aliasing : AliasingWidget {
 
     sn_vco *module;
 };
-
-// struct sn_vco_fft : FFT {
-//     sn_vco_fft() {
-//     }
-
-//     float υ(float phase) override {
-//         return module->sn.A * module->sn.υ(2.0 * M_PI * phase);
-//     }
-
-//     sn_vco *module;
-// };

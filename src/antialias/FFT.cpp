@@ -10,6 +10,26 @@ FFT::FFT() {
 }
 
 void FFT::process(const ANTIALIAS antialias, const float sampleRate, size_t channels, const float frequency[16], std::function<float(float)> υ) {
+    switch (state) {
+    case COLLECT:
+        collect(υ);
+        break;
+
+    case DFT:
+        dft();
+        break;
+
+    case ESTIMATE:
+        estimate(antialias, frequency);
+        break;
+
+    case IDLE:
+        idle(sampleRate);
+        break;
+    }
+}
+
+void FFT::collect(std::function<float(float)> υ) {
     if (ix < FFT::SAMPLES) {
         phase += FFT::FREQUENCY / FFT::SAMPLES;
 
@@ -17,50 +37,60 @@ void FFT::process(const ANTIALIAS antialias, const float sampleRate, size_t chan
             phase -= 1.f;
         }
 
-        buffer[ix] = υ(phase);
+        buffer[ix++] = υ(phase);
+    } else {
+        state = DFT;
+    }
+}
+
+void FFT::dft() {
+    memmove(real, buffer, FFT::SAMPLES * sizeof(double));
+    memset(imag, 0, FFT::SAMPLES * sizeof(double));
+
+    fft_transformRadix2(real, imag, FFT::SAMPLES);
+
+    state = ESTIMATE;
+
+    if (debug) {
+        dump();
+        debug = false;
+    }
+}
+
+void FFT::estimate(const ANTIALIAS antialias, const float frequency[16]) {
+    double freq = frequency[0];
+    double sum = 0.0;
+    double sum20 = 0.0;
+    int i20 = round(0.5 + 20000.0 / freq);
+    double amplitude[256];
+
+    for (int i = 0; i < 256; i++) {
+        amplitude[i] = TF::interpolate(antialias, i * freq) * real[i];
     }
 
-    if (ix == FFT::SAMPLES) {
-        memmove(real, buffer, FFT::SAMPLES * sizeof(double));
-        memset(imag, 0, FFT::SAMPLES * sizeof(double));
-
-        fft_transformRadix2(real, imag, FFT::SAMPLES);
+    for (int i = 0; i < 256; i++) {
+        sum += amplitude[i] * amplitude[i];
     }
 
-    if (ix == FFT::SAMPLES + 1) {
-        double freq = frequency[0];
-        double sum = 0.0;
-        double sum20 = 0.0;
-        int i20 = round(0.5 + 20000.0 / freq);
-        double amplitude[256];
-
-        for (int i = 0; i < 256; i++) {
-            amplitude[i] = TF::interpolate(antialias, i * freq) * real[i];
-        }
-
-        for (int i = 0; i < 256; i++) {
-            sum += amplitude[i] * amplitude[i];
-        }
-
-        for (int i = i20; i < 256; i++) {
-            sum20 += amplitude[i] * amplitude[i];
-        }
-
-        double power = sqrt(sum);
-        double power20 = sqrt(sum20);
-        double ratio = power20 / power;
-        double q = ratio / 0.845;
-
-        this->aliasing = q;
-
-        INFO(">>>>>>>>>>>>>>>>>>>>> sn-vcv: f:%.1f  N:%d  P:%.3f   P(20kHz+):%.3f  ratio:%.3f  Q:%.3f", freq, i20, power, power20, ratio, q);
+    for (int i = i20; i < 256; i++) {
+        sum20 += amplitude[i] * amplitude[i];
     }
 
-    ix++;
+    double power = sqrt(sum);
+    double power20 = sqrt(sum20);
+    double ratio = power20 / power;
 
+    q = ratio / 0.845;
+    state = IDLE;
+
+    INFO(">>>>>>>>>>>>>>>>>>>>> sn-vcv: f:%.1f  N:%d  P:%.3f   P(20kHz+):%.3f  ratio:%.3f  Q:%.3f", freq, i20, power, power20, ratio, q);
+}
+
+void FFT::idle(const float sampleRate) {
     // FIXME: 0.25*sampleRate
-    if (ix > 1.0 * sampleRate) {
+    if (++ix > 1.0 * sampleRate) {
         ix = 0;
+        state = COLLECT;
     }
 }
 
