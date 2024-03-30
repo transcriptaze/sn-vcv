@@ -331,7 +331,7 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
 
         this->aliasing = q;
 
-        // INFO(">>>>>>>>>>>>>>>>>>>>> sn-vcv: f:%.1f  N:%d  P:%.3f   P(20kHz+):%.3f  ratio:%.3f  Q:%.2f", freq, i20, power, power20, ratio, q);
+        INFO(">>>>>>>>>>>>>>>>>>>>> sn-vcv: f:%.1f  N:%d  P:%.3f   P(20kHz+):%.3f  ratio:%.3f  Q:%.3f", freq, i20, power, power20, ratio, q);
     }
 
     fft.ix++;
@@ -343,12 +343,10 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
 }
 
 void sn_vco::dump() {
-    INFO(">>>>>>>>>>>>>>>>>>>>> sn-vcv: dumping FFT to /tmp/sn-vco-fft.tsv");
-
     const double fs = (double)(FFT_SAMPLES) / FFT_FREQUENCY;
     FILE *f = fopen("/tmp/sn-vco-fft.tsv", "wt");
 
-    // fprintf(f, "i\tsn.υ\tf\treal\timaginary\n");
+    fprintf(f, "i\tsn.υ\tf\treal\timaginary\n");
 
     for (size_t i = 0; i < FFT_SAMPLES; i++) {
         const double freq = i * fs / FFT_SAMPLES;

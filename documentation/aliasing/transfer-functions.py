@@ -7,16 +7,40 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def main():
-    worN = np.linspace(0,512*256, num=256, endpoint=False)
-    X1F1(worN)
-    X1F2(worN)
-    X2F1(worN)
-    X2F2(worN)
-    X4F1(worN)
-    X4F2(worN)
+    worN = np.linspace(0,4*48000, num=376, endpoint=False)
+
+    w,h,name,legend = X1F1(worN)
+    export(name, w,h, legend)
+    # tsv(name,w,h)
+    # plot(legend,w,h,name)
+
+    w,h,name,legend = X1F2(worN)
+    export(name, w,h, legend)
+    # tsv(name,w,h)
+    # plot(legend,w,h,name)
+
+    w,h,name,legend = X2F1(worN)
+    export(name, w,h, legend)
+    # tsv(name,w,h)
+    # plot(legend,w,h,name)
+
+    export(name, w,h, legend)
+    # tsv(name,w,h)
+    # plot(legend,w,h,name)
+
+    w,h,name,legend = X4F1(worN)
+    export(name, w,h, legend)
+    # tsv(name,w,h)
+    # plot(legend,w,h,name)
+
+    w,h,name,legend = X4F2(worN)
+    export(name, w,h, legend)
+    # tsv(name,w,h)
+    # plot(legend,w,h,name)
 
 # 1x oversampling, 12.5kHz 4th order Butterworth LPF
 def X1F1(worN):
+    name = 'X1F1'
     legend = '4th order 12.5kHz Butterworth LPF (44.1kHz)'
     N = 4  # order of filter
     f0 = 12500  # cutoff frequency (Hz)
@@ -25,11 +49,11 @@ def X1F1(worN):
     b, a = signal.butter(N, f0, 'lowpass', analog=False, fs=fs)
     w, h = signal.freqz(b, a, fs=fs, worN=worN)
 
-    export('X1F1', w,h, legend)
-    plot(legend,w,h,'1x1f')
+    return w,h, name, legend
 
 # 1x oversampling, 2x16kHz 4th order Butterworth LPF
 def X1F2(worN):
+    name = 'X1F2'
     legend = '2x16kHz, 4 pole Butterworth LPF transfer function (44.1kHz)'
     N = 4  # order of filter
     f0 = 16000  # cutoff frequency (Hz)
@@ -39,11 +63,12 @@ def X1F2(worN):
     w, h = signal.freqz(b, a, fs=fs, worN=worN, whole=True)
     h = h*h
 
-    export('X1F2', w,h, legend)
-    plot(legend,w,h,'1x2f')
+    return w,h, name, legend
+
 
 # 2x oversampling, 16kHz 4th order Butterworth LPF
 def X2F1(worN):
+    name = 'X2F1'
     legend = '2x oversampling, 4th order 16kHz Butterworth LPF (44.1kHz)'
     N = 4  # order of filter
     f0 = 16000  # cutoff frequency (Hz)
@@ -52,11 +77,11 @@ def X2F1(worN):
     b, a = signal.butter(N, f0, 'lowpass', analog=False, fs=fs)
     w, h = signal.freqz(b, a, fs=fs, worN=worN, whole=True)
 
-    export('X2F1',w,h,legend)
-    plot(legend,w,h,'2x1f')
+    return w,h, name, legend
 
 # 2x oversampling, 2x16kHz 4th order Butterworth LPF
 def X2F2(worN):
+    name = 'X2F2'
     legend = '2x oversampling, 2x 4th order 16kHz Butterworth LPF (44.1kHz)'
     N = 4  # order of filter
     f0 = 16000  # cutoff frequency (Hz)
@@ -66,11 +91,11 @@ def X2F2(worN):
     w, h = signal.freqz(b, a, fs=fs, worN=worN, whole=True)
     h = h * h
 
-    export('X2F2', w,h, legend)
-    plot(legend,w,h,'1x2f')
+    return w,h, name, legend
 
 # 4x oversampling, 16kHz 4th order Butterworth LPF
 def X4F1(worN):
+    name = 'X4F1'
     legend = '4x oversampling, 4th order 16kHz Butterworth LPF (44.1kHz)'
     N = 4  # order of filter
     f0 = 16000  # cutoff frequency (Hz)
@@ -79,11 +104,11 @@ def X4F1(worN):
     b, a = signal.butter(N, f0, 'lowpass', analog=False, fs=fs)
     w, h = signal.freqz(b, a, fs=fs, worN=worN, whole=True)
 
-    export('X4F1', w,h, legend)
-    plot(legend,w,h,'4x1f')
+    return w,h, name, legend
 
 # 4x oversampling, 2x16kHz 4th order Butterworth LPF
 def X4F2(worN):
+    name = 'X4F2'
     legend = '4x oversampling, 2x4th order 16kHz Butterworth LPF (44.1kHz)'
     N = 4  # order of filter
     f0 = 16000  # cutoff frequency (Hz)
@@ -93,8 +118,7 @@ def X4F2(worN):
     w, h = signal.freqz(b, a, fs=fs, worN=worN, whole=True)
     h = h * h
 
-    export('X4F2', w,h, legend)
-    plot(legend,w,h,'4x2f')
+    return w,h, name, legend
 
 # Export transfer function to C++
 def export(name, w, h, comment):
@@ -109,6 +133,16 @@ def export(name, w, h, comment):
             ix = ix+1
         print()
     print('};')
+    print()
+
+# Export transfer function to TSV
+def tsv(name, w, h):
+    ix = 0
+
+    print(f'{name}')
+    while ix < len(w):
+        print(f'{w[ix]:8.1f}\t{abs(h[ix]):7.5f}')
+        ix = ix+1
     print()
 
 # Display graphical transfer function

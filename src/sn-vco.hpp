@@ -197,7 +197,7 @@ struct sn_vco_aliasing : AliasingWidget {
         fontPath = asset::system("res/fonts/Nunito-Bold.ttf");
         textPos = Vec(38.1, 15.24);
         text = "0.00";
-        fontSize = 12;
+        fontSize = 11;
     }
 
     void step() override {

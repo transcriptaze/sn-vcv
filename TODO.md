@@ -28,12 +28,12 @@
             - [x] None
             - [x] x1f1
             - [x] x1f2
-            - [ ] x2f1
-            - [ ] x2f2
-            - [ ] x4f1
-            - [ ] x4f2
-            - [ ] use 48kHz sampling
-            - [ ] uint32 frequencies
+            - [x] x2f1
+            - [x] x2f2
+            - [x] x4f1
+            - [x] x4f2
+            - (?) use 48kHz sampling
+            - (?) uint32 frequencies
       - [ ] aliasing for 16 channels
       - [ ] scale by relative velocity
       - [ ] quick rise, slow decay
