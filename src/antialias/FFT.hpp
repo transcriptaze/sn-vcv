@@ -17,12 +17,12 @@ typedef struct FFT {
 
     FFT();
 
-    void process(const ANTIALIAS antialias, const float sampleRate, size_t channels, const float frequency[16], std::function<float(float)> υ);
+    void process(const ANTIALIAS antialias, const float sampleRate, size_t channels, const float frequency[16], const float velocity[16], std::function<float(float)> υ);
 
   private:
     void collect(std::function<float(float)> υ);
     void dft();
-    void estimate(ANTIALIAS antialias, const float frequency[16]);
+    void estimate(ANTIALIAS antialias, const float frequency[16], const float velocity[16]);
     void idle(const float sampleRate);
     void dump();
 

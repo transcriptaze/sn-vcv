@@ -284,7 +284,7 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
         return this->sn.A * this->sn.υ(2.0 * M_PI * phase);
     };
 
-    fft.process(antialias, args.sampleRate, channels, frequency, lambda);
+    fft.process(antialias, args.sampleRate, channels, frequency, velocity, lambda);
 }
 
 void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
@@ -297,7 +297,7 @@ void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
     update.count = KRATE[update.krate];
 
     // ... frequency
-    for (int ch = 0; ch < channels; ch++) {
+    for (size_t ch = 0; ch < channels; ch++) {
         float pitch = clamp(inputs[PITCH_INPUT].getPolyVoltage(ch), -3.f, 5.f); // C1 to C8
 
         frequency[ch] = dsp::FREQ_C4 * std::pow(2.f, pitch);
@@ -305,10 +305,9 @@ void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
 
     // ... velocity
     if (inputs[VELOCITY_INPUT].isConnected()) {
-        int N = inputs[VELOCITY_INPUT].getChannels();
+        size_t N = inputs[VELOCITY_INPUT].getChannels();
 
-        for (int ch = 0; ch < channels; ch++) {
-
+        for (size_t ch = 0; ch < channels; ch++) {
             if (ch < N) {
                 velocity[ch] = inputs[VELOCITY_INPUT].getPolyVoltage(ch) / 10.0f;
             } else {
@@ -316,7 +315,7 @@ void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
             }
         }
     } else {
-        for (int ch = 0; ch < channels; ch++) {
+        for (size_t ch = 0; ch < channels; ch++) {
             velocity[ch] = VELOCITY;
         }
     }

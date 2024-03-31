@@ -9,7 +9,7 @@ const float FFT::FREQUENCY = 1.0f;
 FFT::FFT() {
 }
 
-void FFT::process(const ANTIALIAS antialias, const float sampleRate, size_t channels, const float frequency[16], std::function<float(float)> υ) {
+void FFT::process(const ANTIALIAS antialias, const float sampleRate, size_t channels, const float frequency[16], const float velocity[16], std::function<float(float)> υ) {
     switch (state) {
     case COLLECT:
         collect(υ);
@@ -20,7 +20,7 @@ void FFT::process(const ANTIALIAS antialias, const float sampleRate, size_t chan
         break;
 
     case ESTIMATE:
-        estimate(antialias, frequency);
+        estimate(antialias, frequency, velocity);
         break;
 
     case IDLE:
@@ -57,8 +57,10 @@ void FFT::dft() {
     }
 }
 
-void FFT::estimate(const ANTIALIAS antialias, const float frequency[16]) {
+void FFT::estimate(const ANTIALIAS antialias, const float frequency[16], const float velocity[16]) {
     double freq = frequency[0];
+    double vel = fabs(velocity[0]);
+    double velsum = fabs(velocity[0]);
     double sum = 0.0;
     double sum20 = 0.0;
     int i20 = round(0.5 + 20000.0 / freq);
@@ -80,7 +82,12 @@ void FFT::estimate(const ANTIALIAS antialias, const float frequency[16]) {
     double power20 = sqrt(sum20);
     double ratio = power20 / power;
 
-    q = ratio / 0.845;
+    if (velsum < 0.0001) {
+        q = 0.0;
+    } else {
+        q = (vel / velsum) * (ratio / 0.845);
+    }
+
     state = IDLE;
 
     INFO(">>>>>>>>>>>>>>>>>>>>> sn-vcv: f:%.1f  N:%d  P:%.3f   P(20kHz+):%.3f  ratio:%.3f  Q:%.3f", freq, i20, power, power20, ratio, q);
