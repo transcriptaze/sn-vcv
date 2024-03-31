@@ -209,7 +209,7 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
             vco[ch].phase[i] = phase[i][ch];
             vco[ch].out.vco[i] = υ;
             vco[ch].out.sum[i] = sn.A * υ;
-            vco[ch].velocity = velocity(ch);
+            vco[ch].velocity = velocity[ch];
         }
     }
 
@@ -297,10 +297,32 @@ void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
     update.count = KRATE[update.krate];
 
     // ... frequency
-    for (size_t ch = 0; ch < channels; ch++) {
+    for (int ch = 0; ch < channels; ch++) {
         float pitch = clamp(inputs[PITCH_INPUT].getPolyVoltage(ch), -3.f, 5.f); // C1 to C8
 
         frequency[ch] = dsp::FREQ_C4 * std::pow(2.f, pitch);
+    }
+
+    // ... velocity
+    if (inputs[VELOCITY_INPUT].isConnected()) {
+        int N = inputs[VELOCITY_INPUT].getChannels();
+
+        for (int ch = 0; ch < channels; ch++) {
+
+            if (ch < N) {
+                velocity[ch] = inputs[VELOCITY_INPUT].getPolyVoltage(ch) / 10.0f;
+            } else {
+                velocity[ch] = inputs[VELOCITY_INPUT].getVoltage() / 10.0f;
+            }
+        }
+    } else {
+        for (int ch = 0; ch < channels; ch++) {
+            velocity[ch] = VELOCITY;
+        }
+    }
+
+    for (int ch = channels; ch < 16; ch++) {
+        velocity[ch] = 0.f;
     }
 
     // ... antialiasing
@@ -344,19 +366,19 @@ int sn_vco::channels() {
     return inputs[PITCH_INPUT].isConnected() ? inputs[PITCH_INPUT].getChannels() : CHANNELS;
 }
 
-float sn_vco::velocity(int channel) {
-    if (inputs[VELOCITY_INPUT].isConnected()) {
-        int N = inputs[VELOCITY_INPUT].getChannels();
-
-        if (channel < N) {
-            return inputs[VELOCITY_INPUT].getPolyVoltage(channel) / 10.0f;
-        } else {
-            return inputs[VELOCITY_INPUT].getVoltage() / 10.0f;
-        }
-    }
-
-    return VELOCITY;
-}
+// float sn_vco::velocity(int channel) {
+//     if (inputs[VELOCITY_INPUT].isConnected()) {
+//         int N = inputs[VELOCITY_INPUT].getChannels();
+//
+//         if (channel < N) {
+//             return inputs[VELOCITY_INPUT].getPolyVoltage(channel) / 10.0f;
+//         } else {
+//             return inputs[VELOCITY_INPUT].getVoltage() / 10.0f;
+//         }
+//     }
+//
+//     return VELOCITY;
+// }
 
 sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
     float left = 7.331;
