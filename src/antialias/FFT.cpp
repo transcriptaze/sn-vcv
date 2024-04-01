@@ -37,27 +37,27 @@ void FFT::recompute(ANTIALIAS antialias, float sampleRate) {
 }
 
 void FFT::collect(std::function<float(float)> υ) {
-    if (ix < FFT::SAMPLES) {
-        phase += FFT::FREQUENCY / FFT::SAMPLES;
+    if (buffer.ix < FFT::SAMPLES) {
+        buffer.phase += FFT::FREQUENCY / FFT::SAMPLES;
 
-        while (phase >= 1.f) {
-            phase -= 1.f;
+        while (buffer.phase >= 1.f) {
+            buffer.phase -= 1.f;
         }
 
-        buffer[ix++] = υ(phase);
+        buffer.samples[buffer.ix++] = υ(buffer.phase);
     } else {
         state = DFT;
     }
 }
 
 void FFT::dft() {
-    memmove(real, buffer, FFT::SAMPLES * sizeof(double));
-    memset(imag, 0, FFT::SAMPLES * sizeof(double));
+    memmove(fft.real, buffer.samples, FFT::SAMPLES * sizeof(double));
+    memset(fft.imag, 0, FFT::SAMPLES * sizeof(double));
 
-    fft_transformRadix2(real, imag, FFT::SAMPLES);
+    fft_transformRadix2(fft.real, fft.imag, FFT::SAMPLES);
 
     state = ESTIMATE;
-    chx = 0;
+    acc.ch = 0;
     acc.ratio = 0.0;
     acc.velocity = 0.0;
 
@@ -68,9 +68,9 @@ void FFT::dft() {
 }
 
 void FFT::estimate(size_t channels, const float frequency[16], const float velocity[16]) {
-    if (chx < channels) {
-        double freq = frequency[chx];
-        double vel = fabs(velocity[chx]);
+    if (acc.ch < channels) {
+        double freq = frequency[acc.ch];
+        double vel = fabs(velocity[acc.ch]);
 
         double sum = 0.0;
         double sum20 = 0.0;
@@ -78,7 +78,7 @@ void FFT::estimate(size_t channels, const float frequency[16], const float veloc
         double amplitude[256];
 
         for (int i = 0; i < 256; i++) {
-            amplitude[i] = TF::interpolate(antialias, i * freq) * real[i];
+            amplitude[i] = TF::interpolate(antialias, i * freq) * fft.real[i];
         }
 
         for (int i = 0; i < 256; i++) {
@@ -96,7 +96,7 @@ void FFT::estimate(size_t channels, const float frequency[16], const float veloc
         acc.ratio += vel * ratio;
         acc.velocity += vel;
 
-        chx++;
+        acc.ch++;
     } else {
         q = (acc.velocity < 0.001) ? 0.0 : (acc.ratio / 0.845) / acc.velocity;
         state = IDLE;
@@ -107,10 +107,14 @@ void FFT::idle() {
     // FIXME: 0.25*sampleRate
     if (loops > 1.0 * sampleRate) {
         loops = 0;
-        ix = 0;
-        chx = 0;
+
+        buffer.ix = 0;
+        buffer.phase = 0.f;
+
+        acc.ch = 0;
         acc.ratio = 0.0;
         acc.velocity = 0.0;
+
         state = COLLECT;
     }
 }
@@ -124,7 +128,7 @@ void FFT::dump() {
     for (size_t i = 0; i < FFT::SAMPLES; i++) {
         const double freq = i * fs / FFT::SAMPLES;
 
-        fprintf(f, "%-4lu\t%.5f\t%.3f\t%12.5f\t%12.5f\n", i, buffer[i], freq, real[i], imag[i]);
+        fprintf(f, "%-4lu\t%.5f\t%.3f\t%12.5f\t%12.5f\n", i, buffer.samples[i], freq, fft.real[i], fft.imag[i]);
     }
 
     // for (size_t i = 0; i < FFT_SAMPLES; i += 8) {

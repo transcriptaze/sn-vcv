@@ -36,17 +36,31 @@ typedef struct FFT {
   private:
     STATE state = COLLECT;
     unsigned loops = 0;
-    unsigned ix = 0;
-    unsigned chx = 0;
-    float phase = 0.f;
-    double buffer[512] = {0.0};
-    double real[512] = {0.0};
-    double imag[512] = {0.0};
 
     struct {
+        unsigned ix;
+        float phase;
+        double samples[512];
+    } buffer = {
+        .ix = 0,
+        .phase = 0.f,
+        .samples = {0.0},
+    };
+
+    struct {
+        double real[512];
+        double imag[512];
+    } fft = {
+        .real = {0.0},
+        .imag = {0.0},
+    };
+
+    struct {
+        unsigned ch;
         double ratio;
         double velocity;
     } acc = {
+        .ch = 0,
         .ratio = 0.0,
         .velocity = 0.0,
     };
