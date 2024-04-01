@@ -37,9 +37,18 @@ typedef struct FFT {
     STATE state = COLLECT;
     unsigned loops = 0;
     unsigned ix = 0;
+    unsigned chx = 0;
     float phase = 0.f;
     double buffer[512] = {0.0};
     double real[512] = {0.0};
     double imag[512] = {0.0};
+
+    struct {
+        double ratio;
+        double velocity;
+    } acc = {
+        .ratio = 0.0,
+        .velocity = 0.0,
+    };
 
 } FFT;

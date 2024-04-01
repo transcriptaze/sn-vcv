@@ -57,6 +57,9 @@ void FFT::dft() {
     fft_transformRadix2(real, imag, FFT::SAMPLES);
 
     state = ESTIMATE;
+    chx = 0;
+    acc.ratio = 0.0;
+    acc.velocity = 0.0;
 
     if (debug) {
         dump();
@@ -65,39 +68,39 @@ void FFT::dft() {
 }
 
 void FFT::estimate(size_t channels, const float frequency[16], const float velocity[16]) {
-    double freq = frequency[0];
-    double vel = fabs(velocity[0]);
-    double velsum = fabs(velocity[0]);
-    double sum = 0.0;
-    double sum20 = 0.0;
-    int i20 = round(0.5 + 20000.0 / freq);
-    double amplitude[256];
+    if (chx < channels) {
+        double freq = frequency[chx];
+        double vel = fabs(velocity[chx]);
 
-    for (int i = 0; i < 256; i++) {
-        amplitude[i] = TF::interpolate(antialias, i * freq) * real[i];
-    }
+        double sum = 0.0;
+        double sum20 = 0.0;
+        int i20 = round(0.5 + 20000.0 / freq);
+        double amplitude[256];
 
-    for (int i = 0; i < 256; i++) {
-        sum += amplitude[i] * amplitude[i];
-    }
+        for (int i = 0; i < 256; i++) {
+            amplitude[i] = TF::interpolate(antialias, i * freq) * real[i];
+        }
 
-    for (int i = i20; i < 256; i++) {
-        sum20 += amplitude[i] * amplitude[i];
-    }
+        for (int i = 0; i < 256; i++) {
+            sum += amplitude[i] * amplitude[i];
+        }
 
-    double power = sqrt(sum);
-    double power20 = sqrt(sum20);
-    double ratio = power20 / power;
+        for (int i = i20; i < 256; i++) {
+            sum20 += amplitude[i] * amplitude[i];
+        }
 
-    if (velsum < 0.0001) {
-        q = 0.0;
+        double power = sqrt(sum);
+        double power20 = sqrt(sum20);
+        double ratio = power20 / power;
+
+        acc.ratio += vel * ratio;
+        acc.velocity += vel;
+
+        chx++;
     } else {
-        q = (vel / velsum) * (ratio / 0.845);
+        q = (acc.velocity < 0.001) ? 0.0 : (acc.ratio / 0.845) / acc.velocity;
+        state = IDLE;
     }
-
-    state = IDLE;
-
-    INFO(">>>>>>>>>>>>>>>>>>>>> sn-vcv: f:%.1f  N:%d  P:%.3f   P(20kHz+):%.3f  ratio:%.3f  Q:%.3f", freq, i20, power, power20, ratio, q);
 }
 
 void FFT::idle() {
@@ -105,6 +108,9 @@ void FFT::idle() {
     if (loops > 1.0 * sampleRate) {
         loops = 0;
         ix = 0;
+        chx = 0;
+        acc.ratio = 0.0;
+        acc.velocity = 0.0;
         state = COLLECT;
     }
 }
