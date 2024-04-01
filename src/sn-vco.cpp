@@ -284,7 +284,7 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
         return this->sn.A * this->sn.υ(2.0 * M_PI * phase);
     };
 
-    fft.process(antialias, args.sampleRate, channels, frequency, velocity, lambda);
+    fft.process(channels, frequency, velocity, lambda);
 }
 
 void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
@@ -327,6 +327,7 @@ void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
     // ... antialiasing
     AA.recompute(args.sampleRate);
     dcf.recompute(dcblocking, args.sampleRate);
+    fft.recompute(antialias, args.sampleRate);
 
     // ... param values
     float e = params[ECCENTRICITY_PARAM].getValue();
