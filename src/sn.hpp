@@ -25,6 +25,9 @@ extern const std::vector<std::string> ANTIALIASING; // anti-aliasing option labe
 // ... DC blocking
 extern const std::vector<std::string> DCBLOCKING; // DC blocking option labels
 
+// ... aliasing
+extern const std::vector<std::string> ALIASING; // aliasing widget update option labels
+
 enum AUXMODE {
     OSC,
     SUM,

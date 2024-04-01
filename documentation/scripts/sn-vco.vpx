@@ -7,6 +7,66 @@ new guide v2 vertical   20.35mm
 new guide v3 vertical   35.56mm
 new guide h0 horizontal 7.62mm
 new guide h1 horizontal 23.238mm
+new guide h2 horizontal 36.252mm
+new guide h3 horizontal 49.266mm
+new guide h4 horizontal 62.28mm
+new guide h5 horizontal 75.294mm
+new guide h6 horizontal 88.308mm
+new guide h7 horizontal 101.322mm
+new guide h8 horizontal 114.336mm
 
 new label 'SN VCO' centre,h0 'RobotoCondensed-Bold' 12pt centre,middle #222222,#ebebeb
+
+new input e     v1,h1 PJ301M
+new input s     v1,h2 PJ301M
+new input theta v1,h3 PJ301M
+new input a     v1,h4 PJ301M
+new input dx    v1,h5 PJ301M
+new input dy    v1,h6 PJ301M
+new input debug v1,h8 PJ301M
+
+new input pitch    v3,h2 PJ301M
+new input velocity v3,h3 PJ301M
+
+new output aux     v3,h5 PJ301M
+new output trigger v3,h6 PJ301M
+new output vco     v3,h8 PJ301M
+
+new parameter e     v2,h1 RoundBlackKnob
+new parameter s     v2,h2 RoundBlackKnob
+new parameter theta v2,h3 RoundBlackKnob
+new parameter a     v2,h4 RoundBlackKnob
+new parameter dx    v2,h5 RoundBlackKnob
+new parameter dy    v2,h6 RoundBlackKnob
+new parameter m     v2,h7 RoundBlackKnob
+
+new widget channels v3,h1 ChDsp
+new widget aliasing v2,h8 Custom
+
+new label 'ε'  v1+6.51mm,h1-3.81mm RobotoBold 12pt centre,baseline
+new label 's'  v1+6.51mm,h2-3.81mm RobotoBold 12pt centre,baseline
+new label 'θ'  v1+6.51mm,h3-3.81mm RobotoBold 12pt centre,baseline
+new label 'a'  v1+6.51mm,h4-3.81mm RobotoBold 12pt centre,baseline
+new label 'δx' v1+6.51mm,h5-3.81mm RobotoBold 12pt centre,baseline
+new label 'δy' v1+6.51mm,h6-3.81mm RobotoBold 12pt centre,baseline
+new label 'm'  v1+6.51mm,h7-3.81mm RobotoBold 12pt centre,baseline
+
+new label 'CHAN'      v3,h1-3.81mm RobotoBold 12pt centre,baseline
+new label 'V/OCT'     v3,h2-3.81mm RobotoBold 12pt centre,baseline
+new label 'VELOCITY'  v3,h3-3.81mm RobotoBold 12pt centre,baseline
+new label 'AUX'       v3,h5-3.81mm RobotoBold 12pt centre,baseline #ffffff,#222222
+new label 'TRIG'      v3,h6-3.81mm RobotoBold 12pt centre,baseline #ffffff,#222222
+new label 'VCO'       v3,h8-3.81mm RobotoBold 12pt centre,baseline #ffffff,#222222
+
+decorate (parameter e)     with CircularGraduations (scale 1.1)
+decorate (parameter s)     with CircularGraduations (scale 1.1)
+decorate (parameter theta) with CircularGraduations (scale 1.1)
+decorate (parameter a)     with CircularGraduations (scale 1.1)
+decorate (parameter dx)    with CircularGraduations (scale 1.1)
+decorate (parameter dy)    with CircularGraduations (scale 1.1)
+decorate (parameter m)     with CircularGraduations (scale 1.1)
+
+decorate (output aux +0mm,+5.08mm) with Pad (stretch 1,2.5)
+decorate (output vco +0mm,-2.54mm) with Pad (stretch 1,1.5)
+
 

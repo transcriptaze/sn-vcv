@@ -5,6 +5,13 @@
 #include "../sn.hpp"
 
 typedef struct FFT {
+    enum RATE {
+        NONE,
+        FAST,
+        MEDIUM,
+        SLOW,
+    };
+
     enum STATE {
         COLLECT,
         DFT,
@@ -28,7 +35,8 @@ typedef struct FFT {
     void dump();
 
   public:
-    ANTIALIAS antialias = NONE;
+    ANTIALIAS antialias = ANTIALIAS::NONE;
+    RATE updateRate = RATE::SLOW;
     float sampleRate = 44100.f;
     float q = 0.f;
     bool debug = false;

@@ -16,36 +16,25 @@
       - [x] sn-vcox
       - [ ] ALIASING.md
       - (?) PID
-      - (?) FFT/wavetable
 
 - [ ] Anti-aliasing indicator
       - [x] FFT
       - [x] logarithmic indicator brightness
-      - [ ] Aliasing widget
-      - [ ] label
-      - [ ] apply LPF transfer function
-            - [x] use whole=True to avoids having to reflect freq
-            - [x] None
-            - [x] x1f1
-            - [x] x1f2
-            - [x] x2f1
-            - [x] x2f2
-            - [x] x4f1
-            - [x] x4f2
+      - [x] aliasing for 16 channels
+      - [x] scale by relative velocity
+      - [x] apply LPF transfer function
             - (?) use 48kHz sampling
             - (?) uint32 frequencies
-      - [ ] aliasing for 16 channels
-      - [ ] scale by relative velocity
-      - [ ] quick rise, slow decay
-      - [ ] enable/disable
+      - [ ] Aliasing widget
+             - [x] disable,100ms,200ms,500ms
+             - [ ] _setting_
+             - [ ] quick rise, slow decay
+             - [ ] label
 
-- [x] DC blocking
-      - [x] slow   0.999
-      - [x] medium 0.995
-      - [x] fast   0.991
 
 - [ ] Set k-rate in ms
 
+- [x] DC blocking
 - [x] Clamp input frequency
 - [x] Better blurbs in plugin.json
 - [x] Fix tags in plugin.json

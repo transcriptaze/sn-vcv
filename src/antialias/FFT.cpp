@@ -10,25 +10,29 @@ FFT::FFT() {
 }
 
 void FFT::process(size_t channels, const float frequency[16], const float velocity[16], std::function<float(float)> υ) {
-    switch (state) {
-    case COLLECT:
-        collect(υ);
-        break;
+    if (updateRate == NONE) {
+        return;
+    } else {
+        switch (state) {
+        case COLLECT:
+            collect(υ);
+            break;
 
-    case DFT:
-        dft();
-        break;
+        case DFT:
+            dft();
+            break;
 
-    case ESTIMATE:
-        estimate(channels, frequency, velocity);
-        break;
+        case ESTIMATE:
+            estimate(channels, frequency, velocity);
+            break;
 
-    case IDLE:
-        idle();
-        break;
+        case IDLE:
+            idle();
+            break;
+        }
+
+        loops++;
     }
-
-    loops++;
 }
 
 void FFT::recompute(ANTIALIAS antialias, float sampleRate) {
@@ -104,8 +108,27 @@ void FFT::estimate(size_t channels, const float frequency[16], const float veloc
 }
 
 void FFT::idle() {
-    // FIXME: 0.25*sampleRate
-    if (loops > 1.0 * sampleRate) {
+    unsigned N = 100 * sampleRate / 1000;
+
+    switch (updateRate) {
+    case NONE:
+        N = 500 * sampleRate / 1000;
+        break;
+
+    case FAST:
+        N = 100 * sampleRate / 1000;
+        break;
+
+    case MEDIUM:
+        N = 200 * sampleRate / 1000;
+        break;
+
+    case SLOW:
+        N = 500 * sampleRate / 1000;
+        break;
+    }
+
+    if (loops > N) {
         loops = 0;
 
         buffer.ix = 0;

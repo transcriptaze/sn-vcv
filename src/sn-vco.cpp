@@ -505,6 +505,10 @@ void sn_vcoWidget::appendContextMenu(Menu *menu) {
     menu->addChild(createIndexPtrSubmenuItem("DC blocking",
                                              DCBLOCKING,
                                              &module->dcblocking));
+
+    menu->addChild(createIndexPtrSubmenuItem("Aliasing update rate",
+                                             ALIASING,
+                                             &module->fft.updateRate));
 }
 
 Model *model_sn_vco = createModel<sn_vco, sn_vcoWidget>("sn-vco");

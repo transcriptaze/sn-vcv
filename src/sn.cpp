@@ -29,6 +29,14 @@ const std::vector<std::string> DCBLOCKING = {
     "Fast",
 };
 
+// aliasing widget update rates
+const std::vector<std::string> ALIASING = {
+    "Off",
+    "100ms",
+    "200ms",
+    "500ms",
+};
+
 // SN
 void SN::recompute() {
     float εʼ = std::sqrt(1.0f - ε * ε);
