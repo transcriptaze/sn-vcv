@@ -163,9 +163,7 @@ struct sn_vco_aliasing : AliasingWidget {
         module = NULL;
 
         fontPath = asset::system("res/fonts/Nunito-Bold.ttf");
-        textPos = Vec(38.1, 15.24);
         text = "0.00";
-        fontSize = 11;
     }
 
     void step() override {
@@ -175,6 +173,7 @@ struct sn_vco_aliasing : AliasingWidget {
             char s[16];
 
             level = clamp(module->fft.q, 0.f, 1.f);
+            enabled = module->fft.updateRate != FFT::RATE::NONE;
 
             snprintf(s, sizeof(s), "%0.2f", level);
             text = s;

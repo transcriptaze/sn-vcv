@@ -12,8 +12,8 @@ struct AliasingWidget : Widget {
 
     std::string fontPath;
     std::string text;
-    float fontSize;
-    Vec textPos;
-
+    float fontSize = 10;
+    Vec textPos = Vec(7.62, 7.62);
     float level = 0.f;
+    bool enabled = true;
 };

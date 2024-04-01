@@ -412,7 +412,7 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
 
     Vec xll(2.54, 11.43 + 2.54);
     Vec xrr(43.18, 11.43 + 2.54);
-    Vec alias(left + 7.62, top + 6.6 * dh);
+    Vec alias(middle - 5.08, top + 7 * dh - 6.35);
     Vec debug(left, top + 7 * dh);
 
     setModule(module);
@@ -472,7 +472,7 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
 
     // ... aliasing
     sn_vco_aliasing *widget = createWidget<sn_vco_aliasing>(mm2px(alias));
-    widget->box.size = mm2px(Vec(5.08, 10.16));
+    widget->box.size = mm2px(Vec(10.16, 11.43));
     widget->module = module;
     addChild(widget);
 

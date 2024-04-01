@@ -17,19 +17,28 @@ void AliasingWidget::draw(const DrawArgs &args) {
 
 void AliasingWidget::drawLayer(const DrawArgs &args, int layer) {
     if (layer == 1) {
-        float v = clamp(level, 0.f, 1.f);
-        float h = v * box.size.y;
+        if (enabled) {
+            float v = clamp(level, 0.f, 1.f);
+            float h = v * (box.size.y - 3);
 
-        // ... bar
-        nvgBeginPath(args.vg);
-        nvgRoundedRect(args.vg, 1, box.size.y - h - 1, box.size.x - 2, h, 2);
-        nvgFillColor(args.vg, nvgRGB(0xff, 0x00, 0x00));
-        nvgFill(args.vg);
+            // ... bar
+            nvgBeginPath(args.vg);
+            nvgRect(args.vg, 2, box.size.y - h - 2, 12.7, h);
+            nvgFillColor(args.vg, nvgRGB(0xff, 0x00, 0x00));
+            nvgFill(args.vg);
 
-        // ... text
-        prepareFont(args);
-        nvgFillColor(args.vg, nvgRGB(0xff, 0x00, 0x00));
-        nvgText(args.vg, textPos.x, textPos.y, text.c_str(), NULL);
+            // ... text
+            prepareFont(args);
+            nvgFillColor(args.vg, nvgRGB(0xff, 0xff, 0xff));
+            nvgText(args.vg, textPos.x, textPos.y, text.c_str(), NULL);
+        } else {
+            float h = box.size.y - 3;
+
+            nvgBeginPath(args.vg);
+            nvgRect(args.vg, 2, box.size.y - h - 2, box.size.x - 4, h);
+            nvgFillColor(args.vg, nvgRGB(0x00, 0x00, 0x00));
+            nvgFill(args.vg);
+        }
     }
 
     Widget::drawLayer(args, layer);
@@ -48,5 +57,5 @@ void AliasingWidget::prepareFont(const DrawArgs &args) {
     nvgFontFaceId(args.vg, font->handle);
     nvgFontSize(args.vg, fontSize);
     nvgTextLetterSpacing(args.vg, 0.0);
-    nvgTextAlign(args.vg, NVG_ALIGN_RIGHT);
+    nvgTextAlign(args.vg, NVG_ALIGN_LEFT);
 }

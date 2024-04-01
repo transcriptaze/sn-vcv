@@ -26,7 +26,7 @@
             - (?) use 48kHz sampling
             - (?) uint32 frequencies
       - [ ] Aliasing widget
-             - [x] disable,100ms,200ms,500ms
+             - [x] disabled,100ms,200ms,500ms
              - [ ] _setting_
              - [ ] quick rise, slow decay
              - [ ] label
