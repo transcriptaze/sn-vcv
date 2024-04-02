@@ -27,9 +27,8 @@
             - (?) uint32 frequencies
       - [ ] Aliasing widget
              - [x] disabled,100ms,200ms,500ms
-             - [ ] _setting_
-             - [ ] quick rise, slow decay
-             - [ ] label
+             - [x] _setting_
+             - [ ] _sn-vcox_
 
 
 - [ ] Set k-rate in ms

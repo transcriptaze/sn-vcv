@@ -174,8 +174,9 @@ struct sn_vco_aliasing : AliasingWidget {
 
             level = clamp(module->fft.q, 0.f, 1.f);
             enabled = module->fft.updateRate != FFT::RATE::NONE;
+            mode = module->antialias;
 
-            snprintf(s, sizeof(s), "%0.2f", level);
+            snprintf(s, sizeof(s), "%.0f%%", 5.0 * std::round(20.0 * level));
             text = s;
         }
     }

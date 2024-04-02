@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../plugin.hpp"
+#include "../sn.hpp"
 
 struct AliasingWidget : Widget {
     AliasingWidget();
@@ -16,4 +17,5 @@ struct AliasingWidget : Widget {
     Vec textPos = Vec(7.62, 7.62);
     float level = 0.f;
     bool enabled = true;
+    ANTIALIAS mode = ANTIALIAS::NONE;
 };
