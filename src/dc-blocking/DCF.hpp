@@ -12,8 +12,6 @@ struct DCF {
     void recompute(DCBLOCK block, float fs);
     void process(const double *in, double *out, size_t channels);
 
-    DCBLOCK block;
-    float fs;
     double κ = 0.001;
     double α = 1.0;
     double β = 0.995;
@@ -21,4 +19,8 @@ struct DCF {
 
     double x[16] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     double y[16] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+  private:
+    DCBLOCK _block;
+    float _fs;
 };

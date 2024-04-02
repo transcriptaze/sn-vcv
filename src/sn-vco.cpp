@@ -58,6 +58,7 @@ json_t *sn_vco::dataToJson() {
     json_object_set_new(root, "aux-gain", json_integer(aux.gain));
     json_object_set_new(root, "anti-alias", json_integer(antialias));
     json_object_set_new(root, "dc-blocking", json_integer(dcblocking));
+    json_object_set_new(root, "alias-indicator", json_integer(fft.updateRate));
 
     return root;
 }
@@ -68,6 +69,7 @@ void sn_vco::dataFromJson(json_t *root) {
     json_t *gain = json_object_get(root, "aux-gain");
     json_t *antialias = json_object_get(root, "anti-alias");
     json_t *dcblocking = json_object_get(root, "dc-blocking");
+    json_t *indicator = json_object_get(root, "alias-indicator");
 
     if (krate) {
         int v = json_integer_value(krate);
@@ -102,6 +104,10 @@ void sn_vco::dataFromJson(json_t *root) {
 
     if (dcblocking) {
         this->dcblocking = DCF::int2mode(json_integer_value(dcblocking), this->dcblocking);
+    }
+
+    if (indicator) {
+        fft.updateRate = FFT::int2rate(json_integer_value(indicator), fft.updateRate);
     }
 }
 

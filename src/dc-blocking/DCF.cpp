@@ -46,9 +46,9 @@ DCF::DCF(DCBLOCK block, float fs) {
 }
 
 void DCF::recompute(DCBLOCK block, float fs) {
-    if (this->block != block || this->fs != fs) {
-        this->block = block;
-        this->fs = fs;
+    if (_block != block || _fs != fs) {
+        _block = block;
+        _fs = fs;
 
         int f = static_cast<int>(std::round(fs));
 
@@ -85,9 +85,9 @@ void DCF::recompute(DCBLOCK block, float fs) {
 
 // NB: in and out must NOT be the same array (compiler aliases variables)
 void DCF::process(const double *in, double *out, size_t channels) {
-    if (block != DCBLOCK_NONE && α < 1.0) {
+    if (_block != DCBLOCK_NONE && α < 1.0) {
         α += std::min(1.0, κ * (1.0 - α));
-    } else if (block == DCBLOCK_NONE && α > 0.0) {
+    } else if (_block == DCBLOCK_NONE && α > 0.0) {
         α -= std::max(0.0, κ * α);
     }
 

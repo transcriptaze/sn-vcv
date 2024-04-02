@@ -168,3 +168,18 @@ void FFT::dump() {
 
     fclose(f);
 }
+
+FFT::RATE FFT::int2rate(int v, FFT::RATE defval) {
+    switch (v) {
+    case NONE:
+        return NONE;
+    case FAST:
+        return FAST;
+    case MEDIUM:
+        return MEDIUM;
+    case SLOW:
+        return SLOW;
+    default:
+        return defval;
+    }
+}

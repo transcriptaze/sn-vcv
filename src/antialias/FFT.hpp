@@ -21,6 +21,7 @@ typedef struct FFT {
 
     static const unsigned SAMPLES;
     static const float FREQUENCY;
+    static RATE int2rate(int v, RATE defval);
 
     FFT();
 
