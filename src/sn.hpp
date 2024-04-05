@@ -51,6 +51,13 @@ enum DCBLOCK {
     DCBLOCK_FAST,
 };
 
+enum FFT_RATE {
+    OFF,
+    FAST,
+    MEDIUM,
+    SLOW,
+};
+
 typedef struct VCO {
     float α;
     float velocity;
@@ -78,6 +85,10 @@ typedef struct AUX {
         float sum;
     } out;
 } AUX;
+
+typedef struct FFTx {
+    FFT_RATE rate;
+} FFTx;
 
 // SN
 typedef struct Ζ {
@@ -208,7 +219,13 @@ typedef struct sn_vco_message {
         .out = 0.f,
     };
 
-    void set(bool linked, int channels, ANTIALIAS antialias, DCBLOCK dcblocking, const struct VCO vco[], const struct AUX aux) {
+    struct _FFT {
+        FFT_RATE rate;
+    } fft = {
+        .rate = FFT_RATE::SLOW,
+    };
+
+    void set(bool linked, int channels, ANTIALIAS antialias, DCBLOCK dcblocking, const struct VCO vco[], const struct AUX aux, const struct FFTx fft) {
         this->linked = linked;
         this->channels = channels;
         this->antialias = antialias;
@@ -224,6 +241,8 @@ typedef struct sn_vco_message {
 
         this->aux.phase = aux.phase;
         this->aux.out = aux.out.sum;
+
+        this->fft.rate = fft.rate;
     }
 } sn_vco_message;
 

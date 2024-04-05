@@ -23,15 +23,18 @@
       - [x] aliasing for 16 channels
       - [x] scale by relative velocity
       - [x] apply LPF transfer function
-            - (?) use 48kHz sampling
-            - (?) uint32 frequencies
-      - [ ] Aliasing widget
-             - [x] disabled,100ms,200ms,500ms
-             - [x] _setting_
-             - [ ] _sn-vcox_
-
+      - [x] Aliasing widget
+            - [ ] sn-vco is 100% if _a_ is 0
+      - [ ] _sn-vcox_
+            - [ ] widget
+            - [x] ~~context menu~~
+            - [ ] fft.out
+            - [ ] fft.sum
+      - (?) use 48kHz sampling
+      - (?) uint32 frequency index
 
 - [ ] Set k-rate in ms
+- [ ] Move sn_vco::dcblocking and sn_vc::antialias to  DCB and AA
 
 - [x] DC blocking
 - [x] Clamp input frequency

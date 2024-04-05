@@ -2,7 +2,9 @@
 #include "sn.hpp"
 
 #include "antialias/AA.hpp"
+#include "antialias/FFT.hpp"
 #include "dc-blocking/DCF.hpp"
+#include "widgets/aliasing.hpp"
 #include "widgets/xlight.hpp"
 
 struct sn_vcox : Module {
@@ -118,6 +120,12 @@ struct sn_vcox : Module {
         AA sum;
     } AA;
 
+    struct {
+        FFTx fftx;
+        FFT out;
+        FFT sum;
+    } fft;
+
     // ... DC  blocking
     struct {
         DCF out;
@@ -132,4 +140,30 @@ struct sn_vcoxWidget : ModuleWidget {
     sn_vcoxWidget(sn_vcox *);
 
     void appendContextMenu(Menu *) override;
+};
+
+struct sn_vcox_aliasing : AliasingWidget {
+    sn_vcox_aliasing() {
+        module = NULL;
+
+        fontPath = asset::system("res/fonts/Nunito-Bold.ttf");
+        text = "0.00";
+    }
+
+    void step() override {
+        Widget::step();
+
+        if (module != NULL) {
+            char s[16];
+
+            level = clamp(module->fft.out.q, 0.f, 1.f);
+            enabled = module->fft.fftx.rate != FFT_RATE::OFF;
+            mode = module->AA.out.mode;
+
+            snprintf(s, sizeof(s), "%.0f%%", 5.0 * std::round(20.0 * level));
+            text = s;
+        }
+    }
+
+    sn_vcox *module;
 };

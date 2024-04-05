@@ -190,6 +190,7 @@ void sn_vcox::process(const ProcessArgs &args) {
 
         aux.phase = msg->aux.phase;
         aux.out.sum = msg->aux.out;
+        fft.fftx.rate = msg->fft.rate;
     } else {
         for (int ch = 0; ch < 16; ch++) {
             vco[ch].velocity = 0.f;
@@ -200,6 +201,7 @@ void sn_vcox::process(const ProcessArgs &args) {
 
         aux.phase = 0.0f;
         aux.out.sum = 0.0f;
+        fft.fftx.rate = FFT_RATE::OFF;
     }
 
     processVCO(args, channels, antialias, dcblocking, expanded);
@@ -211,13 +213,13 @@ void sn_vcox::process(const ProcessArgs &args) {
 
         if ((msg = expanders.left.producer()) != NULL) {
             bool linked = msgR != NULL && msgR->linked;
-            msg->set(linked, channels, antialias, dcblocking, vco, aux);
+            msg->set(linked, channels, antialias, dcblocking, vco, aux, fft.fftx);
             expanders.left.flip();
         }
 
         if ((msg = expanders.right.producer()) != NULL) {
             bool linked = msgL != NULL && msgL->linked;
-            msg->set(linked, channels, antialias, dcblocking, vco, aux);
+            msg->set(linked, channels, antialias, dcblocking, vco, aux, fft.fftx);
             expanders.right.flip();
         }
     }
@@ -391,6 +393,7 @@ sn_vcoxWidget::sn_vcoxWidget(sn_vcox *module) {
 
     Vec xll(2.54, 11.43 + 2.54);
     Vec xrr(43.18, 11.43 + 2.54);
+    Vec alias(middle - 5.08, top + 7 * dh - 6.35 + 1.27);
 
     setModule(module);
     setPanel(createPanel(asset::plugin(pluginInstance, "res/sn-vcox.svg"),
@@ -430,6 +433,12 @@ sn_vcoxWidget::sn_vcoxWidget(sn_vcox *module) {
     addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xll), module, sn_vcox::XLR_LIGHT));
     addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_vcox::XRL_LIGHT));
     addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xrr), module, sn_vcox::XRR_LIGHT));
+
+    // ... aliasing
+    sn_vcox_aliasing *widget = createWidget<sn_vcox_aliasing>(mm2px(alias));
+    widget->box.size = mm2px(Vec(10.16, 11.43));
+    widget->module = module;
+    addChild(widget);
 }
 
 void sn_vcoxWidget::appendContextMenu(Menu *menu) {

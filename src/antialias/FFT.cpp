@@ -9,8 +9,8 @@ const float FFT::FREQUENCY = 1.0f;
 FFT::FFT() {
 }
 
-void FFT::process(size_t channels, const float frequency[16], const float velocity[16], std::function<float(float)> υ) {
-    if (updateRate == NONE) {
+void FFT::process(size_t channels, const float frequency[16], const float velocity[16], std::function<float(float)> υ, FFT_RATE rate) {
+    if (rate == FFT_RATE::OFF) {
         return;
     } else {
         switch (state) {
@@ -27,7 +27,7 @@ void FFT::process(size_t channels, const float frequency[16], const float veloci
             break;
 
         case IDLE:
-            idle();
+            idle(rate);
             break;
         }
 
@@ -107,23 +107,23 @@ void FFT::estimate(size_t channels, const float frequency[16], const float veloc
     }
 }
 
-void FFT::idle() {
+void FFT::idle(FFT_RATE rate) {
     unsigned N = 100 * sampleRate / 1000;
 
-    switch (updateRate) {
-    case NONE:
+    switch (rate) {
+    case FFT_RATE::OFF:
         N = 500 * sampleRate / 1000;
         break;
 
-    case FAST:
+    case FFT_RATE::FAST:
         N = 100 * sampleRate / 1000;
         break;
 
-    case MEDIUM:
+    case FFT_RATE::MEDIUM:
         N = 200 * sampleRate / 1000;
         break;
 
-    case SLOW:
+    case FFT_RATE::SLOW:
         N = 500 * sampleRate / 1000;
         break;
     }
@@ -169,16 +169,16 @@ void FFT::dump() {
     fclose(f);
 }
 
-FFT::RATE FFT::int2rate(int v, FFT::RATE defval) {
+FFT_RATE FFT::int2rate(int v, FFT_RATE defval) {
     switch (v) {
-    case NONE:
-        return NONE;
-    case FAST:
-        return FAST;
-    case MEDIUM:
-        return MEDIUM;
-    case SLOW:
-        return SLOW;
+    case FFT_RATE::OFF:
+        return FFT_RATE::OFF;
+    case FFT_RATE::FAST:
+        return FFT_RATE::FAST;
+    case FFT_RATE::MEDIUM:
+        return FFT_RATE::MEDIUM;
+    case FFT_RATE::SLOW:
+        return FFT_RATE::SLOW;
     default:
         return defval;
     }

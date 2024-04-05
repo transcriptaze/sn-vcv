@@ -5,13 +5,6 @@
 #include "../sn.hpp"
 
 typedef struct FFT {
-    enum RATE {
-        NONE,
-        FAST,
-        MEDIUM,
-        SLOW,
-    };
-
     enum STATE {
         COLLECT,
         DFT,
@@ -21,23 +14,22 @@ typedef struct FFT {
 
     static const unsigned SAMPLES;
     static const float FREQUENCY;
-    static RATE int2rate(int v, RATE defval);
+    static FFT_RATE int2rate(int v, FFT_RATE defval);
 
     FFT();
 
     void recompute(ANTIALIAS antialias, float sampleRate);
-    void process(size_t channels, const float frequency[16], const float velocity[16], std::function<float(float)> υ);
+    void process(size_t channels, const float frequency[16], const float velocity[16], std::function<float(float)> υ, FFT_RATE rate);
 
   private:
     void collect(std::function<float(float)> υ);
     void dft();
     void estimate(size_t channels, const float frequency[16], const float velocity[16]);
-    void idle();
+    void idle(FFT_RATE rate);
     void dump();
 
   public:
     ANTIALIAS antialias = ANTIALIAS::NONE;
-    RATE updateRate = RATE::SLOW;
     float sampleRate = 44100.f;
     float q = 0.f;
     bool debug = false;

@@ -76,6 +76,10 @@ struct sn_vco : Module {
         .out = {.osc = 0.f, .sum = 0.f},
     };
 
+    struct FFTx fftx = {
+        .rate = FFT_RATE::SLOW,
+    };
+
     float frequency[16] = {dsp::FREQ_C4};
     float velocity[16] = {0.f};
 
@@ -173,7 +177,7 @@ struct sn_vco_aliasing : AliasingWidget {
             char s[16];
 
             level = clamp(module->fft.q, 0.f, 1.f);
-            enabled = module->fft.updateRate != FFT::RATE::NONE;
+            enabled = module->fftx.rate != FFT_RATE::OFF;
             mode = module->antialias;
 
             snprintf(s, sizeof(s), "%.0f%%", 5.0 * std::round(20.0 * level));

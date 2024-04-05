@@ -58,7 +58,7 @@ json_t *sn_vco::dataToJson() {
     json_object_set_new(root, "aux-gain", json_integer(aux.gain));
     json_object_set_new(root, "anti-alias", json_integer(antialias));
     json_object_set_new(root, "dc-blocking", json_integer(dcblocking));
-    json_object_set_new(root, "alias-indicator", json_integer(fft.updateRate));
+    json_object_set_new(root, "alias-indicator", json_integer(fftx.rate));
 
     return root;
 }
@@ -107,7 +107,7 @@ void sn_vco::dataFromJson(json_t *root) {
     }
 
     if (indicator) {
-        fft.updateRate = FFT::int2rate(json_integer_value(indicator), fft.updateRate);
+        fftx.rate = FFT::int2rate(json_integer_value(indicator), fftx.rate);
     }
 }
 
@@ -161,12 +161,12 @@ void sn_vco::process(const ProcessArgs &args) {
     sn_vco_message *msg;
 
     if ((msg = expanders.left.producer()) != NULL) {
-        msg->set(true, channels, antialias, dcblocking, vco, aux);
+        msg->set(true, channels, antialias, dcblocking, vco, aux, fftx);
         expanders.left.flip();
     }
 
     if ((msg = expanders.right.producer()) != NULL) {
-        msg->set(true, channels, antialias, dcblocking, vco, aux);
+        msg->set(true, channels, antialias, dcblocking, vco, aux, fftx);
         expanders.right.flip();
     }
 }
@@ -290,7 +290,7 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
         return this->sn.A * this->sn.υ(2.0 * M_PI * phase);
     };
 
-    fft.process(channels, frequency, velocity, lambda);
+    fft.process(channels, frequency, velocity, lambda, fftx.rate);
 }
 
 void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
@@ -514,7 +514,7 @@ void sn_vcoWidget::appendContextMenu(Menu *menu) {
 
     menu->addChild(createIndexPtrSubmenuItem("Aliasing update rate",
                                              ALIASING,
-                                             &module->fft.updateRate));
+                                             &module->fftx.rate));
 }
 
 Model *model_sn_vco = createModel<sn_vco, sn_vcoWidget>("sn-vco");
