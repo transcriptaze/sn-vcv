@@ -185,7 +185,7 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
     }
 
     for (size_t ch = 0; ch < channels; ch++) {
-        float freq = frequency[ch];
+        float freq = fftx.frequency[ch];
 
         for (int i = 0; i < oversampling; i++) {
             phase[i][ch] = vco[ch].α + freq * δ[i];
@@ -215,7 +215,7 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
             vco[ch].phase[i] = phase[i][ch];
             vco[ch].out.vco[i] = υ;
             vco[ch].out.sum[i] = sn.A * υ;
-            vco[ch].velocity = velocity[ch];
+            vco[ch].velocity = fftx.velocity[ch];
         }
     }
 
@@ -290,7 +290,7 @@ void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
         return this->sn.A * this->sn.υ(2.0 * M_PI * phase);
     };
 
-    fft.process(channels, frequency, velocity, lambda, fftx.rate);
+    fft.process(channels, fftx.frequency, fftx.velocity, fftx.rate, lambda);
 }
 
 void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
@@ -306,7 +306,7 @@ void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
     for (size_t ch = 0; ch < channels; ch++) {
         float pitch = clamp(inputs[PITCH_INPUT].getPolyVoltage(ch), -3.f, 5.f); // C1 to C8
 
-        frequency[ch] = dsp::FREQ_C4 * std::pow(2.f, pitch);
+        fftx.frequency[ch] = dsp::FREQ_C4 * std::pow(2.f, pitch);
     }
 
     // ... velocity
@@ -315,19 +315,19 @@ void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
 
         for (size_t ch = 0; ch < channels; ch++) {
             if (ch < N) {
-                velocity[ch] = inputs[VELOCITY_INPUT].getPolyVoltage(ch) / 10.0f;
+                fftx.velocity[ch] = inputs[VELOCITY_INPUT].getPolyVoltage(ch) / 10.0f;
             } else {
-                velocity[ch] = inputs[VELOCITY_INPUT].getVoltage() / 10.0f;
+                fftx.velocity[ch] = inputs[VELOCITY_INPUT].getVoltage() / 10.0f;
             }
         }
     } else {
         for (size_t ch = 0; ch < channels; ch++) {
-            velocity[ch] = VELOCITY;
+            fftx.velocity[ch] = VELOCITY;
         }
     }
 
     for (int ch = channels; ch < 16; ch++) {
-        velocity[ch] = 0.f;
+        fftx.velocity[ch] = 0.f;
     }
 
     // ... antialiasing

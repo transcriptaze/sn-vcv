@@ -19,7 +19,7 @@ typedef struct FFT {
     FFT();
 
     void recompute(ANTIALIAS antialias, float sampleRate);
-    void process(size_t channels, const float frequency[16], const float velocity[16], std::function<float(float)> υ, FFT_RATE rate);
+    void process(size_t channels, const float frequency[16], const float velocity[16], FFT_RATE rate, std::function<float(float)> υ);
 
   private:
     void collect(std::function<float(float)> υ);

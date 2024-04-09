@@ -9,7 +9,7 @@ const float FFT::FREQUENCY = 1.0f;
 FFT::FFT() {
 }
 
-void FFT::process(size_t channels, const float frequency[16], const float velocity[16], std::function<float(float)> υ, FFT_RATE rate) {
+void FFT::process(size_t channels, const float frequency[16], const float velocity[16], FFT_RATE rate, std::function<float(float)> υ) {
     if (rate == FFT_RATE::OFF) {
         return;
     } else {

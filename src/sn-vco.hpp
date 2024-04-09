@@ -64,7 +64,6 @@ struct sn_vco : Module {
     void processFFT(const ProcessArgs &args, size_t);
 
     int channels();
-    // float velocity(int);
 
     // ... instance variables
     dsp::PulseGenerator trigger;
@@ -78,10 +77,9 @@ struct sn_vco : Module {
 
     struct FFTx fftx = {
         .rate = FFT_RATE::SLOW,
+        .frequency = {dsp::FREQ_C4},
+        .velocity = {0.f},
     };
-
-    float frequency[16] = {dsp::FREQ_C4};
-    float velocity[16] = {0.f};
 
     struct SN sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 

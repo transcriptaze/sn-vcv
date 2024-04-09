@@ -56,8 +56,9 @@ struct sn_vcox : Module {
     void process(const ProcessArgs &args) override;
 
     void recompute(const ProcessArgs &args, DCBLOCK dcblocking);
-    void processVCO(const ProcessArgs &args, size_t, ANTIALIAS, DCBLOCK, bool);
+    void processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS antialias, DCBLOCK dcblocking, bool);
     void processAUX(const ProcessArgs &args, bool);
+    void processFFT(const ProcessArgs &args, size_t channels);
 
     int krate();
     bool isLinkedLeft();
