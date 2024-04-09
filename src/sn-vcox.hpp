@@ -157,11 +157,12 @@ struct sn_vcox_aliasing : AliasingWidget {
         if (module != NULL) {
             char s[16];
 
-            level = clamp(module->fft.out.q, 0.f, 1.f);
+            level1 = clamp(module->fft.out.q, 0.f, 1.f);
+            level2 = 0.0;
             enabled = module->fft.fftx.rate != FFT_RATE::OFF;
             mode = module->AA.out.mode;
 
-            snprintf(s, sizeof(s), "%.0f%%", 5.0 * std::round(20.0 * level));
+            snprintf(s, sizeof(s), "%.0f%%", 5.0 * std::round(20.0 * fmax(level1, level2)));
             text = s;
         }
     }

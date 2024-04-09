@@ -18,12 +18,20 @@ void AliasingWidget::draw(const DrawArgs &args) {
 void AliasingWidget::drawLayer(const DrawArgs &args, int layer) {
     if (layer == 1) {
         if (enabled) {
-            float v = clamp(level, 0.f, 1.f);
-            float h = v * (box.size.y - 3);
+            float v1 = clamp(level1, 0.f, 1.f);
+            float v2 = clamp(level2, 0.f, 1.f);
+            float h1 = v1 * (box.size.y - 3);
+            float h2 = v2 * (box.size.y - 3);
 
-            // ... bar
+            // ... bar 1
             nvgBeginPath(args.vg);
-            nvgRect(args.vg, 2, box.size.y - h - 2, 12.7, h);
+            nvgRect(args.vg, 2, box.size.y - h1 - 2, 5.715, h1);
+            nvgFillColor(args.vg, nvgRGB(0xff, 0x00, 0x00));
+            nvgFill(args.vg);
+
+            // ... bar 2
+            nvgBeginPath(args.vg);
+            nvgRect(args.vg, 2 + 6.985, box.size.y - h2 - 2, 5.715, h2);
             nvgFillColor(args.vg, nvgRGB(0xff, 0x00, 0x00));
             nvgFill(args.vg);
 

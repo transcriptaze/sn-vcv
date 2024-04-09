@@ -15,7 +15,8 @@ struct AliasingWidget : Widget {
     std::string text;
     float fontSize = 10;
     Vec textPos = Vec(7.62, 7.62);
-    float level = 0.f;
+    float level1 = 0.f;
+    float level2 = 0.f;
     bool enabled = true;
     ANTIALIAS mode = ANTIALIAS::NONE;
 };
