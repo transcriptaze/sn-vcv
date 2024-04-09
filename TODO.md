@@ -24,7 +24,7 @@
       - [x] scale by relative velocity
       - [x] apply LPF transfer function
       - [x] Aliasing widget
-            - [ ] sn-vco is 100% if _a_ is 0
+            - [x] sn-vco is 100% if _a_ is 0
       - [ ] _sn-vcox_
             - [ ] widget
             - [x] ~~context menu~~

@@ -95,7 +95,7 @@ void FFT::estimate(size_t channels, const float frequency[16], const float veloc
 
         double power = sqrt(sum);
         double power20 = sqrt(sum20);
-        double ratio = power20 / power;
+        double ratio = power > 0.001 ? power20 / power : 0.0;
 
         acc.ratio += vel * ratio;
         acc.velocity += vel;
@@ -153,18 +153,6 @@ void FFT::dump() {
 
         fprintf(f, "%-4lu\t%.5f\t%.3f\t%12.5f\t%12.5f\n", i, buffer.samples[i], freq, fft.real[i], fft.imag[i]);
     }
-
-    // for (size_t i = 0; i < FFT_SAMPLES; i += 8) {
-    //     fprintf(f, "             %8.5f, %8.5f, %8.5f, %8.5f, %8.5f, %8.5f, %8.5f, %8.5f,\n",
-    //             fft.buffer[i],
-    //             fft.buffer[i + 1],
-    //             fft.buffer[i + 2],
-    //             fft.buffer[i + 3],
-    //             fft.buffer[i + 4],
-    //             fft.buffer[i + 5],
-    //             fft.buffer[i + 6],
-    //             fft.buffer[i + 7]);
-    // }
 
     fclose(f);
 }
