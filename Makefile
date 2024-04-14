@@ -30,6 +30,6 @@ headless: format install
 	/Applications/VCV\ Rack\ 2\ Free.app/Contents/MacOS/Rack --headless
 
 debug: build
-	mkdir -p runtime/plugins-mac-x64
-	cp -r dist/*.vcvplugin ./runtime/plugins-mac-x64
-	$(EXE) --user ~/Development/shapestry/sn-vcv/runtime
+	mkdir -p workdir/plugins-mac-x64
+	cp -r dist/*.vcvplugin ./workdir/plugins-mac-x64
+	$(EXE) --user ~/Development/shapestry/sn-vcv/workdir

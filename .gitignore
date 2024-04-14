@@ -11,5 +11,4 @@ documentation/patches/sn-v2f.vcv
 documentation/patches/archive
 documentation/midi
 documentation/aliasing/workfiles
-runtime
-
+workdir

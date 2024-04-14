@@ -9,4 +9,5 @@ void init(Plugin *p) {
     p->addModel(model_sn_vcox);
     p->addModel(model_sn_lfo);
     p->addModel(model_sn_lfox);
+    p->addModel(model_sn_psd);
 }

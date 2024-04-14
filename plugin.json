@@ -52,6 +52,14 @@
       "tags": [
         "Expander"
       ]
+    },
+    {
+      "slug": "sn-psd",
+      "name": "sn-psd",
+      "description": "PSD display for sn-vco and sn-vcox.",
+      "tags": [
+        "Utility"
+      ]
     }
   ]
 }

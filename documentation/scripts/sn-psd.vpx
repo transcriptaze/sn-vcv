@@ -1,0 +1,32 @@
+new module sn-psd 2H
+new guide v1 center
+new guide h1 top+10.16mm
+new guide h2 h1+10.16mm
+new guide h3 h2+10.16mm
+new guide h4 h3+10.16mm
+new input frequency v1,h2 PJ301M
+new input velocity v1,h3 PJ301M
+new input in v1,h4 PJ301M
+new guide h5 h4+20.32mm
+new widget display v1,h5 LCD
+set module width 3H
+set background fundamental
+new label "SN-PSD" v1,h1 RobotoBold 10pt center,baseline
+new label "V/OCT" v1,h2-5.08mm RobotoMono 8pt center,baseline
+new label "VELOCITY" v1,h3-5.08mm RobotoMono 8pt center,baseline
+new label "IN" v1,h4-5.08mm RobotoMono 8pt center,baseline
+set guide h2 h1+15.24mm
+set guide h3 h2+15.24mm
+set guide h4 h3+15.24mm
+set label l2 xy (input frequency +0mm,-5.08mm)
+set label l3 xy (input velocity +0mm,-5.08mm)
+set label l4 xy (input in +0mm,-5.08mm)
+set label l1 size 14pt
+set label l1 size 16pt
+set label l1 size 20pt
+set label t1 size 14pt
+set label t1 size 12pt
+set label t1 text "SN PSD"
+set label t1 font RobotoCondensed-Bold
+new guide h6 bottom-15.25mm
+new input debug v1,h6 PJ301M

@@ -130,7 +130,6 @@ struct sn_vco : Module {
     };
 
     // ... debug
-
     dsp::SchmittTrigger debug;
 };
 
