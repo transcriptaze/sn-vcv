@@ -143,19 +143,34 @@ void FFT::idle(FFT_RATE rate) {
 }
 
 void FFT::dump() {
-    const double fs = (double)(FFT::SAMPLES) / FFT::FREQUENCY;
-    FILE *f = fopen("/tmp/sn-vco-fft.tsv", "wt");
+    const char *file = "/tmp/sn-vco-samples.tsv";
+    FILE *f = fopen(file, "wt");
 
-    fprintf(f, "i\tsn.υ\tf\treal\timaginary\n");
+    fprintf(f, "i\tsn.υ\n");
 
     for (size_t i = 0; i < FFT::SAMPLES; i++) {
-        const double freq = i * fs / FFT::SAMPLES;
-
-        fprintf(f, "%-4lu\t%.5f\t%.3f\t%12.5f\t%12.5f\n", i, buffer.samples[i], freq, fft.real[i], fft.imag[i]);
+        fprintf(f, "%-4lu\t%.5f\n", i, buffer.samples[i]);
     }
 
     fclose(f);
+
+    INFO(">> sn-vcv::sn-vco dumped sample buffer to %s", file);
 }
+
+// void FFT::dump() {
+//     const double fs = (double)(FFT::SAMPLES) / FFT::FREQUENCY;
+//     FILE *f = fopen("/tmp/sn-vco-fft.tsv", "wt");
+//
+//     fprintf(f, "i\tsn.υ\tf\treal\timaginary\n");
+//
+//     for (size_t i = 0; i < FFT::SAMPLES; i++) {
+//         const double freq = i * fs / FFT::SAMPLES;
+//
+//         fprintf(f, "%-4lu\t%.5f\t%.3f\t%12.5f\t%12.5f\n", i, buffer.samples[i], freq, fft.real[i], fft.imag[i]);
+//     }
+//
+//     fclose(f);
+// }
 
 FFT_RATE FFT::int2rate(int v, FFT_RATE defval) {
     switch (v) {

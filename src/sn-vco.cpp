@@ -33,7 +33,7 @@ sn_vco::sn_vco() {
     configInput(PITCH_INPUT, "1V/octave pitch");
     configInput(VELOCITY_INPUT, "0-10V velocity");
 
-    // configInput(DEBUG_INPUT, "debug");
+    configInput(DEBUG_INPUT, "debug");
 
     // ... outputs
     configOutput(VCO_OUTPUT, "VCO");
@@ -483,7 +483,7 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
     addChild(widget);
 
     // ... debug
-    // addInput(createInputCentered<ThemedPJ301MPort>(mm2px(debug), module, sn_vco::DEBUG_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(debug), module, sn_vco::DEBUG_INPUT));
 }
 
 void sn_vcoWidget::appendContextMenu(Menu *menu) {
