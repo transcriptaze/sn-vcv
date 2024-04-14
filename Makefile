@@ -33,3 +33,7 @@ debug: build
 	mkdir -p workdir/plugins-mac-x64
 	cp -r dist/*.vcvplugin ./workdir/plugins-mac-x64
 	$(EXE) --user ~/Development/shapestry/sn-vcv/workdir
+
+tail:
+	tail -f workdir/log.txt | grep sn-vcv
+

@@ -17,7 +17,9 @@
       - [ ] ALIASING.md
       - (?) PID
 
-- [ ] sn-pad: anti-aliasing indicator
+- [ ] sn-psd: PSD display
+
+- [ ] sn-vco: anti-aliasing indicator
       - [x] FFT
       - [x] logarithmic indicator brightness
       - [x] aliasing for 16 channels

@@ -33,7 +33,7 @@ struct sn_psd : Module {
     void process(const ProcessArgs &args) override;
 
   private:
-    void dump();
+    void dump(unsigned decimate);
 
   public:
     bool connected = false;

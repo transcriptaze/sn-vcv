@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "plugin.hpp"
 
 #include "sn-psd.hpp"
@@ -12,6 +14,8 @@ sn_psd::sn_psd() {
 }
 
 void sn_psd::process(const ProcessArgs &args) {
+    unsigned sampleRate = unsigned(args.sampleRate);
+
     if (inputs[IN_INPUT].isConnected() && !connected) {
         connected = true;
         fft.state = COLLECT;
@@ -21,7 +25,7 @@ void sn_psd::process(const ProcessArgs &args) {
         fft.state = IDLE;
     }
 
-    if (!connected) {
+    if (!connected || sampleRate < 44100) {
         return;
     }
 
@@ -31,27 +35,47 @@ void sn_psd::process(const ProcessArgs &args) {
     }
 
     // ... FFT
+    unsigned N = unsigned(args.sampleRate / 25.0);
+    unsigned decimate = 1;
+
+    if ((N % 1764) == 0) {
+        decimate = int(args.sampleRate) / 44100;
+    } else if ((N % 1920) == 0) {
+        decimate = int(args.sampleRate) / 48000;
+    } else {
+        decimate = 1 + (N / 2048);
+        N = std::min(unsigned(args.sampleRate / (25.0 * decimate)), unsigned(2048));
+    }
+
+    unsigned ix = fft.ix / decimate;
+
     if (fft.state == STATE::COLLECT) {
-        if (fft.ix < 2048) {
-            fft.buffer[fft.ix++] = inputs[IN_INPUT].getVoltage() / 5.f;
+        if (fft.ix < N) {
+            if ((fft.ix % decimate) == 0) {
+                fft.buffer[ix] = inputs[IN_INPUT].getVoltage() / 5.f;
+            }
+
+            fft.ix++;
         } else {
+            INFO(">> sn-vcv::sn-psd N:%d  decimate:%d  fft.ix:%d  ix:%d", N, decimate, fft.ix, ix);
             fft.state = DFT;
         }
     } else {
         if (fft.debug) {
             fft.debug = false;
-            dump();
+            dump(decimate);
         }
     }
 }
 
-void sn_psd::dump() {
+void sn_psd::dump(unsigned decimate) {
     const char *file = "/tmp/sn-psd-samples.tsv";
     FILE *f = fopen(file, "wt");
+    unsigned N = fft.ix / decimate;
 
     fprintf(f, "i\tsn.υ\n");
 
-    for (size_t i = 0; i < fft.ix; i++) {
+    for (size_t i = 0; i < N; i++) {
         fprintf(f, "%-4lu\t%.5f\n", i, fft.buffer[i]);
     }
 
