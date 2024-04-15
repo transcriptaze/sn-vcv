@@ -29,6 +29,20 @@
 #include "dft.hpp"
 
 static size_t reverse_bits(size_t val, int width);
+static void *memdup(const void *src, size_t n);
+
+bool fft_transform(double real[], double imag[], size_t n) {
+    if (n == 0)
+        return true;
+    else if ((n & (n - 1)) == 0) // Is power of 2
+        return fft_transformRadix2(real, imag, n);
+    else // More complicated algorithm for arbitrary sizes
+        return fft_transformBluestein(real, imag, n);
+}
+
+bool fft_inverse_transform(double real[], double imag[], size_t n) {
+    return fft_transform(imag, real, n);
+}
 
 bool fft_transformRadix2(double real[], double imag[], unsigned n) {
     // Length variables
@@ -92,9 +106,131 @@ cleanup:
     return status;
 }
 
+bool fft_transformBluestein(double real[], double imag[], size_t n) {
+    bool status = false;
+
+    // Find a power-of-2 convolution length m such that m >= n * 2 + 1
+    size_t m = 1;
+    while (m / 2 <= n) {
+        if (m > SIZE_MAX / 2)
+            return false;
+        m *= 2;
+    }
+
+    // Allocate memory
+    if (SIZE_MAX / sizeof(double) < n || SIZE_MAX / sizeof(double) < m)
+        return false;
+    size_t size_n = n * sizeof(double);
+    size_t size_m = m * sizeof(double);
+    double *cos_table = (double *)malloc(size_n);
+    double *sin_table = (double *)malloc(size_n);
+    double *areal = (double *)calloc(m, sizeof(double));
+    double *aimag = (double *)calloc(m, sizeof(double));
+    double *breal = (double *)calloc(m, sizeof(double));
+    double *bimag = (double *)calloc(m, sizeof(double));
+    double *creal = (double *)malloc(size_m);
+    double *cimag = (double *)malloc(size_m);
+    if (cos_table == NULL || sin_table == NULL || areal == NULL || aimag == NULL || breal == NULL || bimag == NULL || creal == NULL || cimag == NULL)
+        goto cleanup;
+
+    // Trigonometric tables
+    for (size_t i = 0; i < n; i++) {
+        uintmax_t temp = ((uintmax_t)i * i) % ((uintmax_t)n * 2);
+        double angle = M_PI * temp / n;
+        cos_table[i] = cos(angle);
+        sin_table[i] = sin(angle);
+    }
+
+    // Temporary vectors and preprocessing
+    for (size_t i = 0; i < n; i++) {
+        areal[i] = real[i] * cos_table[i] + imag[i] * sin_table[i];
+        aimag[i] = -real[i] * sin_table[i] + imag[i] * cos_table[i];
+    }
+    breal[0] = cos_table[0];
+    bimag[0] = sin_table[0];
+    for (size_t i = 1; i < n; i++) {
+        breal[i] = breal[m - i] = cos_table[i];
+        bimag[i] = bimag[m - i] = sin_table[i];
+    }
+
+    // Convolution
+    if (!fft_convolve_complex(areal, aimag, breal, bimag, creal, cimag, m))
+        goto cleanup;
+
+    // Postprocessing
+    for (size_t i = 0; i < n; i++) {
+        real[i] = creal[i] * cos_table[i] + cimag[i] * sin_table[i];
+        imag[i] = -creal[i] * sin_table[i] + cimag[i] * cos_table[i];
+    }
+    status = true;
+
+    // Deallocation
+cleanup:
+    free(cos_table);
+    free(sin_table);
+    free(areal);
+    free(aimag);
+    free(breal);
+    free(bimag);
+    free(creal);
+    free(cimag);
+    return status;
+}
+
+bool fft_convolve_complex(const double xreal[], const double ximag[], const double yreal[], const double yimag[], double outreal[], double outimag[], size_t n) {
+    bool status = false;
+    if (SIZE_MAX / sizeof(double) < n)
+        return false;
+    size_t size = n * sizeof(double);
+
+    double *xr = (double *)memdup(xreal, size);
+    double *xi = (double *)memdup(ximag, size);
+    double *yr = (double *)memdup(yreal, size);
+    double *yi = (double *)memdup(yimag, size);
+    if (xr == NULL || xi == NULL || yr == NULL || yi == NULL)
+        goto cleanup;
+
+    if (!fft_transform(xr, xi, n))
+        goto cleanup;
+
+    if (!fft_transform(yr, yi, n))
+        goto cleanup;
+
+    for (size_t i = 0; i < n; i++) {
+        double temp = xr[i] * yr[i] - xi[i] * yi[i];
+        xi[i] = xi[i] * yr[i] + xr[i] * yi[i];
+        xr[i] = temp;
+    }
+
+    if (!fft_inverse_transform(xr, xi, n))
+        goto cleanup;
+
+    for (size_t i = 0; i < n; i++) { // Scaling (because this FFT implementation omits it)
+        outreal[i] = xr[i] / n;
+        outimag[i] = xi[i] / n;
+    }
+
+    status = true;
+
+cleanup:
+    free(xr);
+    free(xi);
+    free(yr);
+    free(yi);
+    return status;
+}
+
 static size_t reverse_bits(size_t val, int width) {
     size_t result = 0;
     for (int i = 0; i < width; i++, val >>= 1)
         result = (result << 1) | (val & 1U);
     return result;
+}
+
+static void *memdup(const void *src, size_t n) {
+    void *dest = malloc(n);
+    if (n > 0 && dest != NULL) {
+        memcpy(dest, src, n);
+    }
+    return dest;
 }

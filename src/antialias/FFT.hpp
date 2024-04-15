@@ -27,6 +27,8 @@ typedef struct FFT {
     void estimate(size_t channels, const float frequency[16], const float velocity[16]);
     void idle(FFT_RATE rate);
     void dump();
+    void dump_samples();
+    void dump_fft();
 
   public:
     ANTIALIAS antialias = ANTIALIAS::NONE;
