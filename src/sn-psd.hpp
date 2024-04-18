@@ -4,6 +4,8 @@
 #include "widgets/psd.hpp"
 
 struct sn_psd : Module {
+    static const unsigned SAMPLES;
+
     enum ParamId {
         PARAMS_LEN
     };
@@ -47,6 +49,7 @@ struct sn_psd : Module {
   private:
     void collect(const ProcessArgs &args);
     void dft(const ProcessArgs &args);
+    void estimate(const ProcessArgs &args);
     void idle(const ProcessArgs &args);
 
     void dump();
@@ -57,21 +60,25 @@ struct sn_psd : Module {
     bool enabled = false;
 
   private:
+    dsp::SchmittTrigger trigger;
+
     STATE state = STATE::IDLE;
+    FFT_RATE rate = FFT_RATE::OFF;
     unsigned loops = 0;
-    dsp::SchmittTrigger debug;
+    bool debug = false;
 
     struct {
-        FFT_RATE rate;
         unsigned ix;
         unsigned samples;
         double buffer[2048];
-        bool debug;
+        double real[2048];
+        double imag[2048];
     } fft = {
         .ix = 0,
         .samples = 0,
         .buffer = {0.0},
-        .debug = false,
+        .real = {0.0},
+        .imag = {0.0},
     };
 
     friend struct sn_psd_widget;

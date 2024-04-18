@@ -18,6 +18,11 @@
       - (?) PID
 
 - [ ] sn-psd: PSD display
+      - [x] capture single cycle
+      - [ ] validate FFT
+      - [ ] loop at rate
+      - [ ] reduce samples captured from 2048 to 512
+
 
 - [ ] sn-vco: anti-aliasing indicator
       - [x] FFT
@@ -25,13 +30,7 @@
       - [x] aliasing for 16 channels
       - [x] scale by relative velocity
       - [x] apply LPF transfer function
-      - [x] Aliasing widget
-            - [x] sn-vco is 100% if _a_ is 0
-      - [ ] _sn-vcox_
-            - [ ] widget
-            - [x] ~~context menu~~
-            - [ ] fft.out
-            - [ ] fft.sum
+      - [x] PSD widget
       - (?) use 48kHz sampling
       - (?) uint32 frequency index
 

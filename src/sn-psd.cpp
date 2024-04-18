@@ -2,8 +2,11 @@
 
 #include "plugin.hpp"
 
+#include "dsp/dft.hpp"
 #include "sn-psd.hpp"
 #include "sn-psd_widget.h"
+
+const unsigned sn_psd::SAMPLES = 2048;
 
 const std::vector<std::string> sn_psd_widget::FFT_RATES = {
     "Off",
@@ -23,7 +26,7 @@ sn_psd::sn_psd() {
 json_t *sn_psd::dataToJson() {
     json_t *root = json_object();
 
-    json_object_set_new(root, "fft-rate", json_integer(fft.rate));
+    json_object_set_new(root, "fft-rate", json_integer(rate));
 
     return root;
 }
@@ -34,19 +37,19 @@ void sn_psd::dataFromJson(json_t *root) {
     if (fft_rate) {
         switch (json_integer_value(fft_rate)) {
         case FFT_RATE::OFF:
-            fft.rate = FFT_RATE::OFF;
+            rate = FFT_RATE::OFF;
             break;
 
         case FFT_RATE::FAST:
-            fft.rate = FFT_RATE::FAST;
+            rate = FFT_RATE::FAST;
             break;
 
         case FFT_RATE::MEDIUM:
-            fft.rate = FFT_RATE::MEDIUM;
+            rate = FFT_RATE::MEDIUM;
             break;
 
         case FFT_RATE::SLOW:
-            fft.rate = FFT_RATE::SLOW;
+            rate = FFT_RATE::SLOW;
             break;
         }
     }
@@ -55,26 +58,27 @@ void sn_psd::dataFromJson(json_t *root) {
 void sn_psd::process(const ProcessArgs &args) {
     unsigned sampleRate = unsigned(args.sampleRate);
 
-    if (inputs[IN_INPUT].isConnected() && fft.rate != FFT_RATE::OFF && sampleRate >= 44100 && !enabled) {
+    if (inputs[IN_INPUT].isConnected() && rate != FFT_RATE::OFF && sampleRate >= 44100 && !enabled) {
         loops = 0;
         enabled = true;
         state = COLLECT;
 
         fft.ix = 0;
         fft.samples = 0;
-    } else if ((!inputs[IN_INPUT].isConnected() || fft.rate == FFT_RATE::OFF || sampleRate < 44100) && enabled) {
+    } else if ((!inputs[IN_INPUT].isConnected() || rate == FFT_RATE::OFF || sampleRate < 44100) && enabled) {
         enabled = false;
         state = IDLE;
     }
 
     // ... debug?
-    if (debug.processEvent(inputs[DEBUG_INPUT].getVoltage(), 0.f, 1.f) == dsp::TSchmittTrigger<float>::Event::TRIGGERED) {
+    if (trigger.processEvent(inputs[DEBUG_INPUT].getVoltage(), 0.f, 1.f) == dsp::TSchmittTrigger<float>::Event::TRIGGERED) {
         INFO(">> sn-vcv::sn-psd DEBUG connected:   %d", inputs[IN_INPUT].isConnected());
-        INFO(">> sn-vcv::sn-psd DEBUG rate:        %d", fft.rate);
+        INFO(">> sn-vcv::sn-psd DEBUG rate:        %d", rate);
         INFO(">> sn-vcv::sn-psd DEBUG sample rate: %d", sampleRate);
         INFO(">> sn-vcv::sn-psd DEBUG enabled:     %d", enabled);
         INFO(">> sn-vcv::sn-psd DEBUG state:       %d", state);
-        fft.debug = true;
+        INFO(">> sn-vcv::sn-psd DEBUG N:           %d", fft.samples);
+        debug = true;
     }
 
     if (!enabled) {
@@ -86,9 +90,11 @@ void sn_psd::process(const ProcessArgs &args) {
         collect(args);
     } else if (state == STATE::DFT) {
         dft(args);
+    } else if (state == STATE::ESTIMATE) {
+        estimate(args);
     } else if (state == STATE::IDLE) {
-        if (fft.debug) {
-            fft.debug = false;
+        if (debug) {
+            debug = false;
             dump();
         }
 
@@ -107,8 +113,8 @@ void sn_psd::collect(const ProcessArgs &args) {
     } else if ((N % 1920) == 0) {
         decimate = int(args.sampleRate) / 48000;
     } else {
-        decimate = 1 + (N / 2048);
-        N = std::min(unsigned(args.sampleRate / (25.0 * decimate)), unsigned(2048));
+        decimate = 1 + (N / SAMPLES);
+        N = std::min(unsigned(args.sampleRate / (25.0 * decimate)), unsigned(SAMPLES));
     }
 
     unsigned ix = fft.ix / decimate;
@@ -126,6 +132,18 @@ void sn_psd::collect(const ProcessArgs &args) {
 }
 
 void sn_psd::dft(const ProcessArgs &args) {
+    memmove(fft.real, fft.buffer, SAMPLES * sizeof(double));
+    memset(fft.imag, 0, SAMPLES * sizeof(double));
+
+    fft_transformBluestein(fft.real, fft.imag, fft.samples);
+
+    state = STATE::ESTIMATE;
+    // acc.ch = 0;
+    // acc.ratio = 0.0;
+    // acc.velocity = 0.0;
+}
+
+void sn_psd::estimate(const ProcessArgs &args) {
     state = STATE::IDLE;
 }
 
@@ -133,7 +151,7 @@ void sn_psd::idle(const ProcessArgs &args) {
     unsigned sampleRate = unsigned(args.sampleRate);
     unsigned N = 100 * sampleRate / 1000;
 
-    switch (fft.rate) {
+    switch (rate) {
     case FFT_RATE::OFF:
         N = 500 * sampleRate / 1000;
         break;
@@ -162,6 +180,7 @@ void sn_psd::idle(const ProcessArgs &args) {
 
 void sn_psd::dump() {
     dump_samples();
+    dump_fft();
 }
 
 void sn_psd::dump_samples() {
@@ -181,6 +200,22 @@ void sn_psd::dump_samples() {
 }
 
 void sn_psd::dump_fft() {
+    const char *file = "/tmp/sn-psd-fft.tsv";
+    FILE *f = fopen(file, "wt");
+    unsigned N = fft.samples;
+    double fs = 1.0;
+
+    fprintf(f, "f\treal\timaginary\n");
+
+    for (size_t i = 0; i < N; i++) {
+        const double freq = i * fs / N;
+
+        fprintf(f, "%%.3f\t%12.5f\t%12.5f\n", freq, fft.real[i], fft.imag[i]);
+    }
+
+    fclose(f);
+
+    INFO(">> sn-vcv::sn-psd dumped FFT to %s", file);
 }
 
 sn_psd_widget::sn_psd_widget(sn_psd *module) {
@@ -214,7 +249,7 @@ void sn_psd_widget::appendContextMenu(Menu *menu) {
 
     menu->addChild(createIndexPtrSubmenuItem("FFT rate",
                                              FFT_RATES,
-                                             &module->fft.rate));
+                                             &module->rate));
 }
 
 Model *model_sn_psd = createModel<sn_psd, sn_psd_widget>("sn-psd");
