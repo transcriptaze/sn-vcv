@@ -1,7 +1,7 @@
 #include "plugin.hpp"
 
 #include "sn-psd_widget.h"
-#include "widgets/aliasing.hpp"
+#include "widgets/psd.hpp"
 
 struct sn_psd : Module {
     enum ParamId {
@@ -85,7 +85,7 @@ struct sn_psd_widget : ModuleWidget {
     void appendContextMenu(Menu *) override;
 };
 
-struct sn_psd_display : AliasingWidget {
+struct sn_psd_display : PSDWidget {
     sn_psd_display() {
         module = NULL;
 

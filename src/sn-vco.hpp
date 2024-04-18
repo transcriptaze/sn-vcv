@@ -4,7 +4,7 @@
 #include "antialias/AA.hpp"
 #include "antialias/FFT.hpp"
 #include "dc-blocking/DCF.hpp"
-#include "widgets/aliasing.hpp"
+#include "widgets/psd.hpp"
 #include "widgets/xlight.hpp"
 
 typedef struct sn_vco_fft sn_vco_fft;
@@ -159,8 +159,8 @@ struct sn_vco_channels : ChannelsWidget {
     sn_vco *module;
 };
 
-struct sn_vco_aliasing : AliasingWidget {
-    sn_vco_aliasing() {
+struct sn_vco_psd : PSDWidget {
+    sn_vco_psd() {
         module = NULL;
 
         fontPath = asset::system("res/fonts/Nunito-Bold.ttf");

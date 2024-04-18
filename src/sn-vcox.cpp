@@ -217,7 +217,6 @@ void sn_vcox::process(const ProcessArgs &args) {
 
     processVCO(args, channels, antialias, dcblocking, expanded);
     processAUX(args, expanded);
-    processFFT(args, channels);
 
     // ... update expanders
     {
@@ -325,14 +324,6 @@ void sn_vcox::processAUX(const ProcessArgs &args, bool expanded) {
             outputs[AUX_OUTPUT].setChannels(1);
         }
     }
-}
-
-void sn_vcox::processFFT(const ProcessArgs &args, size_t channels) {
-    std::function<float(float)> lambda = [this](float phase) {
-        return this->sn.A * this->sn.υ(2.0 * M_PI * phase);
-    };
-
-    fft.out.process(channels, fft.fftx.frequency, fft.fftx.velocity, fft.fftx.rate, lambda);
 }
 
 void sn_vcox::recompute(const ProcessArgs &args, DCBLOCK dcblocking) {
@@ -453,12 +444,6 @@ sn_vcoxWidget::sn_vcoxWidget(sn_vcox *module) {
     addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xll), module, sn_vcox::XLR_LIGHT));
     addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_vcox::XRL_LIGHT));
     addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xrr), module, sn_vcox::XRR_LIGHT));
-
-    // ... aliasing
-    sn_vcox_aliasing *widget = createWidget<sn_vcox_aliasing>(mm2px(alias));
-    widget->box.size = mm2px(Vec(10.16, 11.43));
-    widget->module = module;
-    addChild(widget);
 }
 
 void sn_vcoxWidget::appendContextMenu(Menu *menu) {

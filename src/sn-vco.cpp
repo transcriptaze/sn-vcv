@@ -418,7 +418,7 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
 
     Vec xll(2.54, 11.43 + 2.54);
     Vec xrr(43.18, 11.43 + 2.54);
-    Vec alias(middle - 5.08, top + 7 * dh - 6.35 + 1.27);
+    Vec psd(middle, top + 7 * dh - 6.35 + 1.27);
     Vec debug(left, top + 7 * dh + 1.27);
 
     setModule(module);
@@ -477,7 +477,7 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
     addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_vco::XRR_LIGHT));
 
     // ... aliasing
-    sn_vco_aliasing *widget = createWidget<sn_vco_aliasing>(mm2px(alias));
+    sn_vco_psd *widget = createWidget<sn_vco_psd>(mm2px(psd));
     widget->box.size = mm2px(Vec(10.16, 11.43));
     widget->module = module;
     addChild(widget);
