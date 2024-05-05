@@ -1,5 +1,12 @@
 # TODO
 
+- [ ] [Antialiasing](https://github.com/transcriptaze/sn-vcv/issues/3)
+      - [x] Context menu
+      - [x] sn-vco
+      - [x] sn-vcox
+      - [ ] ALIASING.md
+      - (?) PID
+
 - [ ] Optimisation
       - [ ] Baseline
       - https://community.vcvrack.com/t/anyone-has-done-profiling-on-a-module-code/7537/
@@ -9,30 +16,6 @@
       - https://stackoverflow.com/questions/3764978/why-hypot-function-is-so-slow
       - https://mattkretz.github.io/2019/01/18/optimizing-hypot-for-simd.html
 
-
-- [ ] [Antialiasing](https://github.com/transcriptaze/sn-vcv/issues/3)
-      - [x] Context menu
-      - [x] sn-vco
-      - [x] sn-vcox
-      - [ ] ALIASING.md
-      - (?) PID
-
-- [ ] sn-psd: PSD display
-      - [x] capture single cycle
-      - [ ] validate FFT
-      - [ ] loop at rate
-      - [ ] reduce samples captured from 2048 to 512
-
-
-- [ ] sn-vco: anti-aliasing indicator
-      - [x] FFT
-      - [x] logarithmic indicator brightness
-      - [x] aliasing for 16 channels
-      - [x] scale by relative velocity
-      - [x] apply LPF transfer function
-      - [x] PSD widget
-      - (?) use 48kHz sampling
-      - (?) uint32 frequency index
 
 - [ ] Set k-rate in ms
 - [ ] Move sn_vco::dcblocking and sn_vc::antialias to  DCB and AA

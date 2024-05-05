@@ -2,7 +2,6 @@
 #include "sn.hpp"
 
 #include "antialias/AA.hpp"
-#include "antialias/FFT.hpp"
 #include "dc-blocking/DCF.hpp"
 #include "widgets/xlight.hpp"
 
@@ -118,12 +117,6 @@ struct sn_vcox : Module {
         AA out;
         AA sum;
     } AA;
-
-    struct {
-        FFTx fftx;
-        FFT out;
-        FFT sum;
-    } fft;
 
     // ... DC  blocking
     struct {

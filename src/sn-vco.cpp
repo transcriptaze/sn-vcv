@@ -1,9 +1,6 @@
 #include "sn-vco.hpp"
 #include "sn-vcox.hpp"
 
-#include "antialias/TF.hpp"
-#include "dsp/dft.hpp"
-
 const int sn_vco::CHANNELS = 1;
 const float sn_vco::VELOCITY = 1.0f;
 
@@ -58,7 +55,6 @@ json_t *sn_vco::dataToJson() {
     json_object_set_new(root, "aux-gain", json_integer(aux.gain));
     json_object_set_new(root, "anti-alias", json_integer(antialias));
     json_object_set_new(root, "dc-blocking", json_integer(dcblocking));
-    json_object_set_new(root, "alias-indicator", json_integer(fftx.rate));
 
     return root;
 }
@@ -69,7 +65,6 @@ void sn_vco::dataFromJson(json_t *root) {
     json_t *gain = json_object_get(root, "aux-gain");
     json_t *antialias = json_object_get(root, "anti-alias");
     json_t *dcblocking = json_object_get(root, "dc-blocking");
-    json_t *indicator = json_object_get(root, "alias-indicator");
 
     if (krate) {
         int v = json_integer_value(krate);
@@ -105,10 +100,6 @@ void sn_vco::dataFromJson(json_t *root) {
     if (dcblocking) {
         this->dcblocking = DCF::int2mode(json_integer_value(dcblocking), this->dcblocking);
     }
-
-    if (indicator) {
-        fftx.rate = FFT::int2rate(json_integer_value(indicator), fftx.rate);
-    }
 }
 
 void sn_vco::onExpanderChange(const ExpanderChangeEvent &e) {
@@ -131,11 +122,6 @@ void sn_vco::onExpanderChange(const ExpanderChangeEvent &e) {
 void sn_vco::process(const ProcessArgs &args) {
     int channels = this->channels();
 
-    // ... debug
-    if (debug.processEvent(inputs[DEBUG_INPUT].getVoltage(), 0.f, 1.f) == dsp::TSchmittTrigger<float>::Event::TRIGGERED) {
-        fft.debug = true;
-    }
-
     // ... expanders
     bool expanded = expanders.left.module != NULL || expanders.right.module != NULL;
     bool xll = false;
@@ -155,18 +141,17 @@ void sn_vco::process(const ProcessArgs &args) {
     recompute(args, channels);
     processVCO(args, channels, expanded);
     processAUX(args, expanded);
-    processFFT(args, channels);
 
     // ... update expanders
     sn_vco_message *msg;
 
     if ((msg = expanders.left.producer()) != NULL) {
-        msg->set(true, channels, antialias, dcblocking, vco, aux, fftx);
+        msg->set(true, channels, antialias, dcblocking, vco, aux);
         expanders.left.flip();
     }
 
     if ((msg = expanders.right.producer()) != NULL) {
-        msg->set(true, channels, antialias, dcblocking, vco, aux, fftx);
+        msg->set(true, channels, antialias, dcblocking, vco, aux);
         expanders.right.flip();
     }
 }
@@ -185,7 +170,7 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
     }
 
     for (size_t ch = 0; ch < channels; ch++) {
-        float freq = fftx.frequency[ch];
+        float freq = frequency[ch];
 
         for (int i = 0; i < oversampling; i++) {
             phase[i][ch] = vco[ch].α + freq * δ[i];
@@ -215,7 +200,7 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
             vco[ch].phase[i] = phase[i][ch];
             vco[ch].out.vco[i] = υ;
             vco[ch].out.sum[i] = sn.A * υ;
-            vco[ch].velocity = fftx.velocity[ch];
+            vco[ch].velocity = velocity[ch];
         }
     }
 
@@ -285,14 +270,6 @@ void sn_vco::processAUX(const ProcessArgs &args, bool expanded) {
     }
 }
 
-void sn_vco::processFFT(const ProcessArgs &args, size_t channels) {
-    std::function<float(float)> lambda = [this](float phase) {
-        return this->sn.A * this->sn.υ(2.0 * M_PI * phase);
-    };
-
-    fft.process(channels, fftx.frequency, fftx.velocity, fftx.rate, lambda);
-}
-
 void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
     // ... update parameters?
     update.count--;
@@ -306,7 +283,7 @@ void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
     for (size_t ch = 0; ch < channels; ch++) {
         float pitch = clamp(inputs[PITCH_INPUT].getPolyVoltage(ch), -3.f, 5.f); // C1 to C8
 
-        fftx.frequency[ch] = dsp::FREQ_C4 * std::pow(2.f, pitch);
+        frequency[ch] = dsp::FREQ_C4 * std::pow(2.f, pitch);
     }
 
     // ... velocity
@@ -315,25 +292,24 @@ void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
 
         for (size_t ch = 0; ch < channels; ch++) {
             if (ch < N) {
-                fftx.velocity[ch] = inputs[VELOCITY_INPUT].getPolyVoltage(ch) / 10.0f;
+                velocity[ch] = inputs[VELOCITY_INPUT].getPolyVoltage(ch) / 10.0f;
             } else {
-                fftx.velocity[ch] = inputs[VELOCITY_INPUT].getVoltage() / 10.0f;
+                velocity[ch] = inputs[VELOCITY_INPUT].getVoltage() / 10.0f;
             }
         }
     } else {
         for (size_t ch = 0; ch < channels; ch++) {
-            fftx.velocity[ch] = VELOCITY;
+            velocity[ch] = VELOCITY;
         }
     }
 
     for (int ch = channels; ch < 16; ch++) {
-        fftx.velocity[ch] = 0.f;
+        velocity[ch] = 0.f;
     }
 
     // ... antialiasing
     AA.recompute(args.sampleRate);
     dcf.recompute(dcblocking, args.sampleRate);
-    fft.recompute(antialias, args.sampleRate);
 
     // ... param values
     float e = params[ECCENTRICITY_PARAM].getValue();
@@ -476,12 +452,6 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
     addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xll), module, sn_vco::XLL_LIGHT));
     addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_vco::XRR_LIGHT));
 
-    // ... aliasing
-    sn_vco_psd *widget = createWidget<sn_vco_psd>(mm2px(psd));
-    widget->box.size = mm2px(Vec(10.16, 11.43));
-    widget->module = module;
-    addChild(widget);
-
     // ... debug
     addInput(createInputCentered<ThemedPJ301MPort>(mm2px(debug), module, sn_vco::DEBUG_INPUT));
 }
@@ -511,10 +481,6 @@ void sn_vcoWidget::appendContextMenu(Menu *menu) {
     menu->addChild(createIndexPtrSubmenuItem("DC blocking",
                                              DCBLOCKING,
                                              &module->dcblocking));
-
-    menu->addChild(createIndexPtrSubmenuItem("Aliasing update rate",
-                                             ALIASING,
-                                             &module->fftx.rate));
 }
 
 Model *model_sn_vco = createModel<sn_vco, sn_vcoWidget>("sn-vco");

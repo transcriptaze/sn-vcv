@@ -2,12 +2,8 @@
 #include "sn.hpp"
 
 #include "antialias/AA.hpp"
-#include "antialias/FFT.hpp"
 #include "dc-blocking/DCF.hpp"
-#include "widgets/psd.hpp"
 #include "widgets/xlight.hpp"
-
-typedef struct sn_vco_fft sn_vco_fft;
 
 struct sn_vco : Module {
     static const int CHANNELS;
@@ -61,24 +57,19 @@ struct sn_vco : Module {
     void recompute(const ProcessArgs &args, size_t);
     void processVCO(const ProcessArgs &args, size_t, bool);
     void processAUX(const ProcessArgs &args, bool);
-    void processFFT(const ProcessArgs &args, size_t);
 
     int channels();
 
     // ... instance variables
     dsp::PulseGenerator trigger;
+    float frequency[16] = {dsp::FREQ_C4};
+    float velocity[16] = {0.f};
 
     struct AUX aux = {
         .mode = POLY,
         .gain = 0,
         .phase = 0.f,
         .out = {.osc = 0.f, .sum = 0.f},
-    };
-
-    struct FFTx fftx = {
-        .rate = FFT_RATE::SLOW,
-        .frequency = {dsp::FREQ_C4},
-        .velocity = {0.f},
     };
 
     struct SN sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
@@ -105,7 +96,6 @@ struct sn_vco : Module {
     // ... anti-aliasing
     ANTIALIAS antialias = NONE; // ... for context submenu
     struct AA AA;
-    struct FFT fft;
 
     // ... DC  blocking
     DCBLOCK dcblocking = DCBLOCK_NONE; // ... for context submenu
@@ -154,33 +144,6 @@ struct sn_vco_channels : ChannelsWidget {
         int channels = module ? module->channels() : 0;
 
         text = string::f("%d", channels);
-    }
-
-    sn_vco *module;
-};
-
-struct sn_vco_psd : PSDWidget {
-    sn_vco_psd() {
-        module = NULL;
-
-        fontPath = asset::system("res/fonts/Nunito-Bold.ttf");
-        text = "0.00";
-    }
-
-    void step() override {
-        Widget::step();
-
-        if (module != NULL) {
-            char s[16];
-
-            level1 = clamp(module->fft.q, 0.f, 1.f);
-            level2 = clamp(module->fft.q, 0.f, 1.f);
-            enabled = module->fftx.rate != FFT_RATE::OFF;
-            mode = module->antialias;
-
-            snprintf(s, sizeof(s), "%.0f%%", 5.0 * std::round(20.0 * level1));
-            text = s;
-        }
     }
 
     sn_vco *module;

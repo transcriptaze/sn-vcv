@@ -190,13 +190,6 @@ void sn_vcox::process(const ProcessArgs &args) {
 
         aux.phase = msg->aux.phase;
         aux.out.sum = msg->aux.out;
-
-        fft.fftx.rate = msg->fft.rate;
-        for (int ch = 0; ch < channels; ch++) {
-            fft.fftx.frequency[ch] = msg->fft.frequency[ch];
-            fft.fftx.velocity[ch] = msg->fft.velocity[ch];
-        }
-
     } else {
         for (int ch = 0; ch < 16; ch++) {
             vco[ch].velocity = 0.f;
@@ -207,12 +200,6 @@ void sn_vcox::process(const ProcessArgs &args) {
 
         aux.phase = 0.0f;
         aux.out.sum = 0.0f;
-        fft.fftx.rate = FFT_RATE::OFF;
-
-        for (int ch = 0; ch < 16; ch++) {
-            fft.fftx.frequency[ch] = dsp::FREQ_C4;
-            fft.fftx.velocity[ch] = 0.f;
-        }
     }
 
     processVCO(args, channels, antialias, dcblocking, expanded);
@@ -224,13 +211,13 @@ void sn_vcox::process(const ProcessArgs &args) {
 
         if ((msg = expanders.left.producer()) != NULL) {
             bool linked = msgR != NULL && msgR->linked;
-            msg->set(linked, channels, antialias, dcblocking, vco, aux, fft.fftx);
+            msg->set(linked, channels, antialias, dcblocking, vco, aux);
             expanders.left.flip();
         }
 
         if ((msg = expanders.right.producer()) != NULL) {
             bool linked = msgL != NULL && msgL->linked;
-            msg->set(linked, channels, antialias, dcblocking, vco, aux, fft.fftx);
+            msg->set(linked, channels, antialias, dcblocking, vco, aux);
             expanders.right.flip();
         }
     }
