@@ -14,3 +14,15 @@
 ```
 sn-vco: f:1046.5  N:20  P:22.658   P(20kHz+):19.141  ratio:0.845
 ```
+
+## Geometry
+
+1. https://www.quantamagazine.org/mathematicians-identify-the-best-versions-of-iconic-shapes-20240105
+2. https://www.quantamagazine.org/geometers-engineer-new-tools-to-wrangle-spacecraft-orbits-20240415
+3. https://www.quantamagazine.org/elliptic-curve-murmurations-found-with-ai-take-flight-20240305
+4. https://www.youtube.com/watch?v=fxzrpfezezE
+5. https://www.youtube.com/watch?v=3depB4EZT7c
+
+## Other
+1. https://www.osar.fr/notes/waveguides
+2. https://opus-codec.org/demo/opus-1.5

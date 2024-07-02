@@ -29,6 +29,15 @@
 
 - [ ] Unit tests
 
+## R & D
+
+1. https://www.quantamagazine.org/mathematicians-identify-the-best-versions-of-iconic-shapes-20240105/#
+2. https://www.quantamagazine.org/geometers-engineer-new-tools-to-wrangle-spacecraft-orbits-20240415/
+3. https://www.quantamagazine.org/elliptic-curve-murmurations-found-with-ai-take-flight-20240305/
+4. https://www.youtube.com/watch?v=fxzrpfezezE
+5. https://www.youtube.com/watch?v=3depB4EZT7c
+6. https://www.soundonsound.com/techniques/synthesizing-strings-string-machines
+
 
 ## Notes and References
 
@@ -40,4 +49,6 @@
 6. `convert *.png -crop 392x331+281+90 cropped/screenshot%d.png`
 7. https://github.com/nullJaX/vcvrack-patchable-devices
 8. https://www.youtube.com/watch?v=yV52TMdGkng
+9. https://surge-synthesizer.github.io/manual-xt/#string
+
 
