@@ -95,7 +95,7 @@ struct sn_vco : Module {
 
     // ... anti-aliasing
     ANTIALIAS antialias = NONE; // ... for context submenu
-    struct AA AA;
+    struct AA aa;
 
     // ... DC  blocking
     DCBLOCK dcblocking = DCBLOCK_NONE; // ... for context submenu

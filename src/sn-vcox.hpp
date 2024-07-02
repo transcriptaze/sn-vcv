@@ -116,7 +116,7 @@ struct sn_vcox : Module {
     struct {
         AA out;
         AA sum;
-    } AA;
+    } aa;
 
     // ... DC  blocking
     struct {

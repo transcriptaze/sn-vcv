@@ -208,7 +208,7 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
         double buffer[16];
         double out[16];
 
-        AA.process(antialias, in, buffer, channels);
+        aa.process(antialias, in, buffer, channels);
         dcf.process(buffer, out, channels);
 
         for (size_t ch = 0; ch < channels; ch++) {
@@ -308,7 +308,7 @@ void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
     }
 
     // ... antialiasing
-    AA.recompute(args.sampleRate);
+    aa.recompute(args.sampleRate);
     dcf.recompute(dcblocking, args.sampleRate);
 
     // ... param values

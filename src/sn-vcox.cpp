@@ -254,7 +254,7 @@ void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS ant
         double buffer[16];
         double out[16];
 
-        AA.out.process(antialias, in, buffer, channels);
+        aa.out.process(antialias, in, buffer, channels);
         dcf.out.process(buffer, out, channels);
 
         for (size_t ch = 0; ch < channels; ch++) {
@@ -268,7 +268,7 @@ void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS ant
         double buffer[16];
         double out[16];
 
-        AA.sum.process(antialias, sum, out, channels);
+        aa.sum.process(antialias, sum, out, channels);
         dcf.sum.process(buffer, out, channels);
 
         for (size_t ch = 0; ch < channels; ch++) {
@@ -322,8 +322,8 @@ void sn_vcox::recompute(const ProcessArgs &args, DCBLOCK dcblocking) {
     update.count = KRATE[update.krate];
 
     // ... antialiasing
-    AA.out.recompute(args.sampleRate);
-    AA.sum.recompute(args.sampleRate);
+    aa.out.recompute(args.sampleRate);
+    aa.sum.recompute(args.sampleRate);
 
     // ... DC blocking
     dcf.out.recompute(dcblocking, args.sampleRate);
