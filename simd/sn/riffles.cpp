@@ -2,36 +2,24 @@
 
 // sn implementation with improvements from 'riffles'
 namespace riffles {
-const float PI2 = M_PI / 2; // π/2
-
-float phi(float a, float b, float θ, float Φ) {
-
-    float dθ = Φ - θ;
-    float φ = std::atan(-(a / b) * std::tan(Φ - θ));
-
-    if (dθ < -PI2) {
-        φ += M_PI;
-    } else if (dθ > PI2) {
-        φ -= M_PI;
-    }
-
-    return φ;
-}
 
 void recompute(SN &sn) {
-    float εʼ = std::sqrt(1.0f - sn.ε * sn.ε);
-    float a = (sn.ε < 0.0f) ? εʼ : 1.0f;
-    float b = (sn.ε > 0.0f) ? εʼ : 1.0f;
+    const float εʼ = std::sqrt(1.0f - sn.ε * sn.ε);
+    const float a = (sn.ε < 0.0f) ? εʼ : 1.0f;
+    const float b = (sn.ε > 0.0f) ? εʼ : 1.0f;
 
-    float cosθ = std::cos(sn.θ);
-    float sinθ = std::sin(sn.θ);
+    const float cosθ = std::cos(sn.θ);
+    const float sinθ = std::sin(sn.θ);
+    const float tanθ = std::tan(sn.θ);
 
-    float u = std::atan(-b * std::tan(sn.θ) / a);
-    float v = std::atan((b / std::tan(sn.θ)) * a);
-    float tx = a * std::cos(u) * cosθ - b * std::sin(u) * sinθ;
-    float ty = b * std::sin(v) * cosθ + a * std::cos(v) * sinθ;
-    float δxʼ = tx * sn.δx;
-    float δyʼ = ty * sn.δy;
+    const float u = std::atan2(-b * tanθ, a);
+    const float v = std::atan2(a * b, tanθ);
+
+    const float tx = a * std::cos(u) * cosθ - b * std::sin(u) * sinθ;
+    const float ty = b * std::sin(v) * cosθ + a * std::cos(v) * sinθ;
+    const float δxʼ = tx * sn.δx;
+    const float δyʼ = ty * sn.δy;
+    const float δθ = sn.Φ - sn.θ;
 
     sn.ζ.pʼ = sn.A * a * cosθ;
     sn.ζ.qʼ = sn.A * b * sinθ;
@@ -39,7 +27,7 @@ void recompute(SN &sn) {
     sn.ζ.sʼ = sn.A * a * sinθ;
     sn.ζ.tʼ = sn.A * b * cosθ;
     sn.ζ.uʼ = sn.A * δyʼ;
-    sn.ζ.φ = phi(a, b, sn.θ, sn.Φ);
+    sn.ζ.φ = std::atan2(-std::sin(δθ) * a, std::cos(δθ) * b);
 }
 
 float υ(const SN &sn, float α) {
