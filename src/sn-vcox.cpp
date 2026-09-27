@@ -224,7 +224,7 @@ void sn_vcox::process(const ProcessArgs &args) {
 }
 
 void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS antialias, DCBLOCK dcblocking, bool expanded) {
-    bool connected = outputs[VCO_OUTPUT].isConnected() | outputs[VCO_SUM_OUTPUT].isConnected();
+    bool connected = outputs[VCO_OUTPUT].isConnected() || outputs[VCO_SUM_OUTPUT].isConnected();
     float gain = params[ATT_PARAM].getValue();
     int oversampling = AA::oversampling(antialias);
 

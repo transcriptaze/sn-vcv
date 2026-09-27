@@ -1,6 +1,6 @@
 .DEFAULT_GOAL = build
 
-RACK_DIR ?= ../..
+RACK_DIR ?= ../../tools/Rack-SDK
 EXE = "/Applications/VCV Rack 2 Free.app/Contents/MacOS/Rack"
 
 FLAGS +=
@@ -15,6 +15,8 @@ INCLUDES += $(wildcard src/*.hpp src/antialias/*.hpp src/dc-blocking/*.hpp src/d
 DISTRIBUTABLES += res
 DISTRIBUTABLES += $(wildcard LICENSE*)
 DISTRIBUTABLES += $(wildcard presets)
+
+BIN = "/Applications/VCV Rack 2 Free.app/Contents/MacOS/Rack"
 
 format: 
 	clang-format -i $(SOURCES) -i $(INCLUDES)
@@ -32,8 +34,7 @@ headless: format install
 debug: build
 	mkdir -p workdir/plugins-mac-x64
 	cp -r dist/*.vcvplugin ./workdir/plugins-mac-x64
-	$(EXE) --user ~/Development/shapestry/sn-vcv/workdir
+	$(BIN) --user ~/Development/shapestry/sn-vcv/workdir
 
 tail:
 	tail -f workdir/log.txt | grep sn-vcv
-
