@@ -1,5 +1,7 @@
 # TODO
 
-- [ ] benchmark baseline implementation
-- [ ] benchmark riffles implementation
-- [ ] measure CPU usage in situ
+- [x] benchmark baseline implementation
+- [x] benchmark riffles implementation
+- [x] measure CPU usage _in situ_
+
+

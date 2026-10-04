@@ -18,7 +18,7 @@ build: format
 	mkdir -p bin
 	clang++ $(CXXFLAGS) $(SRC) -o bin/test 
 	        
-test: all
+test: build
 	./bin/test
 
 baseline: 
@@ -30,4 +30,14 @@ reference:
 	clang-format -i benchmarks/*.cpp
 	clang++ $(CXXFLAGS) benchmarks/reference.cpp sn/*.cpp -o bin/reference
 	@time for i in $$(seq 1 $(RUNS)); do ./bin/reference; done
+
+riffles: 
+	clang-format -i benchmarks/*.cpp
+	clang++ $(CXXFLAGS) benchmarks/riffles.cpp sn/*.cpp -o bin/riffles
+	@time for i in $$(seq 1 $(RUNS)); do ./bin/riffles; done
+
+unpacked: 
+	clang-format -i benchmarks/*.cpp
+	clang++ $(CXXFLAGS) benchmarks/unpacked.cpp sn/*.cpp -o bin/unpacked
+	@time for i in $$(seq 1 $(RUNS)); do ./bin/unpacked; done
 

@@ -6,6 +6,7 @@
 #include "sn/reference.hpp"
 #include "sn/riffles.hpp"
 #include "sn/sn.hpp"
+#include "sn/unpacked.hpp"
 
 using std::cout;
 using std::vector;
@@ -127,7 +128,7 @@ TEST_CASE("validating SN::recompute() riffles implementation") {
     }
 }
 
-TEST_CASE("validating SN::recompute() riffles implementation") {
+TEST_CASE("validating riffles::υ()") {
     struct {
         vector<float> ε;
         vector<float> θ;
@@ -185,6 +186,82 @@ TEST_CASE("validating SN::recompute() riffles implementation") {
 
                                 for (size_t i = 0; i < N; i++) {
                                     CHECK(riffles::υ(sn2, α[i]) == doctest::Approx(reference::υ(sn1, α[i])));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+TEST_CASE("validating unpacked::υ()") {
+    struct {
+        vector<float> ε;
+        vector<float> θ;
+        vector<float> A;
+        vector<float> δx;
+        vector<float> δy;
+        vector<float> Φ;
+        vector<float> m;
+    } tests = {
+        .ε = {std::tanh(1.f * 0.2f)},
+        .θ = {0.0},
+        .A = {1.0},
+        .δx = {0.4},
+        .δy = {-0.1},
+        .Φ = {2.094395},
+        .m = {1.0},
+    };
+
+    float α[] = {0.0, 0.785398, 1.570796, 2.356194, 3.141592, 3.926991, 4.712389, 5.497787, 6.283185};
+    size_t N = sizeof(α) / sizeof(float);
+
+    for (auto εʼ = tests.ε.begin(); εʼ != tests.ε.end(); εʼ++) {
+        for (auto θʼ = tests.θ.begin(); θʼ != tests.θ.end(); θʼ++) {
+            for (auto Aʼ = tests.A.begin(); Aʼ != tests.A.end(); Aʼ++) {
+                for (auto δxʼ = tests.δx.begin(); δxʼ != tests.δx.end(); δxʼ++) {
+                    for (auto δyʼ = tests.δy.begin(); δyʼ != tests.δy.end(); δyʼ++) {
+                        for (auto Φʼ = tests.Φ.begin(); Φʼ != tests.Φ.end(); Φʼ++) {
+                            for (auto mʼ = tests.m.begin(); mʼ != tests.m.end(); mʼ++) {
+                                float ε = *εʼ;
+                                float θ = *θʼ;
+                                float A = *Aʼ;
+                                float δx = *δxʼ;
+                                float δy = *δyʼ;
+                                float Φ = *Φʼ;
+                                float m = *mʼ;
+
+                                struct SN sn1(ε, θ, A, δx, δy, Φ, m);
+                                struct SN sn2(ε, θ, A, δx, δy, Φ, m);
+
+                                reference::recompute(sn1);
+                                unpacked::recompute(sn2);
+
+                                CHECK(sn2.ζ.pʼ == sn1.ζ.pʼ);
+                                CHECK(sn2.ζ.qʼ == sn1.ζ.qʼ);
+                                CHECK(sn2.ζ.rʼ == doctest::Approx(sn1.ζ.rʼ));
+                                CHECK(sn2.ζ.sʼ == sn1.ζ.sʼ);
+                                CHECK(sn2.ζ.tʼ == sn1.ζ.tʼ);
+
+                                // reference sign is flipped for some θ/Φ
+                                CAPTURE(sn2.ζ.uʼ);
+                                CAPTURE(sn1.ζ.uʼ);
+                                CHECK((sn2.ζ.uʼ == doctest::Approx(sn1.ζ.uʼ) || sn2.ζ.uʼ == doctest::Approx(-sn1.ζ.uʼ)));
+
+                                CHECK(sn2.ζ.φ == doctest::Approx(sn1.ζ.φ)); // ±0.000001
+
+                                for (size_t i = 0; i < N; i++) {
+                                    float αʼ = sn2.m * α[i] - sn2.ζ.φ;
+                                    float x = std::cos(αʼ);
+                                    float y = std::sin(αʼ);
+                                    float xʼ = sn2.ζ.pʼ * x - sn2.ζ.qʼ * y + sn2.ζ.rʼ;
+                                    float yʼ = sn2.ζ.sʼ * x + sn2.ζ.tʼ * y + sn2.ζ.uʼ;
+                                    float r = std::hypot(xʼ, yʼ);
+                                    float υ = r > 0.0f ? yʼ / r : 0.0f;
+
+                                    CHECK(υ == doctest::Approx(reference::υ(sn1, α[i])));
                                 }
                             }
                         }
