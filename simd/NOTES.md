@@ -23,6 +23,7 @@
 | reference | 0m59.011s  | 47%, 1.6% per module | 61%, 2.7% per module |
 | riffles   | 0m59.111s  |                      |                      |
 | unpacked  | 0m33.433s  |                      |                      |
+| baseline2 | 0m24.468s  |                      | N/A                  |
 
 
 ## `fmod`

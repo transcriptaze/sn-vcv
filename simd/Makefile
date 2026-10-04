@@ -41,3 +41,12 @@ unpacked:
 	clang++ $(CXXFLAGS) benchmarks/unpacked.cpp sn/*.cpp -o bin/unpacked
 	@time for i in $$(seq 1 $(RUNS)); do ./bin/unpacked; done
 
+sincos: 
+	clang-format -i benchmarks/*.cpp
+	clang++ $(CXXFLAGS) benchmarks/sincos.cpp sn/*.cpp -o bin/sincos
+	@time for i in $$(seq 1 $(RUNS)); do ./bin/sincos; done
+
+baseline2: 
+	clang-format -i benchmarks/*.cpp
+	clang++ $(CXXFLAGS) benchmarks/baseline2.cpp sn/*.cpp -o bin/baseline2
+	@time for i in $$(seq 1 $(RUNS)); do ./bin/baseline2; done
