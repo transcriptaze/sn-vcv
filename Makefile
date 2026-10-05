@@ -30,10 +30,10 @@ headless: format install
 	/Applications/VCV\ Rack\ 2\ Free.app/Contents/MacOS/Rack --headless
 
 debug: build
-	mkdir -p workdir/plugins-mac-x64
-	cp -r dist/*.vcvplugin ./workdir/plugins-mac-arm64
-	$(BIN) --user ~/Development/sn/sn-vcv/workdir
+	mkdir -p workdir/simd/plugins-mac-arm64
+	cp -r dist/*.vcvplugin ./workdir/simd/plugins-mac-arm64
+	$(BIN) --user ~/Development/sn/sn-vcv/workdir/simd
 
 tail:
-	tail -f workdir/log.txt | grep sn-vcv
+	tail -f workdir/simd/log.txt | grep sn-vcv
 
