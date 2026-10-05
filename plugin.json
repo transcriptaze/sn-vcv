@@ -52,6 +52,15 @@
       "tags": [
         "Expander"
       ]
+    },
+    {
+      "slug": "sn-sigma",
+      "name": "sn-sigma",
+      "description": "Non-linear mixer.",
+      "manualUrl": "https://github.com/transcriptaze/sn-vcv/blob/main/documentation/MANUAL.md#sn-sigma",
+      "tags": [
+        "Mixer"
+      ]
     }
   ]
 }
