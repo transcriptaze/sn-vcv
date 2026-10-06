@@ -36,5 +36,10 @@ debug: build
 	cp -r dist/*.vcvplugin ./workdir/sn/plugins-mac-arm64
 	$(BIN) --user ~/Development/sn/sn-vcv/workdir/sn
 
+sn: build
+	mkdir -p workdir/sn/plugins-mac-arm64
+	cp -r dist/*.vcvplugin ./workdir/sn/plugins-mac-arm64
+	$(BIN) --user ~/Development/sn/sn-vcv/workdir/sn
+
 tail:
 	tail -f workdir/sn/log.txt | grep sn-vcv
