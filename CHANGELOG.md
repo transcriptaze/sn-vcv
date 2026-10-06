@@ -3,11 +3,12 @@
 ## Unreleased
 
 ### Added
-1. Antialiasing filters for sn-vco and sn-vcox.
-2. DC blocking filters for sn-vco and sn-vcox.
+1. Antialiasing filters for _sn-vco_ and _sn-vcox_.
+2. DC blocking filters for _sn-vco_ and _sn-vcox_.
 
 ### Updates
-1. Clamped input range for sn-vco to [C1,C8].
+1. Clamped input range for _sn-vco_ to [C1,C8].
+2. Fixed bitwise warning in _sn-vcox_.
 
 
 ## [2.0.0](https://github.com/transcriptaze/sn-vcv/releases/tag/v2.0.0) - 2024-01-22

@@ -4,7 +4,7 @@ RACK_DIR ?= ../../tools/Rack-SDK
 
 FLAGS +=
 CFLAGS +=
-CXXFLAGS += 
+CXXFLAGS +=
 LDFLAGS +=
 
 SOURCES  += $(wildcard src/*.cpp src/antialias/*.cpp src/dc-blocking/*.cpp src/widgets/*.cpp)
@@ -30,9 +30,9 @@ headless: format install
 	/Applications/VCV\ Rack\ 2\ Free.app/Contents/MacOS/Rack --headless
 
 debug: build
-	mkdir -p workdir/simd/plugins-mac-arm64
-	cp -r dist/*.vcvplugin ./workdir/simd/plugins-mac-arm64
-	$(BIN) --user ~/Development/sn/sn-vcv/workdir/simd
+	mkdir -p workdir/plugins-mac-x64
+	cp -r dist/*.vcvplugin ./workdir/plugins-mac-x64
+	$(EXE) --user ~/Development/shapestry/sn-vcv/workdir
 
 simd: build
 	mkdir -p workdir/simd/plugins-mac-arm64
@@ -40,5 +40,5 @@ simd: build
 	$(BIN) --user ~/Development/sn/sn-vcv/workdir/simd
 
 tail:
-	tail -f workdir/simd/log.txt | grep sn-vcv
+	tail -f workdir/log.txt | grep sn-vcv
 
