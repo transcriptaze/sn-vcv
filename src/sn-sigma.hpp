@@ -37,7 +37,7 @@ struct sn_sigma : Module {
 
     void recompute(const ProcessArgs &args, size_t);
 
-    int channels();
+    float hard_max(float in1, float in2);
 
     // ... debug
     dsp::SchmittTrigger debug;

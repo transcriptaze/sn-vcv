@@ -23,6 +23,15 @@ void sn_sigma::dataFromJson(json_t *root) {
 }
 
 void sn_sigma::process(const ProcessArgs &args) {
+    float in1 = inputs[IN1_INPUT].getPolyVoltage(0);
+    float in2 = inputs[IN2_INPUT].getPolyVoltage(0);
+    float outA = hard_max(in1, in2);
+
+    outputs[OUTA_OUTPUT].setVoltage(outA, 0);
+}
+
+float sn_sigma::hard_max(float in1, float in2) {
+    return clamp(in1 + in2, -5.f, 5.f);
 }
 
 sn_sigmaWidget::sn_sigmaWidget(sn_sigma *module) {
