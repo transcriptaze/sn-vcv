@@ -36,5 +36,10 @@ debug: build
 	cp -r dist/*.vcvplugin ./workdir/mixer/plugins-mac-arm64
 	$(BIN) --user ~/Development/sn/sn-vcv/workdir/mixer
 
+mixer: build
+	mkdir -p workdir/mixer/plugins-mac-arm64
+	cp -r dist/*.vcvplugin ./workdir/mixer/plugins-mac-arm64
+	$(BIN) --user ~/Development/sn/sn-vcv/workdir/mixer
+
 tail:
 	tail -f workdir/mixer/log.txt | grep sn-vcv
