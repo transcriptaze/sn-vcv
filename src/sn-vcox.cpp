@@ -3,6 +3,8 @@
 const int sn_vcox::CHANNELS = 1;
 
 sn_vcox::sn_vcox() {
+    INFO("sn-vcox v2.0.1");
+
     // ... params
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 

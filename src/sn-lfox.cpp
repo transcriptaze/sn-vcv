@@ -3,6 +3,8 @@
 const int sn_lfox::CHANNELS = 1;
 
 sn_lfox::sn_lfox() {
+    INFO("sn-lfox v2.0.1");
+
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
     configParam(ECCENTRICITY_PARAM, -1.0f, +1.0f, 0.0f, "ε");
