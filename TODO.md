@@ -1,5 +1,6 @@
 # TODO
 
+## sn-vco
 - [ ] [Antialiasing](https://github.com/transcriptaze/sn-vcv/issues/3)
       - [x] Context menu
       - [x] sn-vco
@@ -28,6 +29,13 @@
 - [x] Invoke parent step() in sn-vc-channels
 
 - [ ] Unit tests
+
+## sn-nlm
+- [x] gain
+- [ ] bypass
+- [ ] AUX xy
+- (?) gain input
+
 
 ## R & D
 

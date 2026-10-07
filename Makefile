@@ -39,10 +39,10 @@ sn: build
 	cp -r dist/*.vcvplugin ./workdir/sn/plugins-mac-arm64
 	$(BIN) --user ~/Development/sn/sn-vcv/workdir/sn
 
-mixer: build
-	mkdir -p workdir/mixer/plugins-mac-arm64
-	cp -r dist/*.vcvplugin ./workdir/mixer/plugins-mac-arm64
-	$(BIN) --user ~/Development/sn/sn-vcv/workdir/mixer
+nlm: build
+	mkdir -p workdir/nlm/plugins-mac-arm64
+	cp -r dist/*.vcvplugin ./workdir/nlm/plugins-mac-arm64
+	$(BIN) --user ~/Development/sn/sn-vcv/workdir/nlm
 
 tail:
-	tail -f workdir/log.txt | grep sn-vcv
+	tail -f workdir/nlm/log.txt | grep sn-nlm

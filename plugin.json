@@ -54,10 +54,10 @@
       ]
     },
     {
-      "slug": "sn-sigma",
-      "name": "sn-sigma",
+      "slug": "sn-nlm",
+      "name": "sn-nlm",
       "description": "Non-linear mixer.",
-      "manualUrl": "https://github.com/transcriptaze/sn-vcv/blob/main/documentation/MANUAL.md#sn-sigma",
+      "manualUrl": "https://github.com/transcriptaze/sn-vcv/blob/main/documentation/MANUAL.md#sn-nlm",
       "tags": [
         "Mixer"
       ]

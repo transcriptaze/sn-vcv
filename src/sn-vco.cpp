@@ -430,7 +430,7 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
     addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_δy), module, sn_vco::DY_INPUT));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(param_δy), module, sn_vco::DY_PARAM));
 
-    // ... m,
+    // ... m
     addParam(createParamCentered<RoundBlackKnob>(mm2px(param_m), module, sn_vco::M_PARAM));
 
     // ... pitch and velocity inputs
