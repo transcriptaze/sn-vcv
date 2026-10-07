@@ -3,7 +3,7 @@
 const int sn_lfox::CHANNELS = 1;
 
 sn_lfox::sn_lfox() {
-    INFO("sn-lfox v2.0.1");
+    INFO("sn-lfox v2.0.1::simd");
 
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 

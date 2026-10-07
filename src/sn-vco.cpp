@@ -5,7 +5,7 @@ const int sn_vco::CHANNELS = 1;
 const float sn_vco::VELOCITY = 1.0f;
 
 sn_vco::sn_vco() {
-    INFO("sn-vco v2.0.1");
+    INFO("sn-vco v2.0.1::simd");
 
     // ... params
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
