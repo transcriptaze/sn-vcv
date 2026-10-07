@@ -22,10 +22,21 @@ sn_nlm::sn_nlm() {
 json_t *sn_nlm::dataToJson() {
     json_t *root = json_object();
 
+    json_object_set_new(root, "gain", json_real(gain));
+
     return root;
 }
 
 void sn_nlm::dataFromJson(json_t *root) {
+    json_t *gain = json_object_get(root, "gain");
+
+    if (gain) {
+        float v = json_number_value(gain);
+
+        if (v >= 0.25f && v < 4.0f) {
+            this->gain = v;
+        }
+    }
 }
 
 void sn_nlm::process(const ProcessArgs &args) {
