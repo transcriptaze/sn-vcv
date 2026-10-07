@@ -15,7 +15,7 @@ const range RANGES[] = {
 const int sn_lfo::CHANNELS = 1;
 
 sn_lfo::sn_lfo() {
-    INFO("sn-lfo v2.0.1");
+    INFO("sn-lfo v2.0.1::nlm");
 
     // ... params
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);

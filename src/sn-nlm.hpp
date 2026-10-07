@@ -47,7 +47,7 @@ struct sn_nlm : Module {
 
     void recompute(const ProcessArgs &args, size_t);
 
-    float hard_max(float in1, float in2, float gain);
+    float hard_limit(float in1, float in2, float gain);
 
     float gain = 1.0;
 

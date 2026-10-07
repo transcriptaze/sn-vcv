@@ -1,6 +1,8 @@
 #include "sn-nlm.hpp"
 
 sn_nlm::sn_nlm() {
+    INFO("sn-nlm v0.0.0");
+
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
     // ... params
@@ -33,13 +35,13 @@ void sn_nlm::process(const ProcessArgs &args) {
 
     this->gain = std::powf(2.0f, 2.0f * gain);
 
-    float outA = hard_max(in1, in2, this->gain);
+    float outA = hard_limit(in1, in2, this->gain);
 
     outputs[OUTA_OUTPUT].setVoltage(outA, 0);
 }
 
-float sn_nlm::hard_max(float in1, float in2, float gain) {
-    return clamp(gain * (in1 + in2), -5.f, 5.f);
+float sn_nlm::hard_limit(float in1, float in2, float gain) {
+    return clamp(in1 + in2, -5.f, 5.f);
 }
 
 sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {
