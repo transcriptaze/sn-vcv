@@ -52,7 +52,7 @@ void sn_nlm::process(const ProcessArgs &args) {
 }
 
 float sn_nlm::hard_limit(float in1, float in2, float gain) {
-    return clamp(in1 + in2, -5.f, 5.f);
+    return clamp(gain * (in1 + in2), -5.f, 5.f);
 }
 
 sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {
