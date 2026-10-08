@@ -1,19 +1,5 @@
 #include "plugin.hpp"
 
-const auto SN_NLM_INPUT_IN1 = mm2px(Vec(7.33, 23.24));
-const auto SN_NLM_INPUT_IN2 = mm2px(Vec(7.33, 36.25));
-const auto SN_NLM_INPUT_IN3 = mm2px(Vec(7.33, 49.27));
-const auto SN_NLM_INPUT_IN4 = mm2px(Vec(7.33, 62.28));
-const auto SN_NLM_INPUT_IN5 = mm2px(Vec(7.33, 75.29));
-const auto SN_NLM_INPUT_IN6 = mm2px(Vec(7.33, 88.31));
-const auto SN_NLM_INPUT_DEBUG = mm2px(Vec(7.33, 114.34));
-const auto SN_NLM_OUTUT_X = mm2px(Vec(35.56, 75.29));
-const auto SN_NLM_OUTUT_Y = mm2px(Vec(35.56, 88.31));
-const auto SN_NLM_OUTUT_OUT = mm2px(Vec(35.56, 114.34));
-const auto SN_NLM_PARAM_GAIN = mm2px(Vec(35.56, 36.25));
-
-const auto SN_NLM_WIDGET_CHANNELS = mm2px(Vec(35.56, 23.24));
-
 struct sn_nlm : Module {
     static const int CHANNELS;
     static const float VELOCITY;
@@ -32,6 +18,8 @@ struct sn_nlm : Module {
 
     enum OutputId {
         OUTA_OUTPUT,
+        OUTX_OUTPUT,
+        OUTY_OUTPUT,
         OUTPUTS_LEN
     };
 
@@ -50,6 +38,14 @@ struct sn_nlm : Module {
     float hard_limit(float in1, float in2, float gain);
 
     float gain = 1.0;
+
+    // ... AUX
+
+    struct {
+        uint32_t phase;
+    } AUX{
+        .phase = 0,
+    };
 
     // ... debug
     dsp::SchmittTrigger debug;

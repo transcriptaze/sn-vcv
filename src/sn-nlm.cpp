@@ -1,5 +1,22 @@
 #include "sn-nlm.hpp"
 
+const auto SN_NLM_IN1 = mm2px(Vec(7.33, 23.24));
+const auto SN_NLM_IN2 = mm2px(Vec(7.33, 36.25));
+const auto SN_NLM_IN3 = mm2px(Vec(7.33, 49.27));
+const auto SN_NLM_IN4 = mm2px(Vec(7.33, 62.28));
+const auto SN_NLM_IN5 = mm2px(Vec(7.33, 75.29));
+const auto SN_NLM_IN6 = mm2px(Vec(7.33, 88.31));
+const auto SN_NLM_DEBUG = mm2px(Vec(7.33, 114.34));
+const auto SN_NLM_OUTX = mm2px(Vec(35.56, 75.29));
+const auto SN_NLM_OUTY = mm2px(Vec(35.56, 88.31));
+const auto SN_NLM_OUTA = mm2px(Vec(35.56, 114.34));
+const auto SN_NLM_GAIN = mm2px(Vec(35.56, 36.25));
+
+const auto SN_NLM_CHANNELS = mm2px(Vec(35.56, 23.24));
+
+constexpr double TWO_TO_32 = 4294967296.0; // 2^32
+constexpr uint32_t MAX_RAMP = 2147483647U;
+
 sn_nlm::sn_nlm() {
     INFO("sn-nlm v0.0.0");
 
@@ -17,6 +34,8 @@ sn_nlm::sn_nlm() {
 
     // ... outputs
     configOutput(OUTA_OUTPUT, "outA");
+    configOutput(OUTX_OUTPUT, "x");
+    configOutput(OUTY_OUTPUT, "y");
 }
 
 json_t *sn_nlm::dataToJson() {
@@ -49,6 +68,23 @@ void sn_nlm::process(const ProcessArgs &args) {
     float outA = hard_limit(in1, in2, this->gain);
 
     outputs[OUTA_OUTPUT].setVoltage(outA, 0);
+
+    // ... AUX
+    uint32_t tuning = static_cast<uint32_t>((20.0 / args.sampleRate) * TWO_TO_32);
+
+    AUX.phase += tuning;
+    bool msb = (AUX.phase >> 31) & 1;
+    uint32_t ramp = AUX.phase & 0x7FFFFFFF;
+    if (msb) {
+        ramp = MAX_RAMP - ramp;
+    }
+
+    double normalized = (static_cast<double>(ramp) / static_cast<double>(MAX_RAMP)) * 2.0 - 1.0;
+    float outX = normalized * 5.0f;
+    float outY = hard_limit(outX, outX, this->gain);
+
+    outputs[OUTX_OUTPUT].setVoltage(outX, 0);
+    outputs[OUTY_OUTPUT].setVoltage(outY, 0);
 }
 
 float sn_nlm::hard_limit(float in1, float in2, float gain) {
@@ -56,16 +92,11 @@ float sn_nlm::hard_limit(float in1, float in2, float gain) {
 }
 
 sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {
-    float left = 7.331;
-    // float middle = 20.351;
-    float right = 35.56;
-    float top = 21.968 + 1.27;
-    float dh = 13.014;
-
-    Vec input1(left, top);
-    Vec input2(left, top + dh);
-    Vec outA(right, top + 7 * dh + 1.27);
-    Vec debug(left, top + 7 * dh + 1.27);
+    // float left = 7.331;
+    // // float middle = 20.351;
+    // float right = 35.56;
+    // float top = 21.968 + 1.27;
+    // float dh = 13.014;
 
     setModule(module);
     setPanel(createPanel(asset::plugin(pluginInstance, "res/sn-nlm.svg"),
@@ -77,17 +108,19 @@ sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {
     addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     // ... inputs
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input1), module, sn_nlm::IN1_INPUT));
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input2), module, sn_nlm::IN2_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_IN1, module, sn_nlm::IN1_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_IN2, module, sn_nlm::IN2_INPUT));
 
     // ... outputs
-    addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(outA), module, sn_nlm::OUTA_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTA, module, sn_nlm::OUTA_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTX, module, sn_nlm::OUTX_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTY, module, sn_nlm::OUTY_OUTPUT));
 
     // ... parameters
-    addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_GAIN, module, sn_nlm::GAIN_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(SN_NLM_GAIN, module, sn_nlm::GAIN_PARAM));
 
     // ... debug
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(debug), module, sn_nlm::DEBUG_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_DEBUG, module, sn_nlm::DEBUG_INPUT));
 }
 
 void sn_nlmWidget::appendContextMenu(Menu *menu) {

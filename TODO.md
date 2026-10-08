@@ -32,9 +32,9 @@
 
 ## sn-nlm
 - [x] gain
+- [x] AUX xy
 - [ ] anti-aliasing
 - [ ] bypass
-- [ ] AUX xy
 - (?) gain input
 
 
