@@ -17,6 +17,15 @@ const auto SN_NLM_CHANNELS = mm2px(Vec(35.56, 23.24));
 constexpr double TWO_TO_32 = 4294967296.0; // 2^32
 constexpr uint32_t MAX_RAMP = 2147483647U;
 
+// 18.0kHz @48kHz
+constexpr struct {
+    const double a[4];
+    const double b[5];
+} IIR{
+    .a = {-3.231676, 3.976641, -2.201366, 0.461665},
+    .b = {0.000329, 0.001316, 0.001974, 0.001316, 0.000329},
+};
+
 sn_nlm::sn_nlm() {
     INFO("sn-nlm v0.0.0");
 
@@ -36,6 +45,15 @@ sn_nlm::sn_nlm() {
     configOutput(OUTA_OUTPUT, "outA");
     configOutput(OUTX_OUTPUT, "x");
     configOutput(OUTY_OUTPUT, "y");
+
+    // ... initialise anti-aliasing filters
+    for (size_t i = 0; i < 16; i++) {
+        antialias.in[i].setCoefficients(IIR.b, IIR.a);
+    }
+
+    for (size_t i = 0; i < 16; i++) {
+        antialias.in[i].reset();
+    }
 }
 
 json_t *sn_nlm::dataToJson() {
@@ -88,7 +106,14 @@ void sn_nlm::process(const ProcessArgs &args) {
 }
 
 float sn_nlm::hard_limit(float in1, float in2, float gain) {
-    return clamp(gain * (in1 + in2), -5.f, 5.f);
+    // ... zero stuffing
+    antialias.in[0].process(in1);
+    antialias.in[0].process(0.f);
+    antialias.in[0].process(0.f);
+
+    return 8.0 * antialias.in[0].process(0.f);
+
+    // return clamp(gain * (in1 + in2), -5.f, 5.f);
 }
 
 sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {

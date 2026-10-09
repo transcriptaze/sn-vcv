@@ -39,8 +39,12 @@ struct sn_nlm : Module {
 
     float gain = 1.0;
 
-    // ... AUX
+    // ... antialiasing
+    struct {
+        dsp::IIRFilter<5, 5, double> in[16];
+    } antialias;
 
+    // ... AUX
     struct {
         uint32_t phase;
     } AUX{
