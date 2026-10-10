@@ -17,13 +17,24 @@ const auto SN_NLM_CHANNELS = mm2px(Vec(35.56, 23.24));
 constexpr double TWO_TO_32 = 4294967296.0; // 2^32
 constexpr uint32_t MAX_RAMP = 2147483647U;
 
-// 18.0kHz @48kHz
+// NTS: designed with fs instead of fs/2 but for some reason is a better filter
+// // 18.0kHz @48kHz, 4x oversampling
+// constexpr struct {
+//     const double a[4];
+//     const double b[5];
+// } IIR{
+//     .a = {-3.231676, 3.976641, -2.201366, 0.461665},
+//     .b = {0.000329, 0.001316, 0.001974, 0.001316, 0.000329},
+// };
+
+// f0       18.0kHz @48kHz, 4x oversampling
+// DC gain  1.000
 constexpr struct {
     const double a[4];
     const double b[5];
 } IIR{
-    .a = {-3.231676, 3.976641, -2.201366, 0.461665},
-    .b = {0.000329, 0.001316, 0.001974, 0.001316, 0.000329},
+    .a = {-2.470272, 2.477971, -1.154635, 0.208848},
+    .b = {0.003870, 0.015478, 0.023217, 0.015478, 0.003870},
 };
 
 sn_nlm::sn_nlm() {
@@ -53,6 +64,14 @@ sn_nlm::sn_nlm() {
 
     for (size_t i = 0; i < 16; i++) {
         antialias.in[i].reset();
+    }
+
+    for (int i = 1; i < 5; i++) {
+        iir.x[i - 1] = 0.f;
+    }
+
+    for (int i = 1; i < 5; i++) {
+        iir.y[i - 1] = 0.f;
     }
 }
 
@@ -106,14 +125,47 @@ void sn_nlm::process(const ProcessArgs &args) {
 }
 
 float sn_nlm::hard_limit(float in1, float in2, float gain) {
-    // ... zero stuffing
-    antialias.in[0].process(in1);
-    antialias.in[0].process(0.f);
-    antialias.in[0].process(0.f);
+    // // ... zero stuffing
+    // antialias.in[0].process(in1);
+    // antialias.in[0].process(0.f);
+    // antialias.in[0].process(0.f);
+    //
+    // return 8.0f * antialias.in[0].process(0.f);
 
-    return 8.0 * antialias.in[0].process(0.f);
+    filter(0.f);
+    filter(0.f);
+    filter(0.f);
+
+    return 8.0f * filter(in1);
 
     // return clamp(gain * (in1 + in2), -5.f, 5.f);
+}
+
+float sn_nlm::filter(float in) {
+    double out = 0.f;
+
+    out = IIR.b[0] * in;
+    out += IIR.b[1] * iir.x[0];
+    out += IIR.b[2] * iir.x[1];
+    out += IIR.b[3] * iir.x[2];
+    out += IIR.b[4] * iir.x[3];
+
+    out -= IIR.a[0] * iir.y[0];
+    out -= IIR.a[1] * iir.y[1];
+    out -= IIR.a[2] * iir.y[2];
+    out -= IIR.a[3] * iir.y[3];
+
+    iir.x[3] = iir.x[2];
+    iir.x[2] = iir.x[1];
+    iir.x[1] = iir.x[0];
+    iir.x[0] = in;
+
+    iir.y[3] = iir.y[2];
+    iir.y[2] = iir.y[1];
+    iir.y[1] = iir.y[0];
+    iir.y[0] = out;
+
+    return out;
 }
 
 sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {

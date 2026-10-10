@@ -33,13 +33,17 @@ struct sn_nlm : Module {
     void dataFromJson(json_t *) override;
     void process(const ProcessArgs &args) override;
 
-    void recompute(const ProcessArgs &args, size_t);
-
     float hard_limit(float in1, float in2, float gain);
+    float filter(float in);
 
     float gain = 1.0;
 
     // ... antialiasing
+    struct {
+        double x[4];
+        double y[4];
+    } iir;
+
     struct {
         dsp::IIRFilter<5, 5, double> in[16];
     } antialias;
