@@ -33,10 +33,66 @@
 ## sn-nlm
 - [x] gain
 - [x] AUX xy
-- [ ] anti-aliasing
 - [ ] bypass
 - (?) gain input
 
+### anti-aliasing
+
+- [x] 4th order Butterworth
+- [ ] 4th order Bessel
+- [ ] 8th order Butterworth
+- [ ] 8th order Bessel
+- [ ] FIR (scipy.firwin)
+
+```
+import numpy as np
+import scipy.signal as signal
+import matplotlib.pyplot as plt
+
+# 1. Specification Parameters
+fs = 1000.0         # Sampling frequency (Hz)
+cutoff = 150.0      # Desired cutoff frequency (Hz)
+numtaps = 101       # Filter length (number of coefficients/taps). Must be odd for type I linear phase.
+
+# 2. Design the Linear-Phase Low-Pass FIR Filter
+# firwin automatically creates a linear phase filter using the window method (default: 'hamming')
+taps = signal.firwin(numtaps, cutoff, window='hamming', fs=fs)
+
+# 3. Analyze Frequency and Phase Response
+w, h = signal.freqz(taps, fs=fs)
+
+# 4. Apply the Filter to a Noisy Signal
+t = np.arange(0, 1.0, 1/fs)
+# Signal consists of a 25 Hz tone + a 300 Hz tone (noise)
+clean_signal = np.sin(2 * np.pi * 25 * t)
+noisy_signal = clean_signal + 0.5 * np.sin(2 * np.pi * 300 * t)
+
+# Use lfilter (or lfilter_zi) for FIR filtering. 
+# Because the filter is linear phase, it delays the signal by (numtaps - 1) / 2 samples.
+filtered_signal = signal.lfilter(taps, 1.0, noisy_signal)
+
+# --- Visualization ---
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 6))
+
+# Frequency Response Magnitude
+ax1.plot(w, 20 * np.log10(np.abs(h)), color='b')
+ax1.set_title("Low-Pass FIR Filter Frequency Response (Linear Phase)")
+ax1.set_xlabel("Frequency (Hz)")
+ax1.set_ylabel("Gain (dB)")
+ax1.grid(True)
+
+# Time Domain Filtering Result
+ax2.plot(t, noisy_signal, label='Noisy Signal', alpha=0.5)
+ax2.plot(t, filtered_signal, label='Filtered Signal (Linear Phase)', linewidth=2, color='r')
+ax2.set_title("Time Domain Filtering")
+ax2.set_xlabel("Time (s)")
+ax2.set_ylabel("Amplitude")
+ax2.legend()
+ax2.grid(True)
+
+plt.tight_layout()
+plt.show()
+```
 
 ## R & D
 

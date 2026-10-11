@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "name": "sn-sigma",
+  "name": "sn-nlm",
   "panel": {
     "width": 45.72,
     "height": 128.5,
@@ -722,54 +722,6 @@
       "offset": null
     },
     "guides": {
-      "h1": {
-        "id": "h1",
-        "x": null,
-        "y": {
-          "reference": "origin",
-          "offset": 23.238
-        }
-      },
-      "h3": {
-        "id": "h3",
-        "x": null,
-        "y": {
-          "reference": "origin",
-          "offset": 49.266
-        }
-      },
-      "h0": {
-        "id": "h0",
-        "x": null,
-        "y": {
-          "reference": "origin",
-          "offset": 7.62
-        }
-      },
-      "h5": {
-        "id": "h5",
-        "x": null,
-        "y": {
-          "reference": "origin",
-          "offset": 75.294
-        }
-      },
-      "h6": {
-        "id": "h6",
-        "x": null,
-        "y": {
-          "reference": "origin",
-          "offset": 88.308
-        }
-      },
-      "v3": {
-        "id": "v3",
-        "x": {
-          "reference": "origin",
-          "offset": 35.56
-        },
-        "y": null
-      },
       "v2": {
         "id": "v2",
         "x": {
@@ -778,20 +730,20 @@
         },
         "y": null
       },
-      "v1": {
-        "id": "v1",
-        "x": {
-          "reference": "origin",
-          "offset": 7.33
-        },
-        "y": null
-      },
-      "h7": {
-        "id": "h7",
+      "h1": {
+        "id": "h1",
         "x": null,
         "y": {
           "reference": "origin",
-          "offset": 101.322
+          "offset": 23.238
+        }
+      },
+      "h2": {
+        "id": "h2",
+        "x": null,
+        "y": {
+          "reference": "origin",
+          "offset": 36.252
         }
       },
       "h4": {
@@ -810,18 +762,66 @@
           "offset": 114.336
         }
       },
-      "h2": {
-        "id": "h2",
+      "h5": {
+        "id": "h5",
         "x": null,
         "y": {
           "reference": "origin",
-          "offset": 36.252
+          "offset": 75.294
         }
+      },
+      "h0": {
+        "id": "h0",
+        "x": null,
+        "y": {
+          "reference": "origin",
+          "offset": 7.62
+        }
+      },
+      "h6": {
+        "id": "h6",
+        "x": null,
+        "y": {
+          "reference": "origin",
+          "offset": 88.308
+        }
+      },
+      "h7": {
+        "id": "h7",
+        "x": null,
+        "y": {
+          "reference": "origin",
+          "offset": 101.322
+        }
+      },
+      "h3": {
+        "id": "h3",
+        "x": null,
+        "y": {
+          "reference": "origin",
+          "offset": 49.266
+        }
+      },
+      "v1": {
+        "id": "v1",
+        "x": {
+          "reference": "origin",
+          "offset": 7.33
+        },
+        "y": null
+      },
+      "v3": {
+        "id": "v3",
+        "x": {
+          "reference": "origin",
+          "offset": 35.56
+        },
+        "y": null
       }
     }
   },
   "script": [
-    "new module sn-sigma 1U 9H",
+    "new module sn-nlm 1U 9H",
     "set background fundamental",
     "new guide v1 vertical   7.33mm",
     "new guide v2 vertical   20.35mm",

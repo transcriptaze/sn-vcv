@@ -1,18 +1,19 @@
 #include "sn-nlm.hpp"
 
-const auto SN_NLM_IN1 = mm2px(Vec(7.33, 23.24));
-const auto SN_NLM_IN2 = mm2px(Vec(7.33, 36.25));
-const auto SN_NLM_IN3 = mm2px(Vec(7.33, 49.27));
-const auto SN_NLM_IN4 = mm2px(Vec(7.33, 62.28));
-const auto SN_NLM_IN5 = mm2px(Vec(7.33, 75.29));
-const auto SN_NLM_IN6 = mm2px(Vec(7.33, 88.31));
-const auto SN_NLM_DEBUG = mm2px(Vec(7.33, 114.34));
-const auto SN_NLM_OUTX = mm2px(Vec(35.56, 75.29));
-const auto SN_NLM_OUTY = mm2px(Vec(35.56, 88.31));
-const auto SN_NLM_OUTA = mm2px(Vec(35.56, 114.34));
-const auto SN_NLM_GAIN = mm2px(Vec(35.56, 36.25));
+const auto SN_NLM_INPUT_IN1 = mm2px(Vec(7.33, 23.24));
+const auto SN_NLM_INPUT_IN2 = mm2px(Vec(7.33, 36.25));
+const auto SN_NLM_INPUT_IN3 = mm2px(Vec(7.33, 49.27));
+const auto SN_NLM_INPUT_IN4 = mm2px(Vec(7.33, 62.28));
+const auto SN_NLM_INPUT_IN5 = mm2px(Vec(7.33, 75.29));
+const auto SN_NLM_INPUT_IN6 = mm2px(Vec(7.33, 88.31));
+const auto SN_NLM_INPUT_DEBUG = mm2px(Vec(7.33, 114.34));
+const auto SN_NLM_OUTUT_X = mm2px(Vec(35.56, 75.29));
+const auto SN_NLM_OUTUT_Y = mm2px(Vec(35.56, 88.31));
+const auto SN_NLM_OUTUT_OUT = mm2px(Vec(35.56, 114.34));
+const auto SN_NLM_PARAM_ATTENUATION = mm2px(Vec(35.56, 23.24));
+const auto SN_NLM_PARAM_GAIN = mm2px(Vec(35.56, 36.25));
 
-const auto SN_NLM_CHANNELS = mm2px(Vec(35.56, 23.24));
+const auto SN_NLM_WIDGET_CHANNELS = mm2px(Vec(35.56, 23.24));
 
 constexpr double TWO_TO_32 = 4294967296.0; // 2^32
 constexpr uint32_t MAX_RAMP = 2147483647U;
@@ -132,11 +133,11 @@ float sn_nlm::hard_limit(float in1, float in2, float gain) {
     //
     // return 8.0f * antialias.in[0].process(0.f);
 
-    filter(0.f);
+    filter(in1);
     filter(0.f);
     filter(0.f);
 
-    return 8.0f * filter(in1);
+    return 8.0f * filter(0.f);
 
     // return clamp(gain * (in1 + in2), -5.f, 5.f);
 }
