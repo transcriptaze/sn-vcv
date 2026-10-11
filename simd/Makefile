@@ -2,7 +2,6 @@ SRC = *.cpp sn/*.cpp
 INCLUDE = *.h sn/*.hpp
 TARGET = bin/test
 
-# CXXFLAGS = -std=c++11 -stdlib=libc++ -fPIC -MMD -MP -g -O3 -funsafe-math-optimizations -fno-omit-frame-pointer -Wall -Wextra -Wno-unused-parameter -Wno-vla-extension -march=armv8-a+fp+simd -mmacosx-version-min=11.0
 CXXFLAGS = -std=c++17 -stdlib=libc++ -fPIC -MMD -MP -g -O3 -funsafe-math-optimizations -fno-omit-frame-pointer -Wall -Wextra -Wno-unused-parameter -Wno-vla-extension -march=armv8-a+fp+simd -mmacosx-version-min=11.0
 
 RUNS ?= 5
@@ -65,19 +64,27 @@ sincos2A:
 float4A: 
 	clang-format -i benchmarks/*.cpp
 	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4A.cpp sn/*.cpp -o bin/float4A
-	@time for i in $$(seq 1 $(RUNS)); do ./bin/float4A; done
+	hyperfine --warmup 2 ./bin/float4A
 
 float4B: 
 	clang-format -i benchmarks/*.cpp
 	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4B.cpp sn/*.cpp -o bin/float4B
-	@time for i in $$(seq 1 $(RUNS)); do ./bin/float4B; done
+	hyperfine --warmup 2 ./bin/float4B
 
 float4C: 
 	clang-format -i benchmarks/*.cpp
 	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4C.cpp sn/*.cpp -o bin/float4C
-	@time for i in $$(seq 1 $(RUNS)); do ./bin/float4C; done
+	hyperfine --warmup 2 ./bin/float4C
 
 float4D: 
 	clang-format -i benchmarks/*.cpp
 	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4D.cpp sn/*.cpp -o bin/float4D
-	@time for i in $$(seq 1 $(RUNS)); do ./bin/float4D; done
+	hyperfine --warmup 2 ./bin/float4D
+
+hyperfine:
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4A.cpp sn/*.cpp -o bin/float4A
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4B.cpp sn/*.cpp -o bin/float4B
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4C.cpp sn/*.cpp -o bin/float4C
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4D.cpp sn/*.cpp -o bin/float4D
+
+	hyperfine --warmup 2  --export-markdown float4.md './bin/float4A' './bin/float4B' './bin/float4C' './bin/float4D'

@@ -17,7 +17,7 @@
     - k-rate:1 (reducing k-rate to 1/256 gives about a 5% performance boost)
 
 
-|           | sandboxed  | VCV, no antialias    | VCV, 4x oversampling |
+| c++11     | sandboxed  | VCV, no antialias    | VCV, 4x oversampling |
 |-----------|------------|----------------------|----------------------|
 | baseline  | 0m23.384s  | 27%, 0.8% per module | N/A                  |
 | reference | 0m59.011s  | 47%, 1.6% per module | 61%, 2.7% per module |
@@ -31,6 +31,25 @@
 | float4B   | 0m16.602s  | -                    | -                    |
 | float4C   | 0m11.717s  | -                    | -                    |
 | float4D   | 0m12.545s  | -                    | -                    |
+
+## hyperfine
+
+### c++11
+
+| Command         | Mean Wall Time [s] | Change | Factor        |
+|:----------------|-------------------:|-------:|:--------------|
+| `./bin/float4A` | 2.232 ± 0.003      |        |               |
+| `./bin/float4B` | 3.400 ± 0.003      | +52.3% | (1.5x slower) |
+| `./bin/float4C` | 2.406 ± 0.002      | +7.8%  |               |
+| `./bin/float4D` | 2.576 ± 0.003      | +15.4% |               |
+
+### c++17
+| Command         | Mean Wall Time [s] | Change | Factor        |
+|:----------------|-------------------:|-------:|:--------------|
+| `./bin/float4A` | 2.183 ± 0.010      |        |               |
+| `./bin/float4B` | 3.379 ± 0.010      | +54.8% | (1.5x slower) |
+| `./bin/float4C` | 2.389 ± 0.003      | +9.4%  |               |
+| `./bin/float4D` | 2.563 ± 0.005      | +17.4% |               |
 
 
 ## `fmod`
