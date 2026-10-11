@@ -13,6 +13,7 @@ all: $(TARGET)
 
 format: $(SRC) $(INCLUDE)
 	clang-format -i $(SRC) -i $(INCLUDE)
+	clang-format -i benchmarks/*.cpp
 
 build: format
 	mkdir -p bin
@@ -21,45 +22,41 @@ build: format
 test: build
 	./bin/test
 
-baseline: 
-	clang-format -i benchmarks/*.cpp
+baseline:  format
 	clang++ $(CXXFLAGS) benchmarks/baseline.cpp sn/*.cpp -o bin/baseline
-	@time for i in $$(seq 1 $(RUNS)); do ./bin/baseline; done
+	hyperfine --warmup 2 ./bin/baseline
 
-reference: 
-	clang-format -i benchmarks/*.cpp
-	clang++ $(CXXFLAGS) benchmarks/reference.cpp sn/*.cpp -o bin/reference
-	@time for i in $$(seq 1 $(RUNS)); do ./bin/reference; done
-
-baseline2: 
-	clang-format -i benchmarks/*.cpp
+baseline2: format
 	clang++ $(CXXFLAGS) benchmarks/baseline2.cpp sn/*.cpp -o bin/baseline2
-	@time for i in $$(seq 1 $(RUNS)); do ./bin/baseline2; done
+	hyperfine --warmup 2 ./bin/baseline2
+/reference: format
+	clang++ $(CXXFLAGS) benchmarks/reference.cpp sn/*.cpp -o bin/reference
+	hyperfine --warmup 2 ./bin/reference
 
 riffles: 
 	clang-format -i benchmarks/*.cpp
 	clang++ $(CXXFLAGS) benchmarks/riffles.cpp sn/*.cpp -o bin/riffles
-	@time for i in $$(seq 1 $(RUNS)); do ./bin/riffles; done
+	hyperfine --warmup 2 ./bin/riffles
 
 unpacked: 
 	clang-format -i benchmarks/*.cpp
 	clang++ $(CXXFLAGS) benchmarks/unpacked.cpp sn/*.cpp -o bin/unpacked
-	@time for i in $$(seq 1 $(RUNS)); do ./bin/unpacked; done
+	hyperfine --warmup 2 ./bin/unpacked
 
 sincos: 
 	clang-format -i benchmarks/*.cpp
 	clang++ $(CXXFLAGS) benchmarks/sincos.cpp sn/*.cpp -o bin/sincos
-	@time for i in $$(seq 1 $(RUNS)); do ./bin/sincos; done
+	hyperfine --warmup 2 ./bin/sincos
 
 sincos2: 
 	clang-format -i benchmarks/*.cpp
 	clang++ $(CXXFLAGS) benchmarks/sincos2.cpp sn/*.cpp -o bin/sincos2
-	@time for i in $$(seq 1 $(RUNS)); do ./bin/sincos2; done
+	hyperfine --warmup 2 ./bin/sincos2
 
 sincos2A: 
 	clang-format -i benchmarks/*.cpp
 	clang++ $(CXXFLAGS) benchmarks/sincos2A.cpp sn/*.cpp -o bin/sincos2A
-	@time for i in $$(seq 1 $(RUNS)); do ./bin/sincos2A; done
+	hyperfine --warmup 2 ./bin/sincos2A
 
 float4A: 
 	clang-format -i benchmarks/*.cpp
@@ -82,9 +79,21 @@ float4D:
 	hyperfine --warmup 2 ./bin/float4D
 
 hyperfine:
+	clang++ $(CXXFLAGS) benchmarks/reference.cpp sn/*.cpp -o bin/reference
+	clang++ $(CXXFLAGS) benchmarks/riffles.cpp  sn/*.cpp -o bin/riffles
+	clang++ $(CXXFLAGS) benchmarks/unpacked.cpp sn/*.cpp -o bin/unpacked
+	clang++ $(CXXFLAGS) benchmarks/sincos.cpp   sn/*.cpp -o bin/sincos
+	clang++ $(CXXFLAGS) benchmarks/sincos2.cpp  sn/*.cpp -o bin/sincos2
+	clang++ $(CXXFLAGS) benchmarks/sincos2A.cpp sn/*.cpp -o bin/sincos2A
 	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4A.cpp sn/*.cpp -o bin/float4A
 	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4B.cpp sn/*.cpp -o bin/float4B
 	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4C.cpp sn/*.cpp -o bin/float4C
 	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4D.cpp sn/*.cpp -o bin/float4D
 
-	hyperfine --warmup 2  --export-markdown float4.md './bin/float4A' './bin/float4B' './bin/float4C' './bin/float4D'
+	hyperfine --warmup 1  --export-markdown ./workdir/sn.md \
+	          ./bin/reference ./bin/riffles ./bin/unpacked \
+	          ./bin/sincos    ./bin/sincos2 ./bin/sincos2A \
+	          ./bin/float4A   ./bin/float4B ./bin/float4C ./bin/float4D
+
+	hyperfine --warmup 1  --export-markdown ./workdir/sn.md \
+	          ./bin/float4A   ./bin/float4B ./bin/float4C ./bin/float4D
