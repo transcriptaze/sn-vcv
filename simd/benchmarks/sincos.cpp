@@ -37,14 +37,17 @@ int main(int argc, char *argv[]) {
         for (size_t ch = 0; ch < 16; ch++) {
             const float δα = sn.m * δt * notes[ch] / N;
 
-            const float c1 = std::cos(δα);
-            const float s1 = std::sin(δα);
-            const float c2 = c1 * c1 - s1 * s1;
-            const float s2 = 2.0f * s1 * c1;
-            const float c3 = c2 * c1 - s2 * s1;
-            const float s3 = s2 * c1 + c2 * s1;
-            const float cL[N] = {1.0f, c1, c2, c3};
-            const float sL[N] = {0.0f, s1, s2, s3};
+            const float cos1 = std::cos(δα);
+            const float sin1 = std::sin(δα);
+
+            const float cos2 = cos1 * cos1 - sin1 * sin1;
+            const float sin2 = 2.0f * sin1 * cos1;
+
+            const float cos3 = cos2 * cos1 - sin2 * sin1;
+            const float sin3 = sin2 * cos1 + cos2 * sin1;
+
+            const float cL[N] = {1.0f, cos1, cos2, cos3};
+            const float sL[N] = {0.0f, sin1, sin2, sin3};
 
             const float α0 = α[ch] - sn.ζ.φ;
             const float c0 = std::cos(α0);
@@ -68,7 +71,7 @@ int main(int argc, char *argv[]) {
     }
 
     for (size_t ch = 0; ch < 16; ch++) {
-        cout << ">> VCO: " << ch + 1 << "  " << vco[ch] << "\n";
+        cout << ">> SINCOS: " << ch + 1 << "  " << vco[ch] << "\n";
     }
 
     cout << "\n\n";

@@ -58,9 +58,9 @@ __attribute__((noinline)) float υ(const SN &, float a) { return a * 0.1f; }
 
 // float υ(const SN &sn, float α) {
 //     static size_t ix = 0;
-// 
+//
 //     ix = (ix + 1) % 37;
-// 
+//
 //     return std::fmod(α + randoms[ix], 2.0) - 1.0;
 // }
 

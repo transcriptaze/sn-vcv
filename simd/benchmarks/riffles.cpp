@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
     }
 
     for (size_t ch = 0; ch < 16; ch++) {
-        cout << ">> VCO: " << ch + 1 << "  " << vco[ch] << "\n";
+        cout << ">> RIFFLES: " << ch + 1 << "  " << vco[ch] << "\n";
     }
 
     cout << "\nCOUNT: " << count << "\n\n";

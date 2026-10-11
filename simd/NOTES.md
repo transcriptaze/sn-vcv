@@ -17,13 +17,20 @@
     - k-rate:1 (reducing k-rate to 1/256 gives about a 5% performance boost)
 
 
-|           | standalone | VCV, no antialias    | VCV, 4x oversampling |
+|           | sandboxed  | VCV, no antialias    | VCV, 4x oversampling |
 |-----------|------------|----------------------|----------------------|
 | baseline  | 0m23.384s  | 27%, 0.8% per module | N/A                  |
 | reference | 0m59.011s  | 47%, 1.6% per module | 61%, 2.7% per module |
-| riffles   | 0m59.111s  |                      |                      |
-| unpacked  | 0m33.433s  |                      |                      |
-| baseline2 | 0m24.468s  |                      | N/A                  |
+| baseline2 | 0m8.496s   | -                    | -                    |
+| riffles   | 0m59.111s  | -                    | -                    |
+| unpacked  | 0m33.433s  | -                    | -                    |
+| sincos    | 0m29.225s  | -                    | -                    |
+| sincos2   | 0m24.946s  | -                    | -                    |
+| sincos2A  | 0m25.207s  | -                    | -                    |
+| float4A   | 0m10.848s  | -                    | -                    |
+| float4B   | 0m16.602s  | -                    | -                    |
+| float4C   | 0m11.717s  | -                    | -                    |
+| float4D   | 0m12.545s  | -                    | -                    |
 
 
 ## `fmod`
