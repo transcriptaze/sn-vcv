@@ -1,5 +1,5 @@
 """
-Generates 4th order Butterworth IIR filter coefficients
+Generates 4th order 4x oversampled Butterworth IIR filter
 
 fc:
 - 16.5kHz @44.1kHz, 4x oversampling
@@ -25,17 +25,14 @@ dc_gain = np.sum(b) / np.sum(a)
 print()
 print(f"// f0       {fc/1000:.1f}kHz @48kHz,4x oversampling")
 print(f"// DC gain  {dc_gain:.3f}")
-print("constexpr struct {")
-print("    const double a[4];")
-print("    const double b[5];")
-print("} IIR {")
+print("constexpr IIR4 BUTTERWORTH {")
 print(f"    .a = {{{a[1]:.6f}, {a[2]:.6f}, {a[3]:.6f}, {a[4]:.6f}}},")
 print(f"    .b = {{{b[0]:.6f}, {b[1]:.6f}, {b[2]:.6f}, {b[3]:.6f}, {b[4]:.6f}}},")
 print("};")
 print()
 
 plt.semilogx(w, 20 * np.log10(abs(h)))
-plt.title("Butterworth digital filter frequency response")
+plt.title("4th order, 4x oversampled Butterworth IIR filter")
 plt.xlabel("Frequency [Hz]")
 plt.ylabel("Amplitude [dB]")
 plt.margins(0, 0.1)

@@ -1,5 +1,16 @@
 #include "plugin.hpp"
 
+namespace sn_nlm {
+
+struct IIR4 {
+    const double a[4];
+    const double b[5];
+};
+
+struct FIR101 {
+    const double taps[101];
+};
+
 struct sn_nlm : Module {
     static const int CHANNELS;
     static const float VELOCITY;
@@ -34,7 +45,8 @@ struct sn_nlm : Module {
     void process(const ProcessArgs &args) override;
 
     float hard_limit(float in1, float in2, float gain);
-    float filter(float in);
+    float filter(const IIR4 &iir, float in);
+    float filter(const FIR101 &fir, float in);
 
     float gain = 1.0;
 
@@ -45,8 +57,9 @@ struct sn_nlm : Module {
     } iir;
 
     struct {
-        dsp::IIRFilter<5, 5, double> in[16];
-    } antialias;
+        size_t head;
+        double delay_line[101];
+    } fir;
 
     // ... AUX
     struct {
@@ -72,3 +85,5 @@ struct LogGain : ParamQuantity {
         return module->gain;
     }
 };
+
+} // namespace sn_nlm

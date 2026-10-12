@@ -1,41 +1,65 @@
 #include "sn-nlm.hpp"
 
-const auto SN_NLM_INPUT_IN1 = mm2px(Vec(7.33, 23.24));
-const auto SN_NLM_INPUT_IN2 = mm2px(Vec(7.33, 36.25));
-const auto SN_NLM_INPUT_IN3 = mm2px(Vec(7.33, 49.27));
-const auto SN_NLM_INPUT_IN4 = mm2px(Vec(7.33, 62.28));
-const auto SN_NLM_INPUT_IN5 = mm2px(Vec(7.33, 75.29));
-const auto SN_NLM_INPUT_IN6 = mm2px(Vec(7.33, 88.31));
-const auto SN_NLM_INPUT_DEBUG = mm2px(Vec(7.33, 114.34));
-const auto SN_NLM_OUTUT_X = mm2px(Vec(35.56, 75.29));
-const auto SN_NLM_OUTUT_Y = mm2px(Vec(35.56, 88.31));
-const auto SN_NLM_OUTUT_OUT = mm2px(Vec(35.56, 114.34));
-const auto SN_NLM_PARAM_ATTENUATION = mm2px(Vec(35.56, 23.24));
-const auto SN_NLM_PARAM_GAIN = mm2px(Vec(35.56, 36.25));
+namespace sn_nlm {
 
+const auto SN_NLM_IN1 = mm2px(Vec(7.33, 23.24));
+const auto SN_NLM_IN2 = mm2px(Vec(7.33, 36.25));
+const auto SN_NLM_IN3 = mm2px(Vec(7.33, 49.27));
+const auto SN_NLM_IN4 = mm2px(Vec(7.33, 62.28));
+const auto SN_NLM_IN5 = mm2px(Vec(7.33, 75.29));
+const auto SN_NLM_IN6 = mm2px(Vec(7.33, 88.31));
+const auto SN_NLM_DEBUG = mm2px(Vec(7.33, 114.34));
+const auto SN_NLM_OUTX = mm2px(Vec(35.56, 75.29));
+const auto SN_NLM_OUTY = mm2px(Vec(35.56, 88.31));
+const auto SN_NLM_OUTA = mm2px(Vec(35.56, 114.34));
+const auto SN_NLM_ATTENUATION = mm2px(Vec(35.56, 23.24));
+const auto SN_NLM_GAIN = mm2px(Vec(35.56, 36.25));
 const auto SN_NLM_WIDGET_CHANNELS = mm2px(Vec(35.56, 23.24));
 
 constexpr double TWO_TO_32 = 4294967296.0; // 2^32
 constexpr uint32_t MAX_RAMP = 2147483647U;
 
-// NTS: designed with fs instead of fs/2 but for some reason is a better filter
-// // 18.0kHz @48kHz, 4x oversampling
-// constexpr struct {
-//     const double a[4];
-//     const double b[5];
-// } IIR{
-//     .a = {-3.231676, 3.976641, -2.201366, 0.461665},
-//     .b = {0.000329, 0.001316, 0.001974, 0.001316, 0.000329},
-// };
-
-// f0       18.0kHz @48kHz, 4x oversampling
-// DC gain  1.000
-constexpr struct {
-    const double a[4];
-    const double b[5];
-} IIR{
+constexpr IIR4 BUTTERWORTH_18Kz_4x{
     .a = {-2.470272, 2.477971, -1.154635, 0.208848},
     .b = {0.003870, 0.015478, 0.023217, 0.015478, 0.003870},
+};
+
+constexpr IIR4 BESSEL_18kHz_4x{
+    .a = {-2.319879, 2.140213, -0.918352, 0.153327},
+    .b = {0.003457, 0.013827, 0.020740, 0.013827, 0.003457},
+};
+
+constexpr FIR101 FIR_18kHz_4x{
+    // clang-format off
+    .taps = { 
+       -4.70446993e-04, -2.91949771e-04,  6.11132306e-19,  3.31610501e-04,
+        6.03730161e-04,  7.11082490e-04,  5.74378721e-04,  1.78727573e-04,
+       -3.96977400e-04, -9.78505607e-04, -1.33549532e-03, -1.25907226e-03,
+       -6.55986686e-04,  3.77746926e-04,  1.54268255e-03,  2.40453669e-03,
+        2.53833544e-03,  1.70594227e-03, -2.51492230e-18, -2.11412925e-03,
+       -3.89934090e-03, -4.58095088e-03, -3.64729783e-03, -1.10919181e-03,
+        2.39420572e-03,  5.71577996e-03,  7.54375492e-03,  6.87611651e-03,
+        3.46658796e-03, -1.93478775e-03, -7.67553876e-03, -1.16532886e-02,
+       -1.20202224e-02, -7.92129461e-03,  5.74745203e-18,  9.55239877e-03,
+        1.74992637e-02,  2.05266010e-02,  1.64152968e-02,  5.04856235e-03,
+       -1.11091352e-02, -2.72966964e-02, -3.75183405e-02, -3.61477887e-02,
+       -1.96427937e-02,  1.21381258e-02,  5.54470280e-02,  1.03198880e-01,
+        1.46481428e-01,  1.76652565e-01,  1.87467727e-01,  1.76652565e-01,
+        1.46481428e-01,  1.03198880e-01,  5.54470280e-02,  1.21381258e-02,
+       -1.96427937e-02, -3.61477887e-02, -3.75183405e-02, -2.72966964e-02,
+       -1.11091352e-02,  5.04856235e-03,  1.64152968e-02,  2.05266010e-02,
+        1.74992637e-02,  9.55239877e-03,  5.74745203e-18, -7.92129461e-03,
+       -1.20202224e-02, -1.16532886e-02, -7.67553876e-03, -1.93478775e-03,
+        3.46658796e-03,  6.87611651e-03,  7.54375492e-03,  5.71577996e-03,
+        2.39420572e-03, -1.10919181e-03, -3.64729783e-03, -4.58095088e-03,
+       -3.89934090e-03, -2.11412925e-03, -2.51492230e-18,  1.70594227e-03,
+        2.53833544e-03,  2.40453669e-03,  1.54268255e-03,  3.77746926e-04,
+       -6.55986686e-04, -1.25907226e-03, -1.33549532e-03, -9.78505607e-04,
+       -3.96977400e-04,  1.78727573e-04,  5.74378721e-04,  7.11082490e-04,
+        6.03730161e-04,  3.31610501e-04,  6.11132306e-19, -2.91949771e-04,
+        -4.70446993e-04,
+    },
+    // clang-format on
 };
 
 sn_nlm::sn_nlm() {
@@ -59,20 +83,17 @@ sn_nlm::sn_nlm() {
     configOutput(OUTY_OUTPUT, "y");
 
     // ... initialise anti-aliasing filters
-    for (size_t i = 0; i < 16; i++) {
-        antialias.in[i].setCoefficients(IIR.b, IIR.a);
-    }
-
-    for (size_t i = 0; i < 16; i++) {
-        antialias.in[i].reset();
-    }
-
-    for (int i = 1; i < 5; i++) {
+    for (size_t i = 1; i < 5; i++) {
         iir.x[i - 1] = 0.f;
     }
 
-    for (int i = 1; i < 5; i++) {
+    for (size_t i = 1; i < 5; i++) {
         iir.y[i - 1] = 0.f;
+    }
+
+    fir.head = 0;
+    for (size_t i = 0; i < 101; i++) {
+        fir.delay_line[i] = 0.0;
     }
 }
 
@@ -119,42 +140,44 @@ void sn_nlm::process(const ProcessArgs &args) {
 
     double normalized = (static_cast<double>(ramp) / static_cast<double>(MAX_RAMP)) * 2.0 - 1.0;
     float outX = normalized * 5.0f;
-    float outY = hard_limit(outX, outX, this->gain);
+    // FIXME float outY = hard_limit(outX, outX, this->gain);
 
     outputs[OUTX_OUTPUT].setVoltage(outX, 0);
-    outputs[OUTY_OUTPUT].setVoltage(outY, 0);
+    // FIXME outputs[OUTY_OUTPUT].setVoltage(outY, 0);
 }
 
+// FIXME move filtering to process because it's the only one which knows which filter is associated with which input
 float sn_nlm::hard_limit(float in1, float in2, float gain) {
-    // // ... zero stuffing
-    // antialias.in[0].process(in1);
-    // antialias.in[0].process(0.f);
-    // antialias.in[0].process(0.f);
+    // // ... IIR filter
+    // filter(BESSEL_18kHz_4x, in1);
+    // filter(BESSEL_18kHz_4x, 0.f);
+    // filter(BESSEL_18kHz_4x, 0.f);
     //
-    // return 8.0f * antialias.in[0].process(0.f);
+    // return 4.0f * filter(BESSEL_18kHz_4x, 0.f);
 
-    filter(in1);
-    filter(0.f);
-    filter(0.f);
+    // ... FIR filter
+    filter(FIR_18kHz_4x, in1);
+    filter(FIR_18kHz_4x, 0.f);
+    filter(FIR_18kHz_4x, 0.f);
 
-    return 8.0f * filter(0.f);
+    return 2.0f * filter(FIR_18kHz_4x, 0.f);
 
     // return clamp(gain * (in1 + in2), -5.f, 5.f);
 }
 
-float sn_nlm::filter(float in) {
+float sn_nlm::filter(const IIR4 &iir4, float in) {
     double out = 0.f;
 
-    out = IIR.b[0] * in;
-    out += IIR.b[1] * iir.x[0];
-    out += IIR.b[2] * iir.x[1];
-    out += IIR.b[3] * iir.x[2];
-    out += IIR.b[4] * iir.x[3];
+    out = iir4.b[0] * in;
+    out += iir4.b[1] * iir.x[0];
+    out += iir4.b[2] * iir.x[1];
+    out += iir4.b[3] * iir.x[2];
+    out += iir4.b[4] * iir.x[3];
 
-    out -= IIR.a[0] * iir.y[0];
-    out -= IIR.a[1] * iir.y[1];
-    out -= IIR.a[2] * iir.y[2];
-    out -= IIR.a[3] * iir.y[3];
+    out -= iir4.a[0] * iir.y[0];
+    out -= iir4.a[1] * iir.y[1];
+    out -= iir4.a[2] * iir.y[2];
+    out -= iir4.a[3] * iir.y[3];
 
     iir.x[3] = iir.x[2];
     iir.x[2] = iir.x[1];
@@ -169,13 +192,28 @@ float sn_nlm::filter(float in) {
     return out;
 }
 
-sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {
-    // float left = 7.331;
-    // // float middle = 20.351;
-    // float right = 35.56;
-    // float top = 21.968 + 1.27;
-    // float dh = 13.014;
+float sn_nlm::filter(const FIR101 &fir101, float in) {
+    fir.delay_line[fir.head] = in;
 
+    double out = 0.0;
+    size_t index = fir.head;
+
+    for (size_t i = 0; i < 101; ++i) {
+        out += fir101.taps[i] * fir.delay_line[index];
+
+        if (index == 0) {
+            index = 101 - 1;
+        } else {
+            --index;
+        }
+    }
+
+    fir.head = (fir.head + 1) % 101;
+
+    return 2.0 * (float)out;
+}
+
+sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {
     setModule(module);
     setPanel(createPanel(asset::plugin(pluginInstance, "res/sn-nlm.svg"),
                          asset::plugin(pluginInstance, "res/sn-nlm-dark.svg")));
@@ -208,4 +246,6 @@ void sn_nlmWidget::appendContextMenu(Menu *menu) {
     menu->addChild(createMenuLabel("sn-nlm settings"));
 }
 
-Model *model_sn_nlm = createModel<sn_nlm, sn_nlmWidget>("sn-nlm");
+} // namespace sn_nlm
+
+Model *model_sn_nlm = createModel<sn_nlm::sn_nlm, sn_nlm::sn_nlmWidget>("sn-nlm");
