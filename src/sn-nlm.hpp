@@ -2,13 +2,14 @@
 
 namespace sn_nlm {
 
-struct IIR4 {
-    const double a[4];
-    const double b[5];
+struct iir4 {
+    double x[4];
+    double y[4];
 };
 
-struct FIR101 {
-    const double taps[101];
+struct fir101 {
+    size_t head;
+    double delay_line[101];
 };
 
 struct sn_nlm : Module {
@@ -44,22 +45,21 @@ struct sn_nlm : Module {
     void dataFromJson(json_t *) override;
     void process(const ProcessArgs &args) override;
 
+    float process(int channel, float gain);
+    void processAUX(const ProcessArgs &args);
+
     float hard_limit(float in1, float in2, float gain);
-    float filter(const IIR4 &iir, float in);
-    float filter(const FIR101 &fir, float in);
+    float filter(struct fir101 &fir, float in);
+    float filter(struct iir4 &iir, float in);
 
     float gain = 1.0;
 
     // ... antialiasing
     struct {
-        double x[4];
-        double y[4];
-    } iir;
-
-    struct {
-        size_t head;
-        double delay_line[101];
-    } fir;
+        struct fir101 in1[16];
+        struct fir101 in2[16];
+        struct iir4 out[16];
+    } antialias;
 
     // ... AUX
     struct {

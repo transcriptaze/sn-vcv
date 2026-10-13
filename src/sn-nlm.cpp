@@ -19,17 +19,25 @@ const auto SN_NLM_WIDGET_CHANNELS = mm2px(Vec(35.56, 23.24));
 constexpr double TWO_TO_32 = 4294967296.0; // 2^32
 constexpr uint32_t MAX_RAMP = 2147483647U;
 
-constexpr IIR4 BUTTERWORTH_18Kz_4x{
+constexpr struct {
+    const double a[4];
+    const double b[5];
+} BUTTERWORTH_18Kz_4x{
     .a = {-2.470272, 2.477971, -1.154635, 0.208848},
     .b = {0.003870, 0.015478, 0.023217, 0.015478, 0.003870},
 };
 
-constexpr IIR4 BESSEL_18kHz_4x{
+constexpr struct {
+    const double a[4];
+    const double b[5];
+} BESSEL_18kHz_4x{
     .a = {-2.319879, 2.140213, -0.918352, 0.153327},
     .b = {0.003457, 0.013827, 0.020740, 0.013827, 0.003457},
 };
 
-constexpr FIR101 FIR_18kHz_4x{
+constexpr struct {
+    const double taps[101];
+} FIR_18kHz_4x{
     // clang-format off
     .taps = { 
        -4.70446993e-04, -2.91949771e-04,  6.11132306e-19,  3.31610501e-04,
@@ -83,17 +91,21 @@ sn_nlm::sn_nlm() {
     configOutput(OUTY_OUTPUT, "y");
 
     // ... initialise anti-aliasing filters
-    for (size_t i = 1; i < 5; i++) {
-        iir.x[i - 1] = 0.f;
+    for (size_t ch = 0; ch < 16; ch++) {
+        antialias.in1[ch].head = 0;
+        antialias.in2[ch].head = 0;
+
+        for (size_t i = 0; i < 101; i++) {
+            antialias.in1[ch].delay_line[i] = 0.0;
+            antialias.in2[ch].delay_line[i] = 0.0;
+        }
     }
 
-    for (size_t i = 1; i < 5; i++) {
-        iir.y[i - 1] = 0.f;
-    }
-
-    fir.head = 0;
-    for (size_t i = 0; i < 101; i++) {
-        fir.delay_line[i] = 0.0;
+    for (size_t ch = 0; ch < 16; ch++) {
+        for (size_t i = 0; i < 4; i++) {
+            antialias.out[ch].x[i] = 0.f;
+            antialias.out[ch].y[i] = 0.f;
+        }
     }
 }
 
@@ -118,17 +130,44 @@ void sn_nlm::dataFromJson(json_t *root) {
 }
 
 void sn_nlm::process(const ProcessArgs &args) {
-    float in1 = inputs[IN1_INPUT].getPolyVoltage(0);
-    float in2 = inputs[IN2_INPUT].getPolyVoltage(0);
-    float gain = params[GAIN_PARAM].getValue();
+    gain = std::powf(2.0f, 2.0f * params[GAIN_PARAM].getValue());
 
-    this->gain = std::powf(2.0f, 2.0f * gain);
+    for (size_t ch = 0; ch < 1; ch++) {
+        float outA = process(ch, gain);
 
-    float outA = hard_limit(in1, in2, this->gain);
+        outputs[OUTA_OUTPUT].setVoltage(outA, ch);
+    }
 
-    outputs[OUTA_OUTPUT].setVoltage(outA, 0);
+    processAUX(args);
+}
 
-    // ... AUX
+float sn_nlm::process(int ch, float gain) {
+    float in1 = inputs[IN1_INPUT].getPolyVoltage(ch);
+    float in2 = inputs[IN2_INPUT].getPolyVoltage(ch);
+
+    float in1A = filter(antialias.in1[ch], in1);
+    float in2A = filter(antialias.in2[ch], in2);
+    float outA = hard_limit(in1A, in2A, gain);
+    filter(antialias.out[ch], outA);
+
+    float in1B = filter(antialias.in1[ch], 0.f);
+    float in2B = filter(antialias.in2[ch], 0.f);
+    float outB = hard_limit(in1B, in2B, gain);
+    filter(antialias.out[ch], outB);
+
+    float in1C = filter(antialias.in1[ch], 0.f);
+    float in2C = filter(antialias.in2[ch], 0.f);
+    float outC = hard_limit(in1C, in2C, gain);
+    filter(antialias.out[ch], outC);
+
+    float in1D = filter(antialias.in1[ch], 0.f);
+    float in2D = filter(antialias.in2[ch], 0.f);
+    float outD = hard_limit(in1D, in2D, gain);
+
+    return filter(antialias.out[ch], outD);
+}
+
+void sn_nlm::processAUX(const ProcessArgs &args) {
     uint32_t tuning = static_cast<uint32_t>((20.0 / args.sampleRate) * TWO_TO_32);
 
     AUX.phase += tuning;
@@ -140,44 +179,50 @@ void sn_nlm::process(const ProcessArgs &args) {
 
     double normalized = (static_cast<double>(ramp) / static_cast<double>(MAX_RAMP)) * 2.0 - 1.0;
     float outX = normalized * 5.0f;
-    // FIXME float outY = hard_limit(outX, outX, this->gain);
+    float outY = hard_limit(outX, outX, this->gain);
 
     outputs[OUTX_OUTPUT].setVoltage(outX, 0);
-    // FIXME outputs[OUTY_OUTPUT].setVoltage(outY, 0);
+    outputs[OUTY_OUTPUT].setVoltage(outY, 0);
 }
 
-// FIXME move filtering to process because it's the only one which knows which filter is associated with which input
 float sn_nlm::hard_limit(float in1, float in2, float gain) {
-    // // ... IIR filter
-    // filter(BESSEL_18kHz_4x, in1);
-    // filter(BESSEL_18kHz_4x, 0.f);
-    // filter(BESSEL_18kHz_4x, 0.f);
-    //
-    // return 4.0f * filter(BESSEL_18kHz_4x, 0.f);
-
-    // ... FIR filter
-    filter(FIR_18kHz_4x, in1);
-    filter(FIR_18kHz_4x, 0.f);
-    filter(FIR_18kHz_4x, 0.f);
-
-    return 2.0f * filter(FIR_18kHz_4x, 0.f);
-
-    // return clamp(gain * (in1 + in2), -5.f, 5.f);
+    return clamp(gain * (in1 + in2), -5.f, 5.f);
 }
 
-float sn_nlm::filter(const IIR4 &iir4, float in) {
+float sn_nlm::filter(struct fir101 &fir, float in) {
+    fir.delay_line[fir.head] = 2.f * in;
+
+    double out = 0.0;
+    size_t index = fir.head;
+
+    for (size_t i = 0; i < 101; ++i) {
+        out += FIR_18kHz_4x.taps[i] * fir.delay_line[index];
+
+        if (index == 0) {
+            index = 101 - 1;
+        } else {
+            --index;
+        }
+    }
+
+    fir.head = (fir.head + 1) % 101;
+
+    return 2.0 * (float)out;
+}
+
+float sn_nlm::filter(struct iir4 &iir, float in) {
     double out = 0.f;
 
-    out = iir4.b[0] * in;
-    out += iir4.b[1] * iir.x[0];
-    out += iir4.b[2] * iir.x[1];
-    out += iir4.b[3] * iir.x[2];
-    out += iir4.b[4] * iir.x[3];
+    out = BESSEL_18kHz_4x.b[0] * in;
+    out += BESSEL_18kHz_4x.b[1] * iir.x[0];
+    out += BESSEL_18kHz_4x.b[2] * iir.x[1];
+    out += BESSEL_18kHz_4x.b[3] * iir.x[2];
+    out += BESSEL_18kHz_4x.b[4] * iir.x[3];
 
-    out -= iir4.a[0] * iir.y[0];
-    out -= iir4.a[1] * iir.y[1];
-    out -= iir4.a[2] * iir.y[2];
-    out -= iir4.a[3] * iir.y[3];
+    out -= BESSEL_18kHz_4x.a[0] * iir.y[0];
+    out -= BESSEL_18kHz_4x.a[1] * iir.y[1];
+    out -= BESSEL_18kHz_4x.a[2] * iir.y[2];
+    out -= BESSEL_18kHz_4x.a[3] * iir.y[3];
 
     iir.x[3] = iir.x[2];
     iir.x[2] = iir.x[1];
@@ -190,27 +235,6 @@ float sn_nlm::filter(const IIR4 &iir4, float in) {
     iir.y[0] = out;
 
     return out;
-}
-
-float sn_nlm::filter(const FIR101 &fir101, float in) {
-    fir.delay_line[fir.head] = in;
-
-    double out = 0.0;
-    size_t index = fir.head;
-
-    for (size_t i = 0; i < 101; ++i) {
-        out += fir101.taps[i] * fir.delay_line[index];
-
-        if (index == 0) {
-            index = 101 - 1;
-        } else {
-            --index;
-        }
-    }
-
-    fir.head = (fir.head + 1) % 101;
-
-    return 2.0 * (float)out;
 }
 
 sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {

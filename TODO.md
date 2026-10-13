@@ -31,71 +31,26 @@
 - [ ] Unit tests
 
 ## sn-nlm
-- [x] gain
 - [x] AUX xy
+- [x] gain
+- [ ] attenuation
 - [ ] bypass
 - (?) gain input
 
-### anti-aliasing
+### antialiasing: input
 - [x] 4th order Butterworth
 - [x] 4th order Bessel
+- [x] FIR
 - [ ] 8th order Butterworth
 - [ ] 8th order Bessel
 - [ ] SOS
-- [ ] FIR (scipy.firwin)
 
-```
-#include <vector>
-#include <iostream>
+### antialiasing: output
+- [ ] 4th order Butterworth
+- [ ] 4th order Bessel
+- [ ] 8th order Butterworth
+- [ ] 8th order Bessel
 
-class FIRFilter {
-public:
-    // Constructor takes the filter coefficients (taps)
-    explicit FIRFilter(const std::vector<double>& coefficients)
-        : taps(coefficients), 
-          num_taps(coefficients.size()), 
-          delay_line(coefficients.size(), 0.0), 
-          head(0) {}
-
-    // Process a single sample
-    double process(double input) {
-        // Store input at the current head position (circular buffer)
-        delay_line[head] = input;
-
-        double output = 0.0;
-        size_t index = head;
-
-        // Convolution sum: multiply coefficients by delayed samples
-        for (size_t i = 0; i < num_taps; ++i) {
-            output += taps[i] * delay_line[index];
-            
-            // Move backward in the circular buffer, wrapping around if necessary
-            if (index == 0) {
-                index = num_taps - 1;
-            } else {
-                --index;
-            }
-        }
-
-        // Advance the head pointer for the next sample
-        head = (head + 1) % num_taps;
-
-        return output;
-    }
-
-    // Reset filter states
-    void reset() {
-        std::fill(delay_line.begin(), delay_line.end(), 0.0);
-        head = 0;
-    }
-
-private:
-    std::vector<double> taps;          // Filter coefficients h[k]
-    size_t num_taps;                   // Number of taps (e.g., 101)
-    std::vector<double> delay_line;    // History buffer x[n-k]
-    size_t head;                       // Current index in circular buffer
-};
-```
 
 ## R & D
 
