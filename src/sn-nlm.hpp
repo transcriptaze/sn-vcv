@@ -48,6 +48,7 @@ struct sn_nlm : Module {
     json_t *dataToJson() override;
     void dataFromJson(json_t *) override;
     void process(const ProcessArgs &args) override;
+    void processBypass(const ProcessArgs &args) override;
 
     float process(int channel, float gain);
     void processAUX(const ProcessArgs &args);

@@ -186,6 +186,14 @@ void sn_nlm::process(const ProcessArgs &args) {
     processAUX(args);
 }
 
+void sn_nlm::processBypass(const ProcessArgs &args) {
+    for (size_t ch = 0; ch < 1; ch++) {
+        outputs[OUTA_OUTPUT].setVoltage(0.f, ch);
+    }
+
+    processAUX(args);
+}
+
 float sn_nlm::process(int ch, float gain) {
     float in1[4];
     float in2[4];

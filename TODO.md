@@ -34,8 +34,23 @@
 - [x] AUX xy
 - [x] gain
 - [ ] attenuation
-- [ ] bypass
+- [x] bypass
+- [ ] average
+- [ ] groups
+    - [ ] 1x8
+    - [ ] 2x4
+    - [ ] 4x2
+    - [ ] 8x1
+
 - (?) gain input
+
+### mix
+- [ ] linear
+- [ ] hard limit
+- [ ] softmax (valve)
+- [ ] inverse softmax (transistor)
+- [ ] hysteresis
+- [ ] inverse hysteresis
 
 ### antialiasing: input
 - [x] 4th order Butterworth
@@ -45,98 +60,9 @@
 - [ ] 8th order Butterworth
 - [ ] 8th order Bessel
 - [ ] 8th order Elliptic
-- [ ] polyphase
+- [x] polyphase
 - [ ] SOS
 
-```
-#include <vector>
-#include <iostream>
-
-class PolyphaseInterpolator4x {
-public:
-    /// @brief Constructor for a 4x polyphase interpolator
-    /// @param taps_per_phase Number of filter taps allocated to each of the 4 sub-filters
-    /// @param full_coeffs The complete low-pass filter impulse response (length = 4 * taps_per_phase)
-    PolyphaseInterpolator4x(int taps_per_phase, const std::vector<double>& full_coeffs)
-        : M(4), P(taps_per_phase), state(P, 0.0), phase_coeffs(M, std::vector<double>(P)) 
-    {
-        if (full_coeffs.size() != static_cast<size_t>(M * P)) {
-            throw std::invalid_argument("Coefficient size must equal 4 * taps_per_phase.");
-        }
-
-        // De-interleave the full filter coefficients into 4 polyphase branches
-        // h[m*M + k] maps to phase k, tap index m
-        for (size_t i = 0; i < full_coeffs.size(); ++i) {
-            int phase = i % M;
-            int tap_idx = i / M;
-            phase_coeffs[phase][tap_idx] = full_coeffs[i];
-        }
-    }
-
-    /// @brief Process a single input sample and produce 4 interpolated output samples
-    /// @param input The new sample at the lower input sample rate
-    /// @return A vector containing the 4 output samples at the higher rate
-    std::vector<double> process(double input) {
-        // 1. Shift the input delay line (stores history of input samples)
-        for (int i = P - 1; i > 0; --i) {
-            state[i] = state[i - 1];
-        }
-        state[0] = input;
-
-        // 2. Compute output for each of the 4 phases
-        std::vector<double> outputs(M);
-        for (int p = 0; p < M; ++p) {
-            double acc = 0.0;
-            for (int i = 0; i < P; ++i) {
-                acc += state[i] * phase_coeffs[p][i];
-            }
-            outputs[p] = acc;
-        }
-
-        return outputs;
-    }
-
-    /// @brief Reset the internal delay line/states to zero
-    void reset() {
-        std::fill(state.begin(), state.end(), 0.0);
-    }
-
-private:
-    int M;                                  // Interpolation factor (4)
-    int P;                                  // Number of taps per phase
-    std::vector<double> state;              // Shared input delay line of length P
-    std::vector<std::vector<double>> phase_coeffs; // 4 sub-filter coefficient arrays
-};
-```
-
-```
-int main() {
-    const int taps_per_phase = 8;
-    const int total_taps = 4 * taps_per_phase; // 32 taps total
-
-    // Dummy prototype coefficients (in a real app, generate these using windowed sinc / Parks-McClellan)
-    std::vector<double> prototype_coeffs(total_taps, 0.1); 
-
-    // Instantiate the 4x interpolator
-    PolyphaseInterpolator4x interpolator(taps_per_phase, prototype_coeffs);
-
-    // Simulate feeding input samples
-    std::vector<double> input_stream = {1.0, 0.5, -0.5, 0.0};
-
-    std::cout << "Processing input stream with 4x interpolation:\n";
-    for (double x : input_stream) {
-        std::vector<double> upsampled = interpolator.process(x);
-        
-        std::cout << "Input: " << x << " -> Outputs: [ ";
-        for (double out : upsampled) {
-            std::cout << out << " ";
-        }
-        std::cout << "]\n";
-    }
-
-    return 0;
-}
-```
 ### antialiasing: output
 - [ ] 4th order Butterworth
 - [ ] 4th order Bessel
