@@ -36,41 +36,6 @@ constexpr struct {
 };
 
 constexpr struct {
-    const double taps[101];
-} FIR_18kHz_4x{
-    // clang-format off
-    .taps = { 
-       -4.70446993e-04, -2.91949771e-04,  6.11132306e-19,  3.31610501e-04,
-        6.03730161e-04,  7.11082490e-04,  5.74378721e-04,  1.78727573e-04,
-       -3.96977400e-04, -9.78505607e-04, -1.33549532e-03, -1.25907226e-03,
-       -6.55986686e-04,  3.77746926e-04,  1.54268255e-03,  2.40453669e-03,
-        2.53833544e-03,  1.70594227e-03, -2.51492230e-18, -2.11412925e-03,
-       -3.89934090e-03, -4.58095088e-03, -3.64729783e-03, -1.10919181e-03,
-        2.39420572e-03,  5.71577996e-03,  7.54375492e-03,  6.87611651e-03,
-        3.46658796e-03, -1.93478775e-03, -7.67553876e-03, -1.16532886e-02,
-       -1.20202224e-02, -7.92129461e-03,  5.74745203e-18,  9.55239877e-03,
-        1.74992637e-02,  2.05266010e-02,  1.64152968e-02,  5.04856235e-03,
-       -1.11091352e-02, -2.72966964e-02, -3.75183405e-02, -3.61477887e-02,
-       -1.96427937e-02,  1.21381258e-02,  5.54470280e-02,  1.03198880e-01,
-        1.46481428e-01,  1.76652565e-01,  1.87467727e-01,  1.76652565e-01,
-        1.46481428e-01,  1.03198880e-01,  5.54470280e-02,  1.21381258e-02,
-       -1.96427937e-02, -3.61477887e-02, -3.75183405e-02, -2.72966964e-02,
-       -1.11091352e-02,  5.04856235e-03,  1.64152968e-02,  2.05266010e-02,
-        1.74992637e-02,  9.55239877e-03,  5.74745203e-18, -7.92129461e-03,
-       -1.20202224e-02, -1.16532886e-02, -7.67553876e-03, -1.93478775e-03,
-        3.46658796e-03,  6.87611651e-03,  7.54375492e-03,  5.71577996e-03,
-        2.39420572e-03, -1.10919181e-03, -3.64729783e-03, -4.58095088e-03,
-       -3.89934090e-03, -2.11412925e-03, -2.51492230e-18,  1.70594227e-03,
-        2.53833544e-03,  2.40453669e-03,  1.54268255e-03,  3.77746926e-04,
-       -6.55986686e-04, -1.25907226e-03, -1.33549532e-03, -9.78505607e-04,
-       -3.96977400e-04,  1.78727573e-04,  5.74378721e-04,  7.11082490e-04,
-        6.03730161e-04,  3.31610501e-04,  6.11132306e-19, -2.91949771e-04,
-        -4.70446993e-04,
-    },
-    // clang-format on
-};
-
-constexpr struct {
     const double taps[4][25];
 } POLYPHASE_18kHz_4x{
     // clang-format off
@@ -138,18 +103,18 @@ sn_nlm::sn_nlm() {
     // ... initialise anti-aliasing filters
     for (size_t i = 0; i < 2; i++) {
         for (size_t ch = 0; ch < 16; ch++) {
-            antialias.fir[i][ch].head = 0;
-
-            for (size_t j = 0; j < 101; j++) {
-                antialias.fir[i][ch].delay_line[j] = 0.0;
+            for (size_t j = 0; j < 25; j++) {
+                source[i].fir[ch].state[i] = 0.f;
             }
         }
     }
 
-    for (size_t ch = 0; ch < 16; ch++) {
-        for (size_t i = 0; i < 4; i++) {
-            antialias.out[ch].x[i] = 0.f;
-            antialias.out[ch].y[i] = 0.f;
+    for (size_t i = 0; i < 1; i++) {
+        for (size_t ch = 0; ch < 16; ch++) {
+            for (size_t j = 0; j < 4; j++) {
+                sink[i].iir[ch].x[j] = 0.f;
+                sink[i].iir[ch].y[j] = 0.f;
+            }
         }
     }
 }
@@ -158,12 +123,14 @@ json_t *sn_nlm::dataToJson() {
     json_t *root = json_object();
 
     json_object_set_new(root, "gain", json_real(gain));
+    json_object_set_new(root, "average", json_boolean(average));
 
     return root;
 }
 
 void sn_nlm::dataFromJson(json_t *root) {
     json_t *gain = json_object_get(root, "gain");
+    json_t *average = json_object_get(root, "average");
 
     if (gain) {
         float v = json_number_value(gain);
@@ -172,15 +139,25 @@ void sn_nlm::dataFromJson(json_t *root) {
             this->gain = v;
         }
     }
+
+    if (average) {
+        this->average = json_boolean_value(average);
+    }
 }
 
 void sn_nlm::process(const ProcessArgs &args) {
     gain = std::powf(2.0f, 2.0f * params[GAIN_PARAM].getValue());
 
     for (size_t ch = 0; ch < 1; ch++) {
-        float outA = process(ch, gain);
+        float out[1];
 
-        outputs[OUTA_OUTPUT].setVoltage(outA, ch);
+        if (average) {
+            process(ch, gain / 2.f, out);
+        } else {
+            process(ch, gain, out);
+        }
+
+        outputs[OUTA_OUTPUT].setVoltage(out[0], ch);
     }
 
     processAUX(args);
@@ -194,21 +171,23 @@ void sn_nlm::processBypass(const ProcessArgs &args) {
     processAUX(args);
 }
 
-float sn_nlm::process(int ch, float gain) {
-    float in1[4];
-    float in2[4];
+void sn_nlm::process(int ch, float gain, float out[1]) {
+    float in[2][4];
+    float buffer[1][4];
 
-    filter(antialias.polyphase[0][ch], inputs[IN1_INPUT].getPolyVoltage(ch), in1);
-    filter(antialias.polyphase[1][ch], inputs[IN2_INPUT].getPolyVoltage(ch), in2);
+    for (size_t i = 0; i < 2; i++) {
+        filter(source[i].fir[ch], inputs[source[i].input].getPolyVoltage(ch), in[i]);
+    }
 
-    float out[4] = {
-        hard_limit(in1[0], in2[0], gain),
-        hard_limit(in1[1], in2[1], gain),
-        hard_limit(in1[2], in2[2], gain),
-        hard_limit(in1[3], in2[3], gain),
-    };
+    for (size_t i = 0; i < 1; i++) {
+        for (size_t j = 0; j < 4; j++) {
+            buffer[i][j] = hard_limit(in[0][j], in[1][j], gain);
+        };
+    }
 
-    return butterworth(antialias.out[ch], out);
+    for (size_t i = 0; i < 1; i++) {
+        out[i] = butterworth(sink[i].iir[ch], buffer[i]);
+    }
 }
 
 void sn_nlm::processAUX(const ProcessArgs &args) {
@@ -233,30 +212,30 @@ float sn_nlm::hard_limit(float in1, float in2, float gain) {
     return clamp(gain * (in1 + in2), -5.f, 5.f);
 }
 
-void sn_nlm::filter(struct fir101 &fir, float in, float out[4]) {
-    float _in[4] = {in, 0.f, 0.f, 0.f};
-
-    for (size_t i = 0; i < 4; i++) {
-        fir.delay_line[fir.head] = _in[i];
-
-        double acc = 0.0;
-        size_t index = fir.head;
-
-        for (size_t j = 0; j < 101; ++j) {
-            acc += FIR_18kHz_4x.taps[j] * fir.delay_line[index];
-
-            if (index == 0) {
-                index = 101 - 1;
-            } else {
-                --index;
-            }
-        }
-
-        fir.head = (fir.head + 1) % 101;
-
-        out[i] = 4.0 * (float)acc;
-    }
-}
+// void sn_nlm::filter(struct fir101 &fir, float in, float out[4]) {
+//     float _in[4] = {in, 0.f, 0.f, 0.f};
+//
+//     for (size_t i = 0; i < 4; i++) {
+//         fir.delay_line[fir.head] = _in[i];
+//
+//         double acc = 0.0;
+//         size_t index = fir.head;
+//
+//         for (size_t j = 0; j < 101; ++j) {
+//             acc += FIR_18kHz_4x.taps[j] * fir.delay_line[index];
+//
+//             if (index == 0) {
+//                 index = 101 - 1;
+//             } else {
+//                 --index;
+//             }
+//         }
+//
+//         fir.head = (fir.head + 1) % 101;
+//
+//         out[i] = 4.0 * (float)acc;
+//     }
+// }
 
 void sn_nlm::filter(struct polyphase100 &polyphase, float in, float out[4]) {
     for (size_t i = 24; i > 0; --i) {
@@ -359,10 +338,12 @@ sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {
 }
 
 void sn_nlmWidget::appendContextMenu(Menu *menu) {
-    // sn_nlm *module = getModule<sn_nlm>();
+    sn_nlm *module = getModule<sn_nlm>();
 
     menu->addChild(new MenuSeparator);
     menu->addChild(createMenuLabel("sn-nlm settings"));
+
+    menu->addChild(createBoolPtrMenuItem("Average", "", &module->average));
 }
 
 } // namespace sn_nlm

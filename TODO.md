@@ -35,18 +35,19 @@
 - [x] gain
 - [ ] attenuation
 - [x] bypass
-- [ ] average
+- [x] average
 - [ ] groups
-    - [ ] 1x8
+    - (?) 1x8
     - [ ] 2x4
     - [ ] 4x2
-    - [ ] 8x1
+    - (?) 8x1
 
-- (?) gain input
+- (?) attenuation CV
+- (?) gain CV
 
 ### mix
 - [ ] linear
-- [ ] hard limit
+- [x] hard limit
 - [ ] softmax (valve)
 - [ ] inverse softmax (transistor)
 - [ ] hysteresis
@@ -61,6 +62,7 @@
 - [ ] 8th order Bessel
 - [ ] 8th order Elliptic
 - [x] polyphase
+    - [ ] rework as ring buffer
 - [ ] SOS
 
 ### antialiasing: output

@@ -7,11 +7,6 @@ struct iir4 {
     double y[4];
 };
 
-struct fir101 {
-    size_t head;
-    double delay_line[101];
-};
-
 struct polyphase100 {
     float state[25];
 };
@@ -50,24 +45,33 @@ struct sn_nlm : Module {
     void process(const ProcessArgs &args) override;
     void processBypass(const ProcessArgs &args) override;
 
-    float process(int channel, float gain);
+    void process(int channel, float gain, float out[1]);
     void processAUX(const ProcessArgs &args);
 
     float hard_limit(float in1, float in2, float gain);
-    void filter(struct fir101 &fir, float in, float out[4]);
     void filter(struct polyphase100 &polyphase, float in, float out[4]);
 
     float butterworth(struct iir4 &iir, float in[4]);
     float bessel(struct iir4 &iir, float in[4]);
 
     float gain = 1.0;
+    bool average = false;
 
-    // ... antialiasing
+    // ... groups
     struct {
-        struct fir101 fir[2][16];
-        struct polyphase100 polyphase[2][16];
-        struct iir4 out[16];
-    } antialias;
+        int input;
+        struct polyphase100 fir[16];
+    } source[2] = {
+        {.input = IN1_INPUT},
+        {.input = IN2_INPUT},
+    };
+
+    struct {
+        int output;
+        struct iir4 iir[16];
+    } sink[1] = {
+        {.output = OUTA_OUTPUT},
+    };
 
     // ... AUX
     struct {
