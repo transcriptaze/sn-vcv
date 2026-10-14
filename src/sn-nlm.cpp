@@ -70,6 +70,51 @@ constexpr struct {
     // clang-format on
 };
 
+constexpr struct {
+    const double taps[4][25];
+} POLYPHASE_18kHz_4x{
+    // clang-format off
+    .taps = {
+        {
+            -3.97413335e-04,  6.59195838e-04, -6.71203177e-04, -1.72181350e-04,
+             2.18356030e-03, -4.32920111e-03,  4.10029020e-03,  9.19749721e-04,
+            -1.04580445e-02,  1.97269540e-02, -1.95196199e-02, -5.51179954e-03,
+             1.63591542e-01,  1.25898134e-01, -2.98487457e-02, -2.67726530e-03,
+             1.38819673e-02, -1.22817019e-02,  5.43046798e-03,  5.75373833e-04,
+            -3.03006506e-03,  2.50666309e-03, -9.83440823e-04, -9.14515086e-05,
+             4.67012328e-04,
+        },
+        {
+            -1.54078989e-04,  6.49144451e-04, -1.15016433e-03,  9.36230975e-04,
+             9.17036077e-04, -4.24804639e-03,  6.80009830e-03, -4.84665351e-03,
+            -4.30926472e-03,  1.93615905e-02, -3.34732299e-02,  3.27022539e-02,
+             1.84640003e-01,  7.92496905e-02, -3.85123472e-02,  1.15115548e-02,
+             4.73504725e-03, -9.93345919e-03,  7.46714654e-03, -2.50899043e-03,
+            -1.02281745e-03,  1.97523848e-03, -1.30684360e-03,  3.89366620e-04,
+             1.62716772e-04,
+        },
+        {
+             1.62716772e-04,  3.89366620e-04, -1.30684360e-03,  1.97523848e-03,
+            -1.02281745e-03, -2.50899043e-03,  7.46714654e-03, -9.93345919e-03,
+             4.73504725e-03,  1.15115548e-02, -3.85123472e-02,  7.92496905e-02,
+             1.84640003e-01,  3.27022539e-02, -3.34732299e-02,  1.93615905e-02,
+            -4.30926472e-03, -4.84665351e-03,  6.80009830e-03, -4.24804639e-03,
+             9.17036077e-04,  9.36230975e-04, -1.15016433e-03,  6.49144451e-04,
+            -1.54078989e-04,
+        },
+        {
+             4.67012328e-04, -9.14515086e-05, -9.83440823e-04,  2.50666309e-03,
+            -3.03006506e-03,  5.75373833e-04,  5.43046798e-03, -1.22817019e-02,
+             1.38819673e-02, -2.67726530e-03, -2.98487457e-02,  1.25898134e-01,
+             1.63591542e-01, -5.51179954e-03, -1.95196199e-02,  1.97269540e-02,
+            -1.04580445e-02,  9.19749721e-04,  4.10029020e-03, -4.32920111e-03,
+             2.18356030e-03, -1.72181350e-04, -6.71203177e-04,  6.59195838e-04,
+            -3.97413335e-04,
+        },
+    },
+    // clang-format on
+};
+
 sn_nlm::sn_nlm() {
     INFO("sn-nlm v0.0.0");
 
@@ -91,13 +136,13 @@ sn_nlm::sn_nlm() {
     configOutput(OUTY_OUTPUT, "y");
 
     // ... initialise anti-aliasing filters
-    for (size_t ch = 0; ch < 16; ch++) {
-        antialias.in1[ch].head = 0;
-        antialias.in2[ch].head = 0;
+    for (size_t i = 0; i < 2; i++) {
+        for (size_t ch = 0; ch < 16; ch++) {
+            antialias.fir[i][ch].head = 0;
 
-        for (size_t i = 0; i < 101; i++) {
-            antialias.in1[ch].delay_line[i] = 0.0;
-            antialias.in2[ch].delay_line[i] = 0.0;
+            for (size_t j = 0; j < 101; j++) {
+                antialias.fir[i][ch].delay_line[j] = 0.0;
+            }
         }
     }
 
@@ -142,29 +187,20 @@ void sn_nlm::process(const ProcessArgs &args) {
 }
 
 float sn_nlm::process(int ch, float gain) {
-    float in1 = inputs[IN1_INPUT].getPolyVoltage(ch);
-    float in2 = inputs[IN2_INPUT].getPolyVoltage(ch);
+    float in1[4];
+    float in2[4];
 
-    float in1A = filter(antialias.in1[ch], in1);
-    float in2A = filter(antialias.in2[ch], in2);
-    float outA = hard_limit(in1A, in2A, gain);
-    filter(antialias.out[ch], outA);
+    filter(antialias.polyphase[0][ch], inputs[IN1_INPUT].getPolyVoltage(ch), in1);
+    filter(antialias.polyphase[1][ch], inputs[IN2_INPUT].getPolyVoltage(ch), in2);
 
-    float in1B = filter(antialias.in1[ch], 0.f);
-    float in2B = filter(antialias.in2[ch], 0.f);
-    float outB = hard_limit(in1B, in2B, gain);
-    filter(antialias.out[ch], outB);
+    float out[4] = {
+        hard_limit(in1[0], in2[0], gain),
+        hard_limit(in1[1], in2[1], gain),
+        hard_limit(in1[2], in2[2], gain),
+        hard_limit(in1[3], in2[3], gain),
+    };
 
-    float in1C = filter(antialias.in1[ch], 0.f);
-    float in2C = filter(antialias.in2[ch], 0.f);
-    float outC = hard_limit(in1C, in2C, gain);
-    filter(antialias.out[ch], outC);
-
-    float in1D = filter(antialias.in1[ch], 0.f);
-    float in2D = filter(antialias.in2[ch], 0.f);
-    float outD = hard_limit(in1D, in2D, gain);
-
-    return filter(antialias.out[ch], outD);
+    return butterworth(antialias.out[ch], out);
 }
 
 void sn_nlm::processAUX(const ProcessArgs &args) {
@@ -189,52 +225,103 @@ float sn_nlm::hard_limit(float in1, float in2, float gain) {
     return clamp(gain * (in1 + in2), -5.f, 5.f);
 }
 
-float sn_nlm::filter(struct fir101 &fir, float in) {
-    fir.delay_line[fir.head] = 2.f * in;
+void sn_nlm::filter(struct fir101 &fir, float in, float out[4]) {
+    float _in[4] = {in, 0.f, 0.f, 0.f};
 
-    double out = 0.0;
-    size_t index = fir.head;
+    for (size_t i = 0; i < 4; i++) {
+        fir.delay_line[fir.head] = _in[i];
 
-    for (size_t i = 0; i < 101; ++i) {
-        out += FIR_18kHz_4x.taps[i] * fir.delay_line[index];
+        double acc = 0.0;
+        size_t index = fir.head;
 
-        if (index == 0) {
-            index = 101 - 1;
-        } else {
-            --index;
+        for (size_t j = 0; j < 101; ++j) {
+            acc += FIR_18kHz_4x.taps[j] * fir.delay_line[index];
+
+            if (index == 0) {
+                index = 101 - 1;
+            } else {
+                --index;
+            }
         }
+
+        fir.head = (fir.head + 1) % 101;
+
+        out[i] = 4.0 * (float)acc;
     }
-
-    fir.head = (fir.head + 1) % 101;
-
-    return 2.0 * (float)out;
 }
 
-float sn_nlm::filter(struct iir4 &iir, float in) {
-    double out = 0.f;
+void sn_nlm::filter(struct polyphase100 &polyphase, float in, float out[4]) {
+    for (size_t i = 24; i > 0; --i) {
+        polyphase.state[i] = polyphase.state[i - 1];
+    }
+    polyphase.state[0] = in;
 
-    out = BESSEL_18kHz_4x.b[0] * in;
-    out += BESSEL_18kHz_4x.b[1] * iir.x[0];
-    out += BESSEL_18kHz_4x.b[2] * iir.x[1];
-    out += BESSEL_18kHz_4x.b[3] * iir.x[2];
-    out += BESSEL_18kHz_4x.b[4] * iir.x[3];
+    for (size_t p = 0; p < 4; ++p) {
+        double acc = 0.0;
+        for (size_t i = 0; i < 25; ++i) {
+            acc += polyphase.state[i] * POLYPHASE_18kHz_4x.taps[p][i];
+        }
 
-    out -= BESSEL_18kHz_4x.a[0] * iir.y[0];
-    out -= BESSEL_18kHz_4x.a[1] * iir.y[1];
-    out -= BESSEL_18kHz_4x.a[2] * iir.y[2];
-    out -= BESSEL_18kHz_4x.a[3] * iir.y[3];
+        out[p] = 4.f * acc;
+    }
+}
 
-    iir.x[3] = iir.x[2];
-    iir.x[2] = iir.x[1];
-    iir.x[1] = iir.x[0];
-    iir.x[0] = in;
+float sn_nlm::butterworth(struct iir4 &iir, float in[4]) {
+    for (size_t i = 0; i < 4; i++) {
+        double out = 0.f;
 
-    iir.y[3] = iir.y[2];
-    iir.y[2] = iir.y[1];
-    iir.y[1] = iir.y[0];
-    iir.y[0] = out;
+        out = BUTTERWORTH_18Kz_4x.b[0] * in[i];
+        out += BUTTERWORTH_18Kz_4x.b[1] * iir.x[0];
+        out += BUTTERWORTH_18Kz_4x.b[2] * iir.x[1];
+        out += BUTTERWORTH_18Kz_4x.b[3] * iir.x[2];
+        out += BUTTERWORTH_18Kz_4x.b[4] * iir.x[3];
 
-    return out;
+        out -= BUTTERWORTH_18Kz_4x.a[0] * iir.y[0];
+        out -= BUTTERWORTH_18Kz_4x.a[1] * iir.y[1];
+        out -= BUTTERWORTH_18Kz_4x.a[2] * iir.y[2];
+        out -= BUTTERWORTH_18Kz_4x.a[3] * iir.y[3];
+
+        iir.x[3] = iir.x[2];
+        iir.x[2] = iir.x[1];
+        iir.x[1] = iir.x[0];
+        iir.x[0] = in[i];
+
+        iir.y[3] = iir.y[2];
+        iir.y[2] = iir.y[1];
+        iir.y[1] = iir.y[0];
+        iir.y[0] = out;
+    }
+
+    return iir.y[0];
+}
+
+float sn_nlm::bessel(struct iir4 &iir, float in[4]) {
+    for (size_t i = 0; i < 4; i++) {
+        double out = 0.f;
+
+        out = BESSEL_18kHz_4x.b[0] * in[i];
+        out += BESSEL_18kHz_4x.b[1] * iir.x[0];
+        out += BESSEL_18kHz_4x.b[2] * iir.x[1];
+        out += BESSEL_18kHz_4x.b[3] * iir.x[2];
+        out += BESSEL_18kHz_4x.b[4] * iir.x[3];
+
+        out -= BESSEL_18kHz_4x.a[0] * iir.y[0];
+        out -= BESSEL_18kHz_4x.a[1] * iir.y[1];
+        out -= BESSEL_18kHz_4x.a[2] * iir.y[2];
+        out -= BESSEL_18kHz_4x.a[3] * iir.y[3];
+
+        iir.x[3] = iir.x[2];
+        iir.x[2] = iir.x[1];
+        iir.x[1] = iir.x[0];
+        iir.x[0] = in[i];
+
+        iir.y[3] = iir.y[2];
+        iir.y[2] = iir.y[1];
+        iir.y[1] = iir.y[0];
+        iir.y[0] = out;
+    }
+
+    return iir.y[0];
 }
 
 sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {

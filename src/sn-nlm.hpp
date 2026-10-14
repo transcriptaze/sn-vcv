@@ -12,6 +12,10 @@ struct fir101 {
     double delay_line[101];
 };
 
+struct polyphase100 {
+    float state[25];
+};
+
 struct sn_nlm : Module {
     static const int CHANNELS;
     static const float VELOCITY;
@@ -49,15 +53,18 @@ struct sn_nlm : Module {
     void processAUX(const ProcessArgs &args);
 
     float hard_limit(float in1, float in2, float gain);
-    float filter(struct fir101 &fir, float in);
-    float filter(struct iir4 &iir, float in);
+    void filter(struct fir101 &fir, float in, float out[4]);
+    void filter(struct polyphase100 &polyphase, float in, float out[4]);
+
+    float butterworth(struct iir4 &iir, float in[4]);
+    float bessel(struct iir4 &iir, float in[4]);
 
     float gain = 1.0;
 
     // ... antialiasing
     struct {
-        struct fir101 in1[16];
-        struct fir101 in2[16];
+        struct fir101 fir[2][16];
+        struct polyphase100 polyphase[2][16];
         struct iir4 out[16];
     } antialias;
 

@@ -4,23 +4,24 @@ import matplotlib.pyplot as plt
 
 FS = 48000
 OVERSAMPLING = 4
-F0 = 5000 / (OVERSAMPLING * FS / 2.0)  # normalized cutoff frequency
+F0 = 18_000 / (OVERSAMPLING * FS / 2.0)  # normalized cutoff frequency
 NUMTAPS = 101
 
 taps = signal.firwin(NUMTAPS, F0, window='hamming')
 w, h = signal.freqz(taps, fs=FS * OVERSAMPLING)
 
 ix = 0
-while ix < 101:
+while ix < NUMTAPS:
     jx = 0
     print("      ", end="")
-    while ix < 101 and jx<4:
+    while ix < NUMTAPS and jx<4:
         print(f" {taps[ix]: .8e},", end="")
         ix += 1
         jx += 1
     print("")
 
 
+plt.figure(figsize=(12, 6))
 plt.semilogx(w, 20 * np.log10(abs(h)))
 plt.title("FIR filter")
 plt.xlabel("Frequency [Hz]")

@@ -12,3 +12,6 @@ bessel:
 
 fir:
 	python3 FIR.py
+
+polyphase:
+	python3 polyphase.py
