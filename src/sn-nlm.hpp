@@ -42,6 +42,7 @@ struct sn_nlm : Module {
     enum MIXFN {
         LINEAR,
         HARD_LIMIT,
+        SOFT_LIMIT,
     };
 
     sn_nlm();
@@ -57,6 +58,8 @@ struct sn_nlm : Module {
     float mix(float in1, float in2, float gain);
     float linear(float in1, float in2, float gain);
     float hard_limit(float in1, float in2, float gain);
+    float soft_limit(float in1, float in2, float gain);
+    float soft_limit_cubic(float in1, float in2, float gain);
 
     void filter(struct polyphase100 &polyphase, float in, float out[4]);
     float butterworth(struct iir4 &iir, float in[4]);
@@ -66,7 +69,7 @@ struct sn_nlm : Module {
     float attenuation = 0.0f;
     float gain = 1.0f;
     bool average = false;
-    MIXFN mixfn = LINEAR;
+    MIXFN mixfn = SOFT_LIMIT;
 
     // ... groups
     struct {

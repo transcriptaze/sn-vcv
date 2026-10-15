@@ -84,6 +84,7 @@ constexpr struct {
 const std::vector<std::string> MIXERS = {
     "Linear",
     "Hard limit",
+    "Soft limit",
 };
 
 sn_nlm::sn_nlm() {
@@ -172,6 +173,10 @@ void sn_nlm::dataFromJson(json_t *root) {
         case HARD_LIMIT:
             this->mixfn = HARD_LIMIT;
             break;
+
+        case SOFT_LIMIT:
+            this->mixfn = SOFT_LIMIT;
+            break;
         }
     }
 }
@@ -244,7 +249,9 @@ float sn_nlm::mix(float in1, float in2, float gain) {
     switch (mixfn) {
     case HARD_LIMIT:
         return hard_limit(in1, in2, this->gain);
-        break;
+
+    case SOFT_LIMIT:
+        return soft_limit(in1, in2, this->gain);
 
     default:
         return linear(in1, in2, this->gain);
@@ -257,6 +264,29 @@ float sn_nlm::linear(float in1, float in2, float gain) {
 
 float sn_nlm::hard_limit(float in1, float in2, float gain) {
     return clamp(gain * (in1 + in2), -5.0f, 5.0f);
+}
+
+float sn_nlm::soft_limit(float in1, float in2, float gain) {
+    float v = gain * (in1 + in2);
+
+    return 5.0f * std::tanh(v / 5.0f);
+}
+
+// cubic soft-clipping: f(x) = x - (x^3)/3
+float sn_nlm::soft_limit_cubic(float in1, float in2, float gain) {
+    float v = (gain * (in1 + in2)) / 5.0f; // normalize to -1..1 range
+
+    if (v <= -1.0f) {
+        return -5.0f;
+    }
+
+    if (v >= 1.0f) {
+        return 5.0f;
+    }
+
+    float shaped = v - (v * v * v) / 3.0f;
+
+    return shaped * 7.5f;
 }
 
 // void sn_nlm::filter(struct fir101 &fir, float in, float out[4]) {

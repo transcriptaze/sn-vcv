@@ -42,6 +42,8 @@
     - [ ] 4x2
     - (?) 8x1
 
+- [ ] isConnected
+- [ ] channel count
 - (?) attenuation CV
 - (?) gain CV
 
