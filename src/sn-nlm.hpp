@@ -39,6 +39,11 @@ struct sn_nlm : Module {
         LIGHTS_LEN
     };
 
+    enum MIXFN {
+        LINEAR,
+        HARD_LIMIT,
+    };
+
     sn_nlm();
 
     json_t *dataToJson() override;
@@ -49,15 +54,19 @@ struct sn_nlm : Module {
     void process(int channel, float attenuation, float gain, float out[1]);
     void processAUX(const ProcessArgs &args);
 
+    float mix(float in1, float in2, float gain);
+    float linear(float in1, float in2, float gain);
     float hard_limit(float in1, float in2, float gain);
-    void filter(struct polyphase100 &polyphase, float in, float out[4]);
 
+    void filter(struct polyphase100 &polyphase, float in, float out[4]);
     float butterworth(struct iir4 &iir, float in[4]);
     float bessel(struct iir4 &iir, float in[4]);
 
+    // ... parameters
     float attenuation = 0.f;
     float gain = 1.f;
     bool average = false;
+    MIXFN mixfn = LINEAR;
 
     // ... groups
     struct {

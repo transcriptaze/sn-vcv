@@ -80,6 +80,12 @@ constexpr struct {
     // clang-format on
 };
 
+// mix funtion menu options
+const std::vector<std::string> MIXERS = {
+    "Linear",
+    "Hard limit",
+};
+
 sn_nlm::sn_nlm() {
     INFO("sn-nlm v0.0.0");
 
@@ -128,6 +134,7 @@ json_t *sn_nlm::dataToJson() {
     json_object_set_new(root, "attenuation", json_real(attenuation));
     json_object_set_new(root, "gain", json_real(gain));
     json_object_set_new(root, "average", json_boolean(average));
+    json_object_set_new(root, "mixer", json_integer(mixfn));
 
     return root;
 }
@@ -136,10 +143,10 @@ void sn_nlm::dataFromJson(json_t *root) {
     json_t *attenuation = json_object_get(root, "attenuation");
     json_t *gain = json_object_get(root, "gain");
     json_t *average = json_object_get(root, "average");
+    json_t *mixer = json_object_get(root, "mixer");
 
     if (attenuation) {
         float v = json_number_value(attenuation);
-
         if (v >= 0.f && v < 1.0f) {
             this->attenuation = v;
         }
@@ -147,7 +154,6 @@ void sn_nlm::dataFromJson(json_t *root) {
 
     if (gain) {
         float v = json_number_value(gain);
-
         if (v >= 0.25f && v < 4.0f) {
             this->gain = v;
         }
@@ -155,6 +161,18 @@ void sn_nlm::dataFromJson(json_t *root) {
 
     if (average) {
         this->average = json_boolean_value(average);
+    }
+
+    if (mixer) {
+        switch (json_integer_value(mixer)) {
+        case LINEAR:
+            this->mixfn = LINEAR;
+            break;
+
+        case HARD_LIMIT:
+            this->mixfn = HARD_LIMIT;
+            break;
+        }
     }
 }
 
@@ -195,8 +213,8 @@ void sn_nlm::process(int ch, float attenuation, float gain, float out[1]) {
 
     for (size_t i = 0; i < 1; i++) {
         for (size_t j = 0; j < 4; j++) {
-            buffer[i][j] = hard_limit(in[0][j], in[1][j], gain);
-        };
+            buffer[i][j] = mix(in[0][j], in[1][j], gain);
+        }
     }
 
     for (size_t i = 0; i < 1; i++) {
@@ -216,10 +234,25 @@ void sn_nlm::processAUX(const ProcessArgs &args) {
 
     double normalized = (static_cast<double>(ramp) / static_cast<double>(MAX_RAMP)) * 2.0 - 1.0;
     float outX = normalized * 5.0f;
-    float outY = hard_limit(outX, outX, this->gain);
+    float outY = mix(outX, outX, gain);
 
     outputs[OUTX_OUTPUT].setVoltage(outX, 0);
     outputs[OUTY_OUTPUT].setVoltage(outY, 0);
+}
+
+float sn_nlm::mix(float in1, float in2, float gain) {
+    switch (mixfn) {
+    case HARD_LIMIT:
+        return hard_limit(in1, in2, this->gain);
+        break;
+
+    default:
+        return linear(in1, in2, this->gain);
+    }
+}
+
+float sn_nlm::linear(float in1, float in2, float gain) {
+    return gain * (in1 + in2);
 }
 
 float sn_nlm::hard_limit(float in1, float in2, float gain) {
@@ -359,6 +392,10 @@ void sn_nlmWidget::appendContextMenu(Menu *menu) {
     menu->addChild(createMenuLabel("sn-nlm settings"));
 
     menu->addChild(createBoolPtrMenuItem("Average", "", &module->average));
+
+    menu->addChild(createIndexPtrSubmenuItem("Mix function",
+                                             MIXERS,
+                                             &module->mixfn));
 }
 
 } // namespace sn_nlm

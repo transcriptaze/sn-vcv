@@ -47,7 +47,7 @@
 - (?) gain CV
 
 ### mix
-- [ ] linear
+- [x] linear
 - [x] hard limit
 - [ ] softmax (valve)
 - [ ] inverse softmax (transistor)
