@@ -113,7 +113,7 @@ sn_nlm::sn_nlm() {
     for (size_t i = 0; i < 2; i++) {
         for (size_t ch = 0; ch < 16; ch++) {
             for (size_t j = 0; j < 25; j++) {
-                source[i].fir[ch].state[i] = 0.f;
+                source[i].fir[ch].state[i] = 0.0f;
             }
         }
     }
@@ -121,8 +121,8 @@ sn_nlm::sn_nlm() {
     for (size_t i = 0; i < 1; i++) {
         for (size_t ch = 0; ch < 16; ch++) {
             for (size_t j = 0; j < 4; j++) {
-                sink[i].iir[ch].x[j] = 0.f;
-                sink[i].iir[ch].y[j] = 0.f;
+                sink[i].iir[ch].x[j] = 0.0f;
+                sink[i].iir[ch].y[j] = 0.0f;
             }
         }
     }
@@ -147,7 +147,7 @@ void sn_nlm::dataFromJson(json_t *root) {
 
     if (attenuation) {
         float v = json_number_value(attenuation);
-        if (v >= 0.f && v < 1.0f) {
+        if (v >= 0.0f && v < 1.0f) {
             this->attenuation = v;
         }
     }
@@ -184,7 +184,7 @@ void sn_nlm::process(const ProcessArgs &args) {
         float out[1];
 
         if (average) {
-            process(ch, attenuation, gain / 2.f, out);
+            process(ch, attenuation, gain / 2.0f, out);
         } else {
             process(ch, attenuation, gain, out);
         }
@@ -197,7 +197,7 @@ void sn_nlm::process(const ProcessArgs &args) {
 
 void sn_nlm::processBypass(const ProcessArgs &args) {
     for (size_t ch = 0; ch < 1; ch++) {
-        outputs[OUTA_OUTPUT].setVoltage(0.f, ch);
+        outputs[OUTA_OUTPUT].setVoltage(0.0f, ch);
     }
 
     processAUX(args);
@@ -208,7 +208,7 @@ void sn_nlm::process(int ch, float attenuation, float gain, float out[1]) {
     float buffer[1][4];
 
     for (size_t i = 0; i < 2; i++) {
-        filter(source[i].fir[ch], (1.f - attenuation) * inputs[source[i].input].getPolyVoltage(ch), in[i]);
+        filter(source[i].fir[ch], (1.0f - attenuation) * inputs[source[i].input].getPolyVoltage(ch), in[i]);
     }
 
     for (size_t i = 0; i < 1; i++) {
@@ -256,11 +256,11 @@ float sn_nlm::linear(float in1, float in2, float gain) {
 }
 
 float sn_nlm::hard_limit(float in1, float in2, float gain) {
-    return clamp(gain * (in1 + in2), -5.f, 5.f);
+    return clamp(gain * (in1 + in2), -5.0f, 5.0f);
 }
 
 // void sn_nlm::filter(struct fir101 &fir, float in, float out[4]) {
-//     float _in[4] = {in, 0.f, 0.f, 0.f};
+//     float _in[4] = {in, 0.0f, 0.0f, 0.0f};
 //
 //     for (size_t i = 0; i < 4; i++) {
 //         fir.delay_line[fir.head] = _in[i];
@@ -296,13 +296,13 @@ void sn_nlm::filter(struct polyphase100 &polyphase, float in, float out[4]) {
             acc += polyphase.state[i] * POLYPHASE_18kHz_4x.taps[p][i];
         }
 
-        out[p] = 4.f * acc;
+        out[p] = 4.0f * acc;
     }
 }
 
 float sn_nlm::butterworth(struct iir4 &iir, float in[4]) {
     for (size_t i = 0; i < 4; i++) {
-        double out = 0.f;
+        double out = 0.0f;
 
         out = BUTTERWORTH_18Kz_4x.b[0] * in[i];
         out += BUTTERWORTH_18Kz_4x.b[1] * iir.x[0];
@@ -331,7 +331,7 @@ float sn_nlm::butterworth(struct iir4 &iir, float in[4]) {
 
 float sn_nlm::bessel(struct iir4 &iir, float in[4]) {
     for (size_t i = 0; i < 4; i++) {
-        double out = 0.f;
+        double out = 0.0f;
 
         out = BESSEL_18kHz_4x.b[0] * in[i];
         out += BESSEL_18kHz_4x.b[1] * iir.x[0];

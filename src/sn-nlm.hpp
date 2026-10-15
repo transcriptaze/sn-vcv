@@ -63,8 +63,8 @@ struct sn_nlm : Module {
     float bessel(struct iir4 &iir, float in[4]);
 
     // ... parameters
-    float attenuation = 0.f;
-    float gain = 1.f;
+    float attenuation = 0.0f;
+    float gain = 1.0f;
     bool average = false;
     MIXFN mixfn = LINEAR;
 
@@ -106,6 +106,13 @@ struct LogGain : ParamQuantity {
         sn_nlm *module = reinterpret_cast<sn_nlm *>(this->module);
 
         return module->gain;
+    }
+
+    void setDisplayValue(float v) override {
+        float clamped = clamp(v, 0.25f, 4.0f);
+        float gain = log2(clamped) / 2.0f;
+
+        setValue(gain);
     }
 };
 
