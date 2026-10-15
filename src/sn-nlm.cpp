@@ -86,8 +86,11 @@ sn_nlm::sn_nlm() {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
     // ... params
+    configParam(ATTENUATION_PARAM, 0.0f, 1.0f, 0.0f, "attenuation", "");
     configParam<LogGain>(GAIN_PARAM, -1.0f, 1.0f, 0.0f, "gain", "");
 
+    getParamQuantity(ATTENUATION_PARAM)->displayPrecision = 1;
+    getParamQuantity(ATTENUATION_PARAM)->randomizeEnabled = false;
     getParamQuantity(GAIN_PARAM)->randomizeEnabled = false;
 
     // ... inputs
@@ -122,6 +125,7 @@ sn_nlm::sn_nlm() {
 json_t *sn_nlm::dataToJson() {
     json_t *root = json_object();
 
+    json_object_set_new(root, "attenuation", json_real(attenuation));
     json_object_set_new(root, "gain", json_real(gain));
     json_object_set_new(root, "average", json_boolean(average));
 
@@ -129,8 +133,17 @@ json_t *sn_nlm::dataToJson() {
 }
 
 void sn_nlm::dataFromJson(json_t *root) {
+    json_t *attenuation = json_object_get(root, "attenuation");
     json_t *gain = json_object_get(root, "gain");
     json_t *average = json_object_get(root, "average");
+
+    if (attenuation) {
+        float v = json_number_value(attenuation);
+
+        if (v >= 0.f && v < 1.0f) {
+            this->attenuation = v;
+        }
+    }
 
     if (gain) {
         float v = json_number_value(gain);
@@ -146,15 +159,16 @@ void sn_nlm::dataFromJson(json_t *root) {
 }
 
 void sn_nlm::process(const ProcessArgs &args) {
+    attenuation = params[ATTENUATION_PARAM].getValue();
     gain = std::powf(2.0f, 2.0f * params[GAIN_PARAM].getValue());
 
     for (size_t ch = 0; ch < 1; ch++) {
         float out[1];
 
         if (average) {
-            process(ch, gain / 2.f, out);
+            process(ch, attenuation, gain / 2.f, out);
         } else {
-            process(ch, gain, out);
+            process(ch, attenuation, gain, out);
         }
 
         outputs[OUTA_OUTPUT].setVoltage(out[0], ch);
@@ -171,12 +185,12 @@ void sn_nlm::processBypass(const ProcessArgs &args) {
     processAUX(args);
 }
 
-void sn_nlm::process(int ch, float gain, float out[1]) {
+void sn_nlm::process(int ch, float attenuation, float gain, float out[1]) {
     float in[2][4];
     float buffer[1][4];
 
     for (size_t i = 0; i < 2; i++) {
-        filter(source[i].fir[ch], inputs[source[i].input].getPolyVoltage(ch), in[i]);
+        filter(source[i].fir[ch], (1.f - attenuation) * inputs[source[i].input].getPolyVoltage(ch), in[i]);
     }
 
     for (size_t i = 0; i < 1; i++) {
@@ -331,6 +345,7 @@ sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {
     addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTY, module, sn_nlm::OUTY_OUTPUT));
 
     // ... parameters
+    addParam(createParamCentered<RoundBlackKnob>(SN_NLM_ATTENUATION, module, sn_nlm::ATTENUATION_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(SN_NLM_GAIN, module, sn_nlm::GAIN_PARAM));
 
     // ... debug

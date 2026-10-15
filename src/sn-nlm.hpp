@@ -16,6 +16,7 @@ struct sn_nlm : Module {
     static const float VELOCITY;
 
     enum ParamId {
+        ATTENUATION_PARAM,
         GAIN_PARAM,
         PARAMS_LEN
     };
@@ -45,7 +46,7 @@ struct sn_nlm : Module {
     void process(const ProcessArgs &args) override;
     void processBypass(const ProcessArgs &args) override;
 
-    void process(int channel, float gain, float out[1]);
+    void process(int channel, float attenuation, float gain, float out[1]);
     void processAUX(const ProcessArgs &args);
 
     float hard_limit(float in1, float in2, float gain);
@@ -54,7 +55,8 @@ struct sn_nlm : Module {
     float butterworth(struct iir4 &iir, float in[4]);
     float bessel(struct iir4 &iir, float in[4]);
 
-    float gain = 1.0;
+    float attenuation = 0.f;
+    float gain = 1.f;
     bool average = false;
 
     // ... groups

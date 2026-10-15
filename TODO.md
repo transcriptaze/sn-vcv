@@ -33,7 +33,8 @@
 ## sn-nlm
 - [x] AUX xy
 - [x] gain
-- [ ] attenuation
+    - [ ] fix set numeric value
+- [x] attenuation
 - [x] bypass
 - [x] average
 - [ ] groups
