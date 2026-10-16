@@ -43,6 +43,7 @@ struct sn_nlm : Module {
         LINEAR,
         HARD_LIMIT,
         SOFT_LIMIT,
+        EXPAND,
     };
 
     sn_nlm();
@@ -60,6 +61,7 @@ struct sn_nlm : Module {
     float hard_limit(float in1, float in2, float gain);
     float soft_limit(float in1, float in2, float gain);
     float soft_limit_cubic(float in1, float in2, float gain);
+    float expand(float in1, float in2, float gain);
 
     void filter(struct polyphase100 &polyphase, float in, float out[4]);
     float butterworth(struct iir4 &iir, float in[4]);

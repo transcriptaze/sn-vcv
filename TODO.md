@@ -50,7 +50,7 @@
 ### mix
 - [x] linear
 - [x] hard limit
-- [ ] softmax (valve)
+- [x] soft limit
 - [ ] inverse softmax (transistor)
 - [ ] hysteresis
 - [ ] inverse hysteresis

@@ -85,6 +85,7 @@ const std::vector<std::string> MIXERS = {
     "Linear",
     "Hard limit",
     "Soft limit",
+    "Expander",
 };
 
 sn_nlm::sn_nlm() {
@@ -177,6 +178,10 @@ void sn_nlm::dataFromJson(json_t *root) {
         case SOFT_LIMIT:
             this->mixfn = SOFT_LIMIT;
             break;
+
+        case EXPAND:
+            this->mixfn = EXPAND;
+            break;
         }
     }
 }
@@ -253,6 +258,9 @@ float sn_nlm::mix(float in1, float in2, float gain) {
     case SOFT_LIMIT:
         return soft_limit(in1, in2, this->gain);
 
+    case EXPAND:
+        return expand(in1, in2, this->gain);
+
     default:
         return linear(in1, in2, this->gain);
     }
@@ -287,6 +295,35 @@ float sn_nlm::soft_limit_cubic(float in1, float in2, float gain) {
     float shaped = v - (v * v * v) / 3.0f;
 
     return shaped * 7.5f;
+}
+
+float sn_nlm::expand(float in1, float in2, float gain) {
+    float sensitivity = 0.25f;
+    float dampened_gain = 1.0f + sensitivity * (gain - 1.0f);
+    dampened_gain = std::max(0.1f, dampened_gain); // Safety floor
+
+    float effective_gain = dampened_gain * 1.733f;
+    float v = effective_gain * (in1 + in2);
+    float abs_v = std::abs(v);
+
+    // ... flattens center as gain increases
+    float m_low = 0.1f / std::sqrt(dampened_gain);
+
+    // ... ends steepness
+    float m_high = 2.1f;
+
+    // .... (supposedly) widens centre as gain increases (T and W expand outward)
+    float width_multiplier = 1.0f + 1.2f * (dampened_gain - 1.0f);
+    float T = 14.5f * width_multiplier;
+    float W = 5.8f * width_multiplier;
+
+    float delta_m = m_high - m_low;
+    float inner_pos = (abs_v - T) / W;
+    float inner_neg = -T / W;
+
+    float shaped = m_low * abs_v + 0.5f * delta_m * (abs_v + W * (std::log(std::cosh(inner_pos)) - std::log(std::cosh(inner_neg))));
+
+    return (v >= 0.0f) ? shaped : -shaped;
 }
 
 // void sn_nlm::filter(struct fir101 &fir, float in, float out[4]) {
