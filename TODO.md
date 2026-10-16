@@ -19,6 +19,7 @@
 - [ ] Dithering
 - [ ] Phase parameter/input
 - [ ] External sync
+- [ ] Phase modulation (all-pass filters, dispersion, etc)
 
 - [ ] Set k-rate in ms
 - [ ] Move sn_vco::dcblocking and sn_vc::antialias to  DCB and AA
