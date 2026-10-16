@@ -16,9 +16,14 @@
       - https://stackoverflow.com/questions/3764978/why-hypot-function-is-so-slow
       - https://mattkretz.github.io/2019/01/18/optimizing-hypot-for-simd.html
 
+- [ ] Dithering
+- [ ] Phase parameter/input
+- [ ] External sync
 
 - [ ] Set k-rate in ms
 - [ ] Move sn_vco::dcblocking and sn_vc::antialias to  DCB and AA
+- [ ] Polyphase decimator
+- [ ] Default to AA filter depending on sampling rate
 
 - [x] DC blocking
 - [x] Clamp input frequency
