@@ -65,6 +65,41 @@
   | float4D   | 2.561 ± 0.003      | +17.1%  |               |
 
 
+## validation suite
+
+float
+=====
+    max(mean)    0.000011
+    max(stddev)  0.00022
+    max(max)     0.002228
+
+
+sincos
+======
+    max(mean)    0.000002
+    max(stddev)  0.00014
+    max(max)     0.002930
+
+
+sincos2
+=======
+    max(mean)    0.000002
+    max(stddev)  0.00014
+    max(max)     0.002930
+
+
+float4A
+=======
+    max(mean)    0.000002
+    max(stddev)  0.00015
+    max(max)     0.002930
+
+===============================================================================
+[doctest] test cases:     6 |     6 passed | 0 failed | 0 skipped
+[doctest] assertions: 15302 | 15302 passed | 0 failed |
+[doctest] Status: SUCCESS!
+
+
 ## `fmod`
 1. `αʼ = std::fmod(αʼ + δα, 2.0 * M_PI);`
 real    0m59.922s

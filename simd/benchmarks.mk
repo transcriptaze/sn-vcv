@@ -63,6 +63,11 @@ float4A:
 	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4A.cpp sn/*.cpp -o bin/float4A
 	hyperfine --warmup 2 ./bin/float4A
 
+float4AX: 
+	clang-format -i benchmarks/*.cpp
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4AX.cpp sn/*.cpp -o bin/float4AX
+	hyperfine --warmup 2 ./bin/float4AX
+
 float4B: 
 	clang-format -i benchmarks/*.cpp
 	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4B.cpp sn/*.cpp -o bin/float4B
@@ -85,15 +90,17 @@ hyperfine:
 	clang++ $(CXXFLAGS) benchmarks/sincos.cpp   sn/*.cpp -o bin/sincos
 	clang++ $(CXXFLAGS) benchmarks/sincos2.cpp  sn/*.cpp -o bin/sincos2
 	clang++ $(CXXFLAGS) benchmarks/sincos2A.cpp sn/*.cpp -o bin/sincos2A
-	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4A.cpp sn/*.cpp -o bin/float4A
-	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4B.cpp sn/*.cpp -o bin/float4B
-	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4C.cpp sn/*.cpp -o bin/float4C
-	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4D.cpp sn/*.cpp -o bin/float4D
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4A.cpp  sn/*.cpp -o bin/float4A
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4AX.cpp sn/*.cpp -o bin/float4AX
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4B.cpp  sn/*.cpp -o bin/float4B
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4C.cpp  sn/*.cpp -o bin/float4C
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4D.cpp  sn/*.cpp -o bin/float4D
+
+# 	hyperfine --warmup 1  --export-markdown ./workdir/sn.md \
+# 	          ./bin/reference ./bin/riffles  ./bin/unpacked \
+# 	          ./bin/sincos    ./bin/sincos2  ./bin/sincos2A \
+# 	          ./bin/float4A   ./bin.float4AX \
+# 	          ./bin/float4B   ./bin/float4C ./bin/float4D
 
 	hyperfine --warmup 1  --export-markdown ./workdir/sn.md \
-	          ./bin/reference ./bin/riffles ./bin/unpacked \
-	          ./bin/sincos    ./bin/sincos2 ./bin/sincos2A \
-	          ./bin/float4A   ./bin/float4B ./bin/float4C ./bin/float4D
-
-	hyperfine --warmup 1  --export-markdown ./workdir/sn.md \
-	          ./bin/float4A   ./bin/float4B ./bin/float4C ./bin/float4D
+	          ./bin/float4A ./bin/float4AX ./bin/float4B ./bin/float4C ./bin/float4D
