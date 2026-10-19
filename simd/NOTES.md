@@ -64,6 +64,45 @@
   | float4C   | 2.387 ± 0.004      | +9.1%   |               |
   | float4D   | 2.561 ± 0.003      | +17.1%  |               |
 
+  |           | Mean Wall Time [s] | Change  | Factor        |
+  |:----------|-------------------:|--------:|:--------------|
+  | float4A   | 2.158 ± 0.008      |         |               |
+  | float4AX  | 1.793 ± 0.003      | -16.9%  |               |
+**| float4AY  | 1.740 ± 0.002      | -19.4%  |               |**
+  | float4B   | 3.362 ± 0.009      | +55.8%  | (1.6x slower) |
+  | float4C   | 2.370 ± 0.002      | +9.8%   |               |
+  | float4D   | 2.540 ± 0.002      | +17.7%  |               |
+
+Benchmark 1: ./bin/float4A (10 runs)
+                mean     ±       σ          min     …     max
+  Wall Time    2.158 s   ±   0.008 s      2.145 s   …   2.168 s
+  Memory         1.6 MiB ±     0.0 MiB      1.6 MiB …     1.6 MiB
+ 
+Benchmark 2: ./bin/float4AX (10 runs)
+                mean     ±       σ          min     …     max
+  Wall Time    1.793 s   ±   0.003 s      1.790 s   …   1.800 s            -16.9%  
+  Memory         1.6 MiB ±     0.0 MiB      1.6 MiB …     1.6 MiB           -1.0%  
+ 
+Benchmark 3: ./bin/float4AY (10 runs)
+                mean     ±       σ          min     …     max
+  Wall Time    1.740 s   ±   0.002 s      1.738 s   …   1.742 s            -19.4%  
+  Memory         1.6 MiB ±     0.0 MiB      1.6 MiB …     1.6 MiB           -1.0%  
+ 
+Benchmark 4: ./bin/float4B (10 runs)
+                mean     ±       σ          min     …     max
+  Wall Time    3.362 s   ±   0.009 s      3.348 s   …   3.374 s            +55.8%  (1.6x slower)
+  Memory         1.6 MiB ±     0.0 MiB      1.6 MiB …     1.6 MiB           -0.1%  
+ 
+Benchmark 5: ./bin/float4C (10 runs)
+                mean     ±       σ          min     …     max
+  Wall Time    2.370 s   ±   0.002 s      2.368 s   …   2.374 s             +9.8%  
+  Memory         1.6 MiB ±     0.0 MiB      1.6 MiB …     1.6 MiB           -1.0%  
+ 
+Benchmark 6: ./bin/float4D (10 runs)
+                mean     ±       σ          min     …     max
+  Wall Time    2.540 s   ±   0.002 s      2.537 s   …   2.542 s            +17.7%  
+  Memory         1.6 MiB ±     0.0 MiB      1.6 MiB …     1.6 MiB           -0.1%  
+
 
 ## validation suite
 
