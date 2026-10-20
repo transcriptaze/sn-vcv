@@ -11,6 +11,23 @@ struct polyphase100 {
     float state[25];
 };
 
+struct hysteresis {
+    double prev_h_;
+    double current_b_;
+    bool increasing_;
+};
+
+struct source {
+    int input;
+    struct polyphase100 fir[16];
+};
+
+struct sink {
+    int output;
+    struct hysteresis hysteresis[16];
+    struct iir4 iir[16];
+};
+
 struct sn_nlm : Module {
     static const int CHANNELS;
     static const float VELOCITY;
@@ -44,6 +61,7 @@ struct sn_nlm : Module {
         HARD_LIMIT,
         SOFT_LIMIT,
         EXPAND,
+        HYSTERESIS,
     };
 
     sn_nlm();
@@ -53,15 +71,16 @@ struct sn_nlm : Module {
     void process(const ProcessArgs &args) override;
     void processBypass(const ProcessArgs &args) override;
 
-    void process(int channel, float attenuation, float gain, float out[1]);
+    void process(struct sink &sink, int channel, float attenuation, float gain, float out[1]);
     void processAUX(const ProcessArgs &args);
 
-    float mix(float in1, float in2, float gain);
+    float mix(float in1, float in2, float gain, struct hysteresis &h);
     float linear(float in1, float in2, float gain);
     float hard_limit(float in1, float in2, float gain);
     float soft_limit(float in1, float in2, float gain);
     float soft_limit_cubic(float in1, float in2, float gain);
     float expand(float in1, float in2, float gain);
+    float hysteresis(struct hysteresis &h, float in1, float in2, float gain);
 
     void filter(struct polyphase100 &polyphase, float in, float out[4]);
     float butterworth(struct iir4 &iir, float in[4]);
@@ -74,24 +93,19 @@ struct sn_nlm : Module {
     MIXFN mixfn = SOFT_LIMIT;
 
     // ... groups
-    struct {
-        int input;
-        struct polyphase100 fir[16];
-    } source[2] = {
+    struct source sources[2] = {
         {.input = IN1_INPUT},
         {.input = IN2_INPUT},
     };
 
-    struct {
-        int output;
-        struct iir4 iir[16];
-    } sink[1] = {
+    struct sink sinks[1] = {
         {.output = OUTA_OUTPUT},
     };
 
     // ... AUX
     struct {
         uint32_t phase;
+        struct hysteresis hysteresis;
     } AUX{
         .phase = 0,
     };

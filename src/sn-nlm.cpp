@@ -80,12 +80,20 @@ constexpr struct {
     // clang-format on
 };
 
+struct {
+    double mu_rev_ = 0.15;
+    double b_sat_ = 1.5;
+    double h_c_ = 2.5;
+    double sharpness_ = 1.0;
+} BH;
+
 // mix funtion menu options
 const std::vector<std::string> MIXERS = {
     "Linear",
     "Hard limit",
     "Soft limit",
     "Expander",
+    "Hysteresis",
 };
 
 sn_nlm::sn_nlm() {
@@ -115,7 +123,7 @@ sn_nlm::sn_nlm() {
     for (size_t i = 0; i < 2; i++) {
         for (size_t ch = 0; ch < 16; ch++) {
             for (size_t j = 0; j < 25; j++) {
-                source[i].fir[ch].state[i] = 0.0f;
+                sources[i].fir[ch].state[i] = 0.0f;
             }
         }
     }
@@ -123,11 +131,24 @@ sn_nlm::sn_nlm() {
     for (size_t i = 0; i < 1; i++) {
         for (size_t ch = 0; ch < 16; ch++) {
             for (size_t j = 0; j < 4; j++) {
-                sink[i].iir[ch].x[j] = 0.0f;
-                sink[i].iir[ch].y[j] = 0.0f;
+                sinks[i].iir[ch].x[j] = 0.0f;
+                sinks[i].iir[ch].y[j] = 0.0f;
             }
         }
     }
+
+    // ... hysteresis
+    for (size_t i = 0; i < 1; i++) {
+        for (size_t ch = 0; ch < 16; ch++) {
+            sinks[i].hysteresis[ch].prev_h_ = 0.0;
+            sinks[i].hysteresis[ch].current_b_ = 0.0;
+            sinks[i].hysteresis[ch].increasing_ = true;
+        }
+    }
+
+    AUX.hysteresis.prev_h_ = 0.0;
+    AUX.hysteresis.current_b_ = 0.0;
+    AUX.hysteresis.increasing_ = true;
 }
 
 json_t *sn_nlm::dataToJson() {
@@ -182,6 +203,10 @@ void sn_nlm::dataFromJson(json_t *root) {
         case EXPAND:
             this->mixfn = EXPAND;
             break;
+
+        case HYSTERESIS:
+            this->mixfn = HYSTERESIS;
+            break;
         }
     }
 }
@@ -194,9 +219,9 @@ void sn_nlm::process(const ProcessArgs &args) {
         float out[1];
 
         if (average) {
-            process(ch, attenuation, gain / 2.0f, out);
+            process(sinks[0], ch, attenuation, gain / 2.0f, out);
         } else {
-            process(ch, attenuation, gain, out);
+            process(sinks[0], ch, attenuation, gain, out);
         }
 
         outputs[OUTA_OUTPUT].setVoltage(out[0], ch);
@@ -213,22 +238,22 @@ void sn_nlm::processBypass(const ProcessArgs &args) {
     processAUX(args);
 }
 
-void sn_nlm::process(int ch, float attenuation, float gain, float out[1]) {
+void sn_nlm::process(struct sink &sink, int ch, float attenuation, float gain, float out[1]) {
     float in[2][4];
     float buffer[1][4];
 
     for (size_t i = 0; i < 2; i++) {
-        filter(source[i].fir[ch], (1.0f - attenuation) * inputs[source[i].input].getPolyVoltage(ch), in[i]);
+        filter(sources[i].fir[ch], (1.0f - attenuation) * inputs[sources[i].input].getPolyVoltage(ch), in[i]);
     }
 
     for (size_t i = 0; i < 1; i++) {
         for (size_t j = 0; j < 4; j++) {
-            buffer[i][j] = mix(in[0][j], in[1][j], gain);
+            buffer[i][j] = mix(in[0][j], in[1][j], gain, sink.hysteresis[ch]);
         }
     }
 
     for (size_t i = 0; i < 1; i++) {
-        out[i] = butterworth(sink[i].iir[ch], buffer[i]);
+        out[i] = butterworth(sinks[i].iir[ch], buffer[i]);
     }
 }
 
@@ -244,13 +269,13 @@ void sn_nlm::processAUX(const ProcessArgs &args) {
 
     double normalized = (static_cast<double>(ramp) / static_cast<double>(MAX_RAMP)) * 2.0 - 1.0;
     float outX = normalized * 5.0f;
-    float outY = mix(outX, outX, gain);
+    float outY = mix(outX, outX, gain, AUX.hysteresis);
 
     outputs[OUTX_OUTPUT].setVoltage(outX, 0);
     outputs[OUTY_OUTPUT].setVoltage(outY, 0);
 }
 
-float sn_nlm::mix(float in1, float in2, float gain) {
+float sn_nlm::mix(float in1, float in2, float gain, struct hysteresis &h) {
     switch (mixfn) {
     case HARD_LIMIT:
         return hard_limit(in1, in2, this->gain);
@@ -260,6 +285,9 @@ float sn_nlm::mix(float in1, float in2, float gain) {
 
     case EXPAND:
         return expand(in1, in2, this->gain);
+
+    case HYSTERESIS:
+        return hysteresis(h, in1, in2, this->gain);
 
     default:
         return linear(in1, in2, this->gain);
@@ -324,6 +352,30 @@ float sn_nlm::expand(float in1, float in2, float gain) {
     float shaped = m_low * abs_v + 0.5f * delta_m * (abs_v + W * (std::log(std::cosh(inner_pos)) - std::log(std::cosh(inner_neg))));
 
     return (v >= 0.0f) ? shaped : -shaped;
+}
+
+float sn_nlm::hysteresis(struct hysteresis &H, float in1, float in2, float gain) {
+    float v = gain * (in1 + in2);
+
+    if (v > H.prev_h_) {
+        H.increasing_ = true;
+    } else if (v < H.prev_h_) {
+        H.increasing_ = false;
+    }
+
+    double target_b;
+    if (H.increasing_) {
+        target_b = (BH.mu_rev_ * v) + (BH.b_sat_ * std::atan((v - BH.h_c_) * BH.sharpness_));
+    } else {
+        target_b = (BH.mu_rev_ * v) + (BH.b_sat_ * std::atan((v + BH.h_c_) * BH.sharpness_));
+    }
+
+    double memory_inertia = 0.35;
+    H.current_b_ += memory_inertia * (target_b - H.current_b_);
+
+    H.prev_h_ = v;
+
+    return H.current_b_;
 }
 
 // void sn_nlm::filter(struct fir101 &fir, float in, float out[4]) {
