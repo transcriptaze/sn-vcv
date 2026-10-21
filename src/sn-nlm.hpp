@@ -18,8 +18,8 @@ struct hysteresis {
 };
 
 struct source {
-    int input;
-    struct polyphase100 fir[16];
+    struct polyphase100 fir;
+    float buffer[4];
 };
 
 struct sink {
@@ -29,9 +29,6 @@ struct sink {
 };
 
 struct sn_nlm : Module {
-    static const int CHANNELS;
-    static const float VELOCITY;
-
     enum ParamId {
         ATTENUATION_PARAM,
         GAIN_PARAM,
@@ -64,6 +61,10 @@ struct sn_nlm : Module {
         HYSTERESIS,
     };
 
+    constexpr static int INPUTS[] = {IN1_INPUT, IN2_INPUT};
+    constexpr static int N_INPUTS = sizeof(INPUTS) / sizeof(int);
+    constexpr static int CHANNELS = 1;
+
     sn_nlm();
 
     json_t *dataToJson() override;
@@ -71,7 +72,7 @@ struct sn_nlm : Module {
     void process(const ProcessArgs &args) override;
     void processBypass(const ProcessArgs &args) override;
 
-    void process(struct sink &sink, int channel, float attenuation, float gain, float out[1]);
+    void process(struct sink &sink, int channel, float gain, float out[1]);
     void processAUX(const ProcessArgs &args);
 
     float mix(float in1, float in2, float gain, struct hysteresis &h);
@@ -93,10 +94,7 @@ struct sn_nlm : Module {
     MIXFN mixfn = SOFT_LIMIT;
 
     // ... groups
-    struct source sources[2] = {
-        {.input = IN1_INPUT},
-        {.input = IN2_INPUT},
-    };
+    struct source sources[2][16];
 
     struct sink sinks[1] = {
         {.output = OUTA_OUTPUT},

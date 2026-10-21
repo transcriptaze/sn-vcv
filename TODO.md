@@ -59,6 +59,8 @@
 - [x] soft limit
 - [ ] inverse softmax (transistor)
 - [ ] hysteresis
+    - https://www.desmos.com/calculator/qqlexwmbsd
+    - https://arxiv.org/pdf/2006.02784
 - [ ] inverse hysteresis
 
 ### antialiasing: input

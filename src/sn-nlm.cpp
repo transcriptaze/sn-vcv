@@ -97,7 +97,7 @@ const std::vector<std::string> MIXERS = {
 };
 
 sn_nlm::sn_nlm() {
-    INFO("sn-nlm v0.0.0");
+    INFO("sn-nlm v0.0.0 %d", N_INPUTS);
 
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
@@ -120,10 +120,10 @@ sn_nlm::sn_nlm() {
     configOutput(OUTY_OUTPUT, "y");
 
     // ... initialise anti-aliasing filters
-    for (size_t i = 0; i < 2; i++) {
-        for (size_t ch = 0; ch < 16; ch++) {
-            for (size_t j = 0; j < 25; j++) {
-                sources[i].fir[ch].state[i] = 0.0f;
+    for (int i = 0; i < N_INPUTS; i++) {
+        for (int ch = 0; ch < CHANNELS; ch++) {
+            for (int j = 0; j < 25; j++) {
+                sources[i][ch].fir.state[j] = 0.0f;
             }
         }
     }
@@ -215,13 +215,26 @@ void sn_nlm::process(const ProcessArgs &args) {
     attenuation = params[ATTENUATION_PARAM].getValue();
     gain = std::powf(2.0f, 2.0f * params[GAIN_PARAM].getValue());
 
+    // ... oversample inputs using zero stuffing + polyphase FIR interpolation filter
+    float k = 1.0f - attenuation;
+
+    for (int i = 0; i < N_INPUTS; i++) {
+        for (int ch = 0; ch < CHANNELS; ch++) {
+            float v = inputs[INPUTS[i]].getPolyVoltage(ch);
+            source &src = sources[i][ch];
+
+            filter(src.fir, k * v, src.buffer);
+        }
+    }
+
+    // ... mix
     for (size_t ch = 0; ch < 1; ch++) {
         float out[1];
 
         if (average) {
-            process(sinks[0], ch, attenuation, gain / 2.0f, out);
+            process(sinks[0], ch, gain / 2.0f, out);
         } else {
-            process(sinks[0], ch, attenuation, gain, out);
+            process(sinks[0], ch, gain, out);
         }
 
         outputs[OUTA_OUTPUT].setVoltage(out[0], ch);
@@ -238,17 +251,15 @@ void sn_nlm::processBypass(const ProcessArgs &args) {
     processAUX(args);
 }
 
-void sn_nlm::process(struct sink &sink, int ch, float attenuation, float gain, float out[1]) {
-    float in[2][4];
+void sn_nlm::process(struct sink &sink, int ch, float gain, float out[1]) {
     float buffer[1][4];
-
-    for (size_t i = 0; i < 2; i++) {
-        filter(sources[i].fir[ch], (1.0f - attenuation) * inputs[sources[i].input].getPolyVoltage(ch), in[i]);
-    }
 
     for (size_t i = 0; i < 1; i++) {
         for (size_t j = 0; j < 4; j++) {
-            buffer[i][j] = mix(in[0][j], in[1][j], gain, sink.hysteresis[ch]);
+            buffer[i][j] = mix(sources[0][ch].buffer[j],
+                               sources[1][ch].buffer[j],
+                               gain,
+                               sink.hysteresis[ch]);
         }
     }
 
