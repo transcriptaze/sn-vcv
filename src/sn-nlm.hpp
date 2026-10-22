@@ -22,9 +22,14 @@ struct source {
     float buffer[4];
 };
 
+struct mixer {
+    float buffer[4];
+    struct hysteresis hysteresis;
+};
+
 struct sink {
     int output;
-    struct hysteresis hysteresis[16];
+    // struct hysteresis hysteresis[16];
     struct iir4 iir[16];
 };
 
@@ -63,6 +68,8 @@ struct sn_nlm : Module {
 
     constexpr static int INPUTS[] = {IN1_INPUT, IN2_INPUT};
     constexpr static int N_INPUTS = sizeof(INPUTS) / sizeof(int);
+    constexpr static int N_MIXERS = 1;
+    constexpr static int N_OUTPUTS = 1;
     constexpr static int CHANNELS = 1;
 
     sn_nlm();
@@ -71,8 +78,6 @@ struct sn_nlm : Module {
     void dataFromJson(json_t *) override;
     void process(const ProcessArgs &args) override;
     void processBypass(const ProcessArgs &args) override;
-
-    void process(struct sink &sink, int channel, float gain, float out[1]);
     void processAUX(const ProcessArgs &args);
 
     float mix(float in1, float in2, float gain, struct hysteresis &h);
@@ -81,7 +86,7 @@ struct sn_nlm : Module {
     float soft_limit(float in1, float in2, float gain);
     float soft_limit_cubic(float in1, float in2, float gain);
     float expand(float in1, float in2, float gain);
-    float hysteresis(struct hysteresis &h, float in1, float in2, float gain);
+    float hysteresis(float in1, float in2, float gain, struct hysteresis &h);
 
     void filter(struct polyphase100 &polyphase, float in, float out[4]);
     float butterworth(struct iir4 &iir, float in[4]);
@@ -94,9 +99,11 @@ struct sn_nlm : Module {
     MIXFN mixfn = SOFT_LIMIT;
 
     // ... groups
-    struct source sources[2][16];
+    struct source sources[N_INPUTS][CHANNELS];
 
-    struct sink sinks[1] = {
+    struct mixer mixers[N_MIXERS][CHANNELS];
+
+    struct sink sinks[N_OUTPUTS] = {
         {.output = OUTA_OUTPUT},
     };
 

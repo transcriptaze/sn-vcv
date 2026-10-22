@@ -26,3 +26,17 @@ sn-vco: f:1046.5  N:20  P:22.658   P(20kHz+):19.141  ratio:0.845
 ## Other
 1. https://www.osar.fr/notes/waveguides
 2. https://opus-codec.org/demo/opus-1.5
+
+## NonLinear
+
+1.  https://www.scispace.com/pdf/deep-learning-based-wave-digital-modeling-of-rate-dependent-bx32h3jl.pdf
+2.  https://preview-www.nature.com/nature-index/topics/l4/wave-digital-filter-techniques-in-nonlinear-circuit-modeling
+3.  https://onlinelibrary.wiley.com/doi/10.1002/cta.3146
+4.  https://onlinelibrary.wiley.com/doi/10.1002/jnm.3255
+5.  https://tonalux.org/blog/wave-digital-filters-analog-modeling
+6.  https://tobanteaudio.github.io/dsp-cookbook/docs/06_analog_modeling/wave_digital_filters/
+7.  https://ieeexplore.ieee.org/document/769781
+8.  https://ieeexplore.ieee.org/document/765137
+9.  https://github.com/gusanthon/pywdf
+10. https://github.com/Chowdhury-DSP/chowdsp_wdf
+11. https://ieeexplore.ieee.org/document/7080056

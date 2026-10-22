@@ -37,6 +37,9 @@
 - [ ] Unit tests
 
 ## sn-nlm
+- Baxandall: https://electronics.stackexchange.com/questions/770950/issue-deriving-transfer-function-from-james-baxandall-tonestack-circuit
+
+
 - [x] AUX xy
 - [x] gain
 - [x] attenuation
@@ -58,9 +61,11 @@
 - [x] hard limit
 - [x] soft limit
 - [ ] inverse softmax (transistor)
+- [ ] diode clipper
 - [ ] hysteresis
     - https://www.desmos.com/calculator/qqlexwmbsd
     - https://arxiv.org/pdf/2006.02784
+    - https://www.scispace.com/pdf/deep-learning-based-wave-digital-modeling-of-rate-dependent-bx32h3jl.pdf
 - [ ] inverse hysteresis
 
 ### antialiasing: input

@@ -137,12 +137,12 @@ sn_nlm::sn_nlm() {
         }
     }
 
-    // ... hysteresis
-    for (size_t i = 0; i < 1; i++) {
+    // ... mixers
+    for (size_t i = 0; i < N_MIXERS; i++) {
         for (size_t ch = 0; ch < 16; ch++) {
-            sinks[i].hysteresis[ch].prev_h_ = 0.0;
-            sinks[i].hysteresis[ch].current_b_ = 0.0;
-            sinks[i].hysteresis[ch].increasing_ = true;
+            mixers[i][ch].hysteresis.prev_h_ = 0.0;
+            mixers[i][ch].hysteresis.current_b_ = 0.0;
+            mixers[i][ch].hysteresis.increasing_ = true;
         }
     }
 
@@ -215,7 +215,7 @@ void sn_nlm::process(const ProcessArgs &args) {
     attenuation = params[ATTENUATION_PARAM].getValue();
     gain = std::powf(2.0f, 2.0f * params[GAIN_PARAM].getValue());
 
-    // ... oversample inputs using zero stuffing + polyphase FIR interpolation filter
+    // ... oversample inputs with polyphase interpolation filter
     float k = 1.0f - attenuation;
 
     for (int i = 0; i < N_INPUTS; i++) {
@@ -228,18 +228,31 @@ void sn_nlm::process(const ProcessArgs &args) {
     }
 
     // ... mix
-    for (size_t ch = 0; ch < 1; ch++) {
-        float out[1];
+    for (size_t ch = 0; ch < CHANNELS; ch++) {
+        float g = average ? gain / 2.0f : gain;
 
-        if (average) {
-            process(sinks[0], ch, gain / 2.0f, out);
-        } else {
-            process(sinks[0], ch, gain, out);
+        for (size_t i = 0; i < N_MIXERS; i++) {
+            for (int ch = 0; ch < CHANNELS; ch++) {
+                for (size_t j = 0; j < 4; j++) {
+                    mixers[i][ch].buffer[j] = mix(sources[0][ch].buffer[j],
+                                                  sources[1][ch].buffer[j],
+                                                  g,
+                                                  mixers[i][ch].hysteresis);
+                }
+            }
         }
-
-        outputs[OUTA_OUTPUT].setVoltage(out[0], ch);
     }
 
+    // ... decimate and anti-alias
+    for (size_t i = 0; i < N_OUTPUTS; i++) {
+        for (size_t ch = 0; ch < CHANNELS; ch++) {
+            float out = butterworth(sinks[i].iir[ch], mixers[i][ch].buffer);
+
+            outputs[OUTA_OUTPUT].setVoltage(out, ch);
+        }
+    }
+
+    // ... AUX
     processAUX(args);
 }
 
@@ -249,23 +262,6 @@ void sn_nlm::processBypass(const ProcessArgs &args) {
     }
 
     processAUX(args);
-}
-
-void sn_nlm::process(struct sink &sink, int ch, float gain, float out[1]) {
-    float buffer[1][4];
-
-    for (size_t i = 0; i < 1; i++) {
-        for (size_t j = 0; j < 4; j++) {
-            buffer[i][j] = mix(sources[0][ch].buffer[j],
-                               sources[1][ch].buffer[j],
-                               gain,
-                               sink.hysteresis[ch]);
-        }
-    }
-
-    for (size_t i = 0; i < 1; i++) {
-        out[i] = butterworth(sinks[i].iir[ch], buffer[i]);
-    }
 }
 
 void sn_nlm::processAUX(const ProcessArgs &args) {
@@ -289,19 +285,19 @@ void sn_nlm::processAUX(const ProcessArgs &args) {
 float sn_nlm::mix(float in1, float in2, float gain, struct hysteresis &h) {
     switch (mixfn) {
     case HARD_LIMIT:
-        return hard_limit(in1, in2, this->gain);
+        return hard_limit(in1, in2, gain);
 
     case SOFT_LIMIT:
-        return soft_limit(in1, in2, this->gain);
+        return soft_limit(in1, in2, gain);
 
     case EXPAND:
-        return expand(in1, in2, this->gain);
+        return expand(in1, in2, gain);
 
     case HYSTERESIS:
-        return hysteresis(h, in1, in2, this->gain);
+        return hysteresis(in1, in2, gain, h);
 
     default:
-        return linear(in1, in2, this->gain);
+        return linear(in1, in2, gain);
     }
 }
 
@@ -365,7 +361,7 @@ float sn_nlm::expand(float in1, float in2, float gain) {
     return (v >= 0.0f) ? shaped : -shaped;
 }
 
-float sn_nlm::hysteresis(struct hysteresis &H, float in1, float in2, float gain) {
+float sn_nlm::hysteresis(float in1, float in2, float gain, struct hysteresis &H) {
     float v = gain * (in1 + in2);
 
     if (v > H.prev_h_) {
