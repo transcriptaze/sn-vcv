@@ -119,30 +119,31 @@ sn_nlm::sn_nlm() {
     configOutput(OUTX_OUTPUT, "x");
     configOutput(OUTY_OUTPUT, "y");
 
-    // ... initialise anti-aliasing filters
+    // ... initialise interpolation filters
     for (int i = 0; i < N_INPUTS; i++) {
         for (int ch = 0; ch < CHANNELS; ch++) {
             for (int j = 0; j < 25; j++) {
-                sources[i][ch].fir.state[j] = 0.0f;
+                sources[i].fir[ch].state[j] = 0.0f;
             }
         }
     }
 
+    // ... initialise mixers
+    for (size_t i = 0; i < N_MIXERS; i++) {
+        for (size_t ch = 0; ch < CHANNELS; ch++) {
+            mixers[i].hysteresis[ch].prev_h_ = 0.0;
+            mixers[i].hysteresis[ch].current_b_ = 0.0;
+            mixers[i].hysteresis[ch].increasing_ = true;
+        }
+    }
+
+    // ... initialise decimation filters
     for (size_t i = 0; i < 1; i++) {
-        for (size_t ch = 0; ch < 16; ch++) {
+        for (size_t ch = 0; ch < CHANNELS; ch++) {
             for (size_t j = 0; j < 4; j++) {
                 sinks[i].iir[ch].x[j] = 0.0f;
                 sinks[i].iir[ch].y[j] = 0.0f;
             }
-        }
-    }
-
-    // ... mixers
-    for (size_t i = 0; i < N_MIXERS; i++) {
-        for (size_t ch = 0; ch < 16; ch++) {
-            mixers[i][ch].hysteresis.prev_h_ = 0.0;
-            mixers[i][ch].hysteresis.current_b_ = 0.0;
-            mixers[i][ch].hysteresis.increasing_ = true;
         }
     }
 
@@ -215,38 +216,27 @@ void sn_nlm::process(const ProcessArgs &args) {
     attenuation = params[ATTENUATION_PARAM].getValue();
     gain = std::powf(2.0f, 2.0f * params[GAIN_PARAM].getValue());
 
-    // ... oversample inputs with polyphase interpolation filter
+    // ... 4x oversampling + polyphase interpolation
     float k = 1.0f - attenuation;
 
     for (int i = 0; i < N_INPUTS; i++) {
         for (int ch = 0; ch < CHANNELS; ch++) {
             float v = inputs[INPUTS[i]].getPolyVoltage(ch);
-            source &src = sources[i][ch];
+            source &src = sources[i];
 
-            filter(src.fir, k * v, src.buffer);
+            filter(src.fir[ch], k * v, src.buffer[ch]);
         }
     }
 
     // ... mix
-    for (size_t ch = 0; ch < CHANNELS; ch++) {
-        float g = average ? gain / 2.0f : gain;
+    float g = average ? gain / 2.0f : gain;
 
-        for (size_t i = 0; i < N_MIXERS; i++) {
-            for (int ch = 0; ch < CHANNELS; ch++) {
-                for (size_t j = 0; j < 4; j++) {
-                    mixers[i][ch].buffer[j] = mix(sources[0][ch].buffer[j],
-                                                  sources[1][ch].buffer[j],
-                                                  g,
-                                                  mixers[i][ch].hysteresis);
-                }
-            }
-        }
-    }
+    mix2x4(sources[0], sources[1], mixers[0], sinks[0], g);
 
-    // ... decimate and anti-alias
+    // ... decimate + anti-alias
     for (size_t i = 0; i < N_OUTPUTS; i++) {
         for (size_t ch = 0; ch < CHANNELS; ch++) {
-            float out = butterworth(sinks[i].iir[ch], mixers[i][ch].buffer);
+            float out = butterworth(sinks[i].iir[ch], sinks[i].buffer[ch]);
 
             outputs[OUTA_OUTPUT].setVoltage(out, ch);
         }
@@ -280,6 +270,18 @@ void sn_nlm::processAUX(const ProcessArgs &args) {
 
     outputs[OUTX_OUTPUT].setVoltage(outX, 0);
     outputs[OUTY_OUTPUT].setVoltage(outY, 0);
+}
+
+void sn_nlm::mix2x4(source &p, source &q, mixer &r, sink &s, float gain) {
+    for (int ch = 0; ch < CHANNELS; ch++) {
+        mix(p.buffer[ch], q.buffer[ch], s.buffer[ch], gain, r.hysteresis[ch]);
+    }
+}
+
+void sn_nlm::mix(float in1[4], float in2[4], float out[4], float gain, struct hysteresis &h) {
+    for (int i = 0; i < 4; i++) {
+        out[i] = mix(in1[i], in2[i], gain, h);
+    }
 }
 
 float sn_nlm::mix(float in1, float in2, float gain, struct hysteresis &h) {

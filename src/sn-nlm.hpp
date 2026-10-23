@@ -18,19 +18,17 @@ struct hysteresis {
 };
 
 struct source {
-    struct polyphase100 fir;
-    float buffer[4];
+    struct polyphase100 fir[16];
+    float buffer[4][16];
 };
 
 struct mixer {
-    float buffer[4];
-    struct hysteresis hysteresis;
+    struct hysteresis hysteresis[16];
 };
 
 struct sink {
-    int output;
-    // struct hysteresis hysteresis[16];
     struct iir4 iir[16];
+    float buffer[16][4];
 };
 
 struct sn_nlm : Module {
@@ -80,7 +78,10 @@ struct sn_nlm : Module {
     void processBypass(const ProcessArgs &args) override;
     void processAUX(const ProcessArgs &args);
 
+    void mix2x4(source &p, source &q, mixer &r, sink &s, float gain);
     float mix(float in1, float in2, float gain, struct hysteresis &h);
+    void mix(float in1[4], float in2[4], float out[4], float gain, struct hysteresis &h);
+
     float linear(float in1, float in2, float gain);
     float hard_limit(float in1, float in2, float gain);
     float soft_limit(float in1, float in2, float gain);
@@ -99,13 +100,9 @@ struct sn_nlm : Module {
     MIXFN mixfn = SOFT_LIMIT;
 
     // ... groups
-    struct source sources[N_INPUTS][CHANNELS];
-
-    struct mixer mixers[N_MIXERS][CHANNELS];
-
-    struct sink sinks[N_OUTPUTS] = {
-        {.output = OUTA_OUTPUT},
-    };
+    struct source sources[N_INPUTS];
+    struct mixer mixers[N_MIXERS];
+    struct sink sinks[N_OUTPUTS];
 
     // ... AUX
     struct {
