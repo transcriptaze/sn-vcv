@@ -57,6 +57,7 @@
 - (?) gain CV
 
 ### mix
+- [ ] E(phi,k)
 - [x] linear
 - [x] hard limit
 - [x] soft limit
