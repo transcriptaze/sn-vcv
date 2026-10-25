@@ -160,3 +160,19 @@ real    0m37.398s
 user    0m37.159s
 sys 0m0.062s
 
+
+## sn-vco
+
+  |            | vcv | sn-vco | sn-vco_4x1 | sn-vco_4x2 |
+  |:-----------|-----|--------|------------|------------|
+  | baseline   | 25% | 43%    | 48%        | 50%        |
+
+
+**Notes:**
+
+1. `vcv`:        18x VCV fundamental VCOs
+2. `sn-vco`:     18x sn-vco, no antialiasing
+3. `sn-vco_4x1`: 18x sn-vco, 4x oversampling, 16kHz LPF
+4. `sn-vco_4x2`: 18x sn-vco, 4x oversampling, 2x16kHz LPF
+
+
