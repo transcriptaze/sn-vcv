@@ -56,6 +56,7 @@ struct sn_vco : Module {
 
     void recompute(const ProcessArgs &args, size_t);
     void processVCO(const ProcessArgs &args, size_t, bool);
+    void processVCO4(const ProcessArgs &args, size_t, bool);
     void processAUX(const ProcessArgs &args, bool);
 
     int channels();

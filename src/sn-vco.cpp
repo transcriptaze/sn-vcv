@@ -1,6 +1,8 @@
 #include "sn-vco.hpp"
 #include "sn-vcox.hpp"
 
+using rack::simd::float_4;
+
 const int sn_vco::CHANNELS = 1;
 const float sn_vco::VELOCITY = 1.0f;
 
@@ -124,6 +126,10 @@ void sn_vco::onExpanderChange(const ExpanderChangeEvent &e) {
 void sn_vco::process(const ProcessArgs &args) {
     int channels = this->channels();
 
+    if (debug.process(inputs[DEBUG_INPUT].getVoltage())) {
+        INFO("DEBUG");
+    }
+
     // ... expanders
     bool expanded = expanders.left.module != NULL || expanders.right.module != NULL;
     bool xll = false;
@@ -141,7 +147,7 @@ void sn_vco::process(const ProcessArgs &args) {
 
     // ... generate
     recompute(args, channels);
-    processVCO(args, channels, expanded);
+    processVCO4(args, channels, expanded);
     processAUX(args, expanded);
 
     // ... update expanders
@@ -223,8 +229,62 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
     }
 }
 
+void sn_vco::processVCO4(const ProcessArgs &args, size_t channels, bool expanded) {
+    const bool connected = outputs[VCO_OUTPUT].isConnected();
+    const float δt = args.sampleTime;
+
+    double in[4][16];
+
+    for (size_t ch = 0; ch < channels; ch++) {
+        float α = 2.0f * M_PI * vco[ch].α;
+        float δα = δt * frequency[ch];
+
+        float_4 υ = sn.υ4(α, δα);
+
+        in[0][ch] = υ[0];
+        in[1][ch] = υ[1];
+        in[2][ch] = υ[2];
+        in[3][ch] = υ[3];
+
+        vco[ch].α += δα;
+    }
+
+    // ... send to extender
+    // for (size_t ch = 0; ch < channels; ch++) {
+    // for (int i = 0; i < oversampling; i++) {
+    //     double υ = in[i][ch];
+    //
+    //     vco[ch].phase[i] = phase[i][ch];
+    //     vco[ch].out.vco[i] = υ;
+    //     vco[ch].out.sum[i] = sn.A * υ;
+    // }
+    //
+    // vco[ch].velocity = velocity[ch];
+    // }
+
+    if (connected) {
+        double buffer[16];
+        double out[16];
+
+        aa.process(antialias, in, buffer, channels);
+        dcf.process(buffer, out, channels);
+
+        for (size_t ch = 0; ch < channels; ch++) {
+            double υ = out[ch];
+
+            outputs[VCO_OUTPUT].setVoltage(5.f * velocity[ch] * υ, ch);
+        }
+
+        outputs[VCO_OUTPUT].setChannels(channels);
+    }
+}
+
 void sn_vco::processAUX(const ProcessArgs &args, bool expanded) {
-    aux.phase += AUX_FREQUENCY * args.sampleTime;
+    float δt = args.sampleTime;
+    float δα = δt * AUX_FREQUENCY;
+
+    aux.phase += δα;
+
     while (aux.phase >= 1.f) {
         aux.phase -= 1.f;
 
@@ -237,10 +297,10 @@ void sn_vco::processAUX(const ProcessArgs &args, bool expanded) {
 
     if (outputs[AUX_OUTPUT].isConnected() || expanded) {
         float α = aux.phase * 2.0f * M_PI;
-        float υ = sn.υ(α);
+        float_4 υ = sn.υ4(α, δα);
 
-        aux.out.osc = sn.A * υ;
-        aux.out.sum = sn.A * υ;
+        aux.out.osc = sn.A * υ[0];
+        aux.out.sum = sn.A * υ[0];
     } else {
         aux.out.osc = 0.0f;
         aux.out.sum = 0.0f;

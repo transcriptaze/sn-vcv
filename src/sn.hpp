@@ -119,9 +119,16 @@ typedef struct SN {
         .φ = 0.f,
     };
 
+    rack::simd::float_4 P;
+    rack::simd::float_4 Q;
+    rack::simd::float_4 R;
+    rack::simd::float_4 S;
+    rack::simd::float_4 T;
+    rack::simd::float_4 U;
+
     void recompute();
-    float υ(float);
-    float phi(float, float, float, float);
+    float υ(float α);
+    rack::simd::float_4 υ4(float α, float δt);
 } SN;
 
 // ... expanders

@@ -1,5 +1,7 @@
 #include "sn.hpp"
 
+using rack::simd::float_4;
+
 // Control rates
 const std::vector<unsigned> KRATE = {1, 64, 128, 256};                   // k-rates
 const std::vector<std::string> KRATES = {"1", "¹⁄₆₄", "¹⁄₁₂₈", "¹⁄₂₅₆"}; // k-rate labels
@@ -39,19 +41,22 @@ const std::vector<std::string> ALIASING = {
 
 // SN
 void SN::recompute() {
-    float εʼ = std::sqrt(1.0f - ε * ε);
-    float a = (ε < 0.0f) ? εʼ : 1.0f;
-    float b = (ε > 0.0f) ? εʼ : 1.0f;
+    const float εʼ = std::sqrt(1.0f - ε * ε);
+    const float a = (ε < 0.0f) ? εʼ : 1.0f;
+    const float b = (ε > 0.0f) ? εʼ : 1.0f;
 
-    float cosθ = std::cos(θ);
-    float sinθ = std::sin(θ);
+    const float cosθ = std::cos(θ);
+    const float sinθ = std::sin(θ);
+    const float tanθ = std::tan(θ);
 
-    float u = std::atan(-b * std::tan(θ) / a);
-    float v = std::atan((b / std::tan(θ)) * a);
-    float tx = a * std::cos(u) * cosθ - b * std::sin(u) * sinθ;
-    float ty = b * std::sin(v) * cosθ + a * std::cos(v) * sinθ;
-    float δxʼ = tx * δx;
-    float δyʼ = ty * δy;
+    const float u = std::atan2(-b * tanθ, a);
+    const float v = std::atan2(a * b, tanθ);
+
+    const float tx = a * std::cos(u) * cosθ - b * std::sin(u) * sinθ;
+    const float ty = b * std::sin(v) * cosθ + a * std::cos(v) * sinθ;
+    const float δxʼ = tx * δx;
+    const float δyʼ = ty * δy;
+    const double δθ = Φ - θ;
 
     ζ.pʼ = A * a * cosθ;
     ζ.qʼ = A * b * sinθ;
@@ -59,7 +64,14 @@ void SN::recompute() {
     ζ.sʼ = A * a * sinθ;
     ζ.tʼ = A * b * cosθ;
     ζ.uʼ = A * δyʼ;
-    ζ.φ = phi(a, b, θ, Φ);
+    ζ.φ = std::atan2(-std::sin(δθ) * a, std::cos(δθ) * b);
+
+    P = float_4(ζ.pʼ);
+    Q = float_4(ζ.qʼ);
+    R = float_4(ζ.rʼ);
+    S = float_4(ζ.sʼ);
+    T = float_4(ζ.tʼ);
+    U = float_4(ζ.uʼ);
 }
 
 float SN::υ(float α) {
@@ -74,15 +86,17 @@ float SN::υ(float α) {
     return r > 0.0f ? yʼ / r : 0.0f;
 }
 
-float SN::phi(float a, float b, float θ, float Φ) {
-    float dθ = Φ - θ;
-    float φ = std::atan(-(a / b) * std::tan(Φ - θ));
+float_4 SN::υ4(float α, float δα) {
+    const float_4 lanes(0.f, 1.f, 2.f, 3.f);
+    const float δαʼ = δα / 4;
+    const float_4 α0 = (α - ζ.φ) + lanes * δαʼ;
 
-    if (dθ < -PI2) {
-        φ += M_PI;
-    } else if (dθ > PI2) {
-        φ -= M_PI;
-    }
+    const float_4 x = rack::simd::cos(α0);
+    const float_4 y = rack::simd::sin(α0);
 
-    return φ;
+    const float_4 xʼ = P * x - Q * y + R;
+    const float_4 yʼ = S * x + T * y + U;
+    const float_4 r = xʼ * xʼ + yʼ * yʼ + 1e-30f;
+
+    return yʼ / rack::simd::sqrt(r);
 }
