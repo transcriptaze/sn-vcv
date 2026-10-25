@@ -88,25 +88,49 @@ float4D:
 	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4D.cpp sn/*.cpp -o bin/float4D
 	hyperfine --warmup 2 ./bin/float4D
 
-hyperfine:
+float4X: 
+	clang-format -i benchmarks/*.cpp
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4X.cpp sn/*.cpp -o bin/float4X
+	hyperfine --warmup 2 ./bin/float4X
+
+hyperfine: format
 	clang++ $(CXXFLAGS) benchmarks/reference.cpp sn/*.cpp -o bin/reference
-	clang++ $(CXXFLAGS) benchmarks/riffles.cpp  sn/*.cpp -o bin/riffles
-	clang++ $(CXXFLAGS) benchmarks/unpacked.cpp sn/*.cpp -o bin/unpacked
-	clang++ $(CXXFLAGS) benchmarks/sincos.cpp   sn/*.cpp -o bin/sincos
-	clang++ $(CXXFLAGS) benchmarks/sincos2.cpp  sn/*.cpp -o bin/sincos2
-	clang++ $(CXXFLAGS) benchmarks/sincos2A.cpp sn/*.cpp -o bin/sincos2A
+	clang++ $(CXXFLAGS) benchmarks/riffles.cpp   sn/*.cpp -o bin/riffles
+	clang++ $(CXXFLAGS) benchmarks/unpacked.cpp  sn/*.cpp -o bin/unpacked
+	clang++ $(CXXFLAGS) benchmarks/sincos.cpp    sn/*.cpp -o bin/sincos
+	clang++ $(CXXFLAGS) benchmarks/sincos2.cpp   sn/*.cpp -o bin/sincos2
+	clang++ $(CXXFLAGS) benchmarks/sincos2A.cpp  sn/*.cpp -o bin/sincos2A
 	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4A.cpp  sn/*.cpp -o bin/float4A
 	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4AX.cpp sn/*.cpp -o bin/float4AX
 	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4AY.cpp sn/*.cpp -o bin/float4AY
 	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4B.cpp  sn/*.cpp -o bin/float4B
 	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4C.cpp  sn/*.cpp -o bin/float4C
 	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4D.cpp  sn/*.cpp -o bin/float4D
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4X.cpp  sn/*.cpp -o bin/float4X
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4X.cpp  sn/*.cpp -o bin/float4X
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4XX.cpp sn/*.cpp -o bin/float4XX
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4XY.cpp sn/*.cpp -o bin/float4XY
 
-# 	hyperfine --warmup 1  --export-markdown ./workdir/sn.md \
-# 	          ./bin/reference ./bin/riffles  ./bin/unpacked \
-# 	          ./bin/sincos    ./bin/sincos2  ./bin/sincos2A \
-# 	          ./bin/float4A   ./bin.float4AX \
-# 	          ./bin/float4B   ./bin/float4C ./bin/float4D
+	hyperfine --warmup 2  --export-markdown ./workdir/sn.md \
+              ./bin/reference ./bin/riffles  ./bin/unpacked \
+              ./bin/sincos    ./bin/sincos2  ./bin/sincos2A \
+              ./bin/float4A   ./bin/float4AX ./bin/float4AY \
+              ./bin/float4B   ./bin/float4C  ./bin/float4D  \
+              ./bin/float4X   ./bin/float4XX ./bin/float4XY
+
+
+float4: format
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4A.cpp   sn/*.cpp -o bin/float4A
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4AX.cpp  sn/*.cpp -o bin/float4AX
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4AY.cpp  sn/*.cpp -o bin/float4AY
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4B.cpp   sn/*.cpp -o bin/float4B
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4C.cpp   sn/*.cpp -o bin/float4C
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4D.cpp   sn/*.cpp -o bin/float4D
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4X.cpp   sn/*.cpp -o bin/float4X
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4XX.cpp  sn/*.cpp -o bin/float4XX
+	clang++ $(CXXFLAGS) -I ./sdk -I ./sdk/simd -I ./libs benchmarks/float4XX.cpp  sn/*.cpp -o bin/float4XY
 
 	hyperfine --warmup 1  --export-markdown ./workdir/sn.md \
-	          ./bin/float4A ./bin/float4AX ./bin/float4AY ./bin/float4B ./bin/float4C ./bin/float4D
+              ./bin/float4A ./bin/float4AX ./bin/float4AY   \
+              ./bin/float4B ./bin/float4C  ./bin/float4D    \
+              ./bin/float4X ./bin/float4XX ./bin/float4XY

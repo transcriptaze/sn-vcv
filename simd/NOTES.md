@@ -36,72 +36,89 @@
 
 ### c++11
 
-| Command         | Mean Wall Time [s] | Change | Factor        |
-|:----------------|-------------------:|-------:|:--------------|
-| `./bin/float4A` | 2.232 ± 0.003      |        |               |
-| `./bin/float4B` | 3.400 ± 0.003      | +52.3% | (1.5x slower) |
-| `./bin/float4C` | 2.406 ± 0.002      | +7.8%  |               |
-| `./bin/float4D` | 2.576 ± 0.003      | +15.4% |               |
+  | Command   | Mean Wall Time [s] | Change | Factor         |
+  |:----------|-------------------:|-------:|:---------------|
+  | float4A   | 2.232 ± 0.003      |        |                |
+  | float4B   | 3.400 ± 0.003      | +52.3% | (1.5x slower)  |
+  | float4C   | 2.406 ± 0.002      | +7.8%  |                |
+  | float4D   | 2.576 ± 0.003      | +15.4% |                |
 
 ### c++17
-  |           | Mean Wall Time [s] | Change  | Factor        |
-  |:----------|-------------------:|--------:|:--------------|
-  | reference | 11.949 ± 0.060     |         |               |
-  | riffles   | 12.044 ± 0.018     | +0.8%   |               |
-  | unpacked  | 6.697 ± 0.009      | -44.0%  | (1.8x faster) |
-  | sincos    | 5.996 ± 0.019      | -49.8%  | (2.0x faster) |
-  | sincos2   | 5.114 ± 0.004      | -57.2%  | (2.3x faster) |
-  | sincos2A  | 5.167 ± 0.005      | -56.8%  | (2.3x faster) |
-**| float4A   | 2.236 ± 0.002      | -81.3%  | (5.3x faster) |**
-  | float4B   | 3.402 ± 0.004      | -71.5%  | (3.5x faster) |
-  | float4C   | 2.409 ± 0.003      | -79.8%  | (5.0x faster) |
-  | float4D   | 2.580 ± 0.006      | -78.4%  | (4.6x faster) |
+  | Command   | Mean Wall Time [s] | Change | Factor         |
+  |:----------|-------------------:|-------:|:---------------|
+  | reference | 11.928 ± 0.028     |        |                |
+  | riffles   | 11.974 ± 0.010     | +0.4%  |                |
+  | unpacked  | 6.695 ± 0.006      | -43.9% | (1.8x faster)  |
+  | sincos    | 6.013 ± 0.050      | -49.6% | (2.0x faster)  |
+  | sincos2   | 5.105 ± 0.005      | -57.2% | (2.3x faster)  |
+  | sincos2A  | 5.157 ± 0.008      | -56.8% | (2.3x faster)  |
+  | float4A   | 2.223 ± 0.003      | -81.4% | (5.4x faster)  |
+  | float4AX  | 1.840 ± 0.002      | -84.6% | (6.5x faster)  |
+**| float4AY  | 1.777 ± 0.004      | -85.1% | (6.7x faster)  |**
+  | float4B   | 3.390 ± 0.004      | -71.6% | (3.5x faster)  |
+  | float4C   | 2.390 ± 0.003      | -80.0% | (5.0x faster)  |
+  | float4D   | 2.553 ± 0.002      | -78.6% | (4.7x faster)  |
+  | float4X   | 1.842 ± 0.002      | -84.6% | (6.5x faster)  |
+**| float4XX  | 1.920 ± 0.001      | -83.9% | (6.2x faster)  |**
+  | float4XY  | 1.857 ± 0.001      | -84.4% | (6.4x faster)  |
 
-  |           | Mean Wall Time [s] | Change  | Factor        |
-  |:----------|-------------------:|--------:|:--------------|
-  | float4A   | 2.187 ± 0.008      |         |               |
-  | float4B   | 3.381 ± 0.006      | +54.6%  | (1.5x slower) |
-  | float4C   | 2.387 ± 0.004      | +9.1%   |               |
-  | float4D   | 2.561 ± 0.003      | +17.1%  |               |
+  | Command   | Mean Wall Time [s] | Change | Factor         |
+  |:----------|-------------------:|-------:|:---------------|
+  | float4A   | 2.154 ± 0.007      |        |                |
+  | float4AX  | 1.789 ± 0.003      | -17.0% |                |
+**| float4AY  | 1.734 ± 0.002      | -19.5% |                |**
+  | float4B   | 3.374 ± 0.076      | +56.7% | (1.6x slower)  |
+  | float4C   | 2.364 ± 0.002      | +9.8%  |                |
+  | float4D   | 2.529 ± 0.003      | +17.4% |                |
+  | float4X   | 1.824 ± 0.004      | -15.3% |                |
+**| float4XX  | 1.906 ± 0.004      | -11.5% |                |**
+  | float4XY  | 1.904 ± 0.004      | -11.6% |                |
 
-  |           | Mean Wall Time [s] | Change  | Factor        |
-  |:----------|-------------------:|--------:|:--------------|
-  | float4A   | 2.158 ± 0.008      |         |               |
-  | float4AX  | 1.793 ± 0.003      | -16.9%  |               |
-**| float4AY  | 1.740 ± 0.002      | -19.4%  |               |**
-  | float4B   | 3.362 ± 0.009      | +55.8%  | (1.6x slower) |
-  | float4C   | 2.370 ± 0.002      | +9.8%   |               |
-  | float4D   | 2.540 ± 0.002      | +17.7%  |               |
 
 Benchmark 1: ./bin/float4A (10 runs)
                 mean     ±       σ          min     …     max
-  Wall Time    2.158 s   ±   0.008 s      2.145 s   …   2.168 s
+  Wall Time    2.154 s   ±   0.007 s      2.141 s   …   2.162 s
   Memory         1.6 MiB ±     0.0 MiB      1.6 MiB …     1.6 MiB
  
 Benchmark 2: ./bin/float4AX (10 runs)
                 mean     ±       σ          min     …     max
-  Wall Time    1.793 s   ±   0.003 s      1.790 s   …   1.800 s            -16.9%  
-  Memory         1.6 MiB ±     0.0 MiB      1.6 MiB …     1.6 MiB           -1.0%  
+  Wall Time    1.789 s   ±   0.003 s      1.785 s   …   1.793 s            -17.0%  
+  Memory         1.6 MiB ±     0.0 MiB      1.6 MiB …     1.6 MiB            0.0%
  
 Benchmark 3: ./bin/float4AY (10 runs)
                 mean     ±       σ          min     …     max
-  Wall Time    1.740 s   ±   0.002 s      1.738 s   …   1.742 s            -19.4%  
-  Memory         1.6 MiB ±     0.0 MiB      1.6 MiB …     1.6 MiB           -1.0%  
+  Wall Time    1.734 s   ±   0.002 s      1.731 s   …   1.738 s            -19.5%  
+  Memory         1.6 MiB ±     0.0 MiB      1.6 MiB …     1.6 MiB            0.0%
  
 Benchmark 4: ./bin/float4B (10 runs)
                 mean     ±       σ          min     …     max
-  Wall Time    3.362 s   ±   0.009 s      3.348 s   …   3.374 s            +55.8%  (1.6x slower)
-  Memory         1.6 MiB ±     0.0 MiB      1.6 MiB …     1.6 MiB           -0.1%  
+  Wall Time    3.374 s   ±   0.076 s      3.338 s   …   3.590 s            +56.7%  (1.6x slower)
+  Memory         1.6 MiB ±     0.0 MiB      1.6 MiB …     1.6 MiB           -1.0%  
  
 Benchmark 5: ./bin/float4C (10 runs)
                 mean     ±       σ          min     …     max
-  Wall Time    2.370 s   ±   0.002 s      2.368 s   …   2.374 s             +9.8%  
-  Memory         1.6 MiB ±     0.0 MiB      1.6 MiB …     1.6 MiB           -1.0%  
+  Wall Time    2.364 s   ±   0.002 s      2.359 s   …   2.367 s             +9.8%  
+  Memory         1.6 MiB ±     0.0 MiB      1.6 MiB …     1.6 MiB           -0.2%  
  
 Benchmark 6: ./bin/float4D (10 runs)
                 mean     ±       σ          min     …     max
-  Wall Time    2.540 s   ±   0.002 s      2.537 s   …   2.542 s            +17.7%  
-  Memory         1.6 MiB ±     0.0 MiB      1.6 MiB …     1.6 MiB           -0.1%  
+  Wall Time    2.529 s   ±   0.003 s      2.526 s   …   2.533 s            +17.4%  
+  Memory         1.6 MiB ±     0.0 MiB      1.6 MiB …     1.6 MiB           -1.0%  
+ 
+Benchmark 7: ./bin/float4X (10 runs)
+                mean     ±       σ          min     …     max
+  Wall Time    1.824 s   ±   0.004 s      1.819 s   …   1.829 s            -15.3%  
+  Memory         1.6 MiB ±     0.0 MiB      1.6 MiB …     1.6 MiB           -1.0%  
+ 
+Benchmark 8: ./bin/float4XX (10 runs)
+                mean     ±       σ          min     …     max
+  Wall Time    1.906 s   ±   0.004 s      1.901 s   …   1.911 s            -11.5%  
+  Memory         1.6 MiB ±     0.0 MiB      1.6 MiB …     1.6 MiB           -0.2%  
+ 
+Benchmark 9: ./bin/float4XY (10 runs)
+                mean     ±       σ          min     …     max
+  Wall Time    1.904 s   ±   0.004 s      1.898 s   …   1.911 s            -11.6%  
+  Memory         1.6 MiB ±     0.0 MiB      1.6 MiB …     1.6 MiB           -1.0%  
 
 
 ## validation suite
@@ -133,10 +150,35 @@ float4A
     max(stddev)  0.00015
     max(max)     0.002930
 
+
+float4X
+=======
+    max(mean)    0.000000
+    max(stddev)  0.00001
+    max(max)     0.000165
+
 ===============================================================================
-[doctest] test cases:     6 |     6 passed | 0 failed | 0 skipped
-[doctest] assertions: 15302 | 15302 passed | 0 failed |
+[doctest] test cases:     7 |     7 passed | 0 failed | 0 skipped
+[doctest] assertions: 18947 | 18947 passed | 0 failed |
 [doctest] Status: SUCCESS!
+
+
+## sn-vco
+
+### k-rate 1/256, no DC blocking
+
+  |            | vcv | squinky | sn-vco | sn-vco_4x1 | sn-vco_4x2 |
+  |:-----------|-----|---------|--------|------------|------------|
+  | baseline   | 25% |         | 34%    | 48.75%     | 49.5%      |
+
+
+**Notes:**
+
+1. `vcv`:        18x VCV fundamental VCOs
+2. `sn-vco`:     18x sn-vco, no antialiasing
+3. `sn-vco_4x1`: 18x sn-vco, 4x oversampling
+4. `sn-vco_4x2`: 18x sn-vco, 4x oversampling
+
 
 
 ## `fmod`
@@ -159,20 +201,5 @@ sys 0m0.071s
 real    0m37.398s
 user    0m37.159s
 sys 0m0.062s
-
-
-## sn-vco
-
-  |            | vcv | sn-vco | sn-vco_4x1 | sn-vco_4x2 |
-  |:-----------|-----|--------|------------|------------|
-  | baseline   | 25% | 43%    | 48%        | 50%        |
-
-
-**Notes:**
-
-1. `vcv`:        18x VCV fundamental VCOs
-2. `sn-vco`:     18x sn-vco, no antialiasing
-3. `sn-vco_4x1`: 18x sn-vco, 4x oversampling, 16kHz LPF
-4. `sn-vco_4x2`: 18x sn-vco, 4x oversampling, 2x16kHz LPF
 
 

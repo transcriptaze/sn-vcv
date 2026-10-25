@@ -135,6 +135,33 @@ namespace float4A {
 
 } // namespace float4A
 
+namespace float4XX {
+    struct sn {
+        double ε;
+        double θ;
+        double A;
+        double δx;
+        double δy;
+        double Φ;
+        double m;
+
+        struct {
+            double pʼ;
+            double qʼ;
+            double rʼ;
+            double sʼ;
+            double tʼ;
+            double uʼ;
+            double φ;
+        } ζ;
+
+        sn(double ε, double θ, double A, double δx, double δy, double Φ, double m);
+
+        void υ(double α, double δα, float out[4]);
+    };
+
+} // namespace float4XX
+
 constexpr double radians(double v) {
     return v * M_PI / 180.0;
 }

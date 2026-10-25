@@ -3,5 +3,5 @@
 #include "sn.hpp"
 
 namespace unpacked {
-void recompute(SN &sn);
+    void recompute(SN &sn);
 } // namespace unpacked

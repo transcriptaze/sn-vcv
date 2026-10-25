@@ -26,3 +26,4 @@ sn-vco: f:1046.5  N:20  P:22.658   P(20kHz+):19.141  ratio:0.845
 ## Other
 1. https://www.osar.fr/notes/waveguides
 2. https://opus-codec.org/demo/opus-1.5
+

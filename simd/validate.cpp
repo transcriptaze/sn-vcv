@@ -578,6 +578,127 @@ TEST_CASE("validating float4A implementation against reference") {
     std::printf("\n");
 }
 
+TEST_CASE("validating float4XX implementation against reference") {
+    vector<test> tests = generate();
+
+    struct {
+        std::vector<double> mean;
+        std::vector<double> stddev;
+        std::vector<double> max;
+    } cumulative;
+
+    for (auto ix = tests.begin(); ix != tests.end(); ix++) {
+        double ε = ix->ε;
+        double θ = radians(ix->θ);
+        double A = ix->A;
+        double δx = ix->δx;
+        double δy = ix->δy;
+        double Φ = radians(ix->Φ);
+        double m = ix->m;
+
+        struct reference::sn ref(ε, θ, A, δx, δy, Φ, m);
+        struct float4XX::sn fp(ε, θ, A, δx, δy, Φ, m);
+
+        struct {
+            double mean;
+            double variance;
+            double stddev;
+            double max;
+        } error;
+
+        std::vector<double> errors;
+
+        const double δα = 1.0;
+
+        for (size_t i = 0; i <= 360; i++) {
+            double α = static_cast<double>(i);
+            double αʼ = radians(α);
+            double δαʼ = radians(δα);
+
+            float p[4];
+            double q[4];
+
+            fp.υ(static_cast<float>(m * αʼ), static_cast<float>(m * δαʼ), p);
+
+            q[0] = ref.υ(αʼ);
+            q[1] = ref.υ(αʼ + 0.25 * δαʼ);
+            q[2] = ref.υ(αʼ + 0.5 * δαʼ);
+            q[3] = ref.υ(αʼ + 0.75 * δαʼ);
+
+            for (int k = 0; k < 4; k++) {
+                double pʼ = p[k];
+                double qʼ = q[k];
+
+                errors.push_back(pʼ - qʼ);
+
+                if (std::abs(pʼ - qʼ) > 2.0) {
+                    CHECK_MESSAGE(pʼ == doctest::Approx(qʼ), " -- ", pʼ - qʼ);
+                }
+            }
+        }
+
+        // ... mean
+        size_t N = errors.size();
+        double sum = std::accumulate(errors.begin(), errors.end(), 0.0);
+        error.mean = sum / static_cast<double>(N);
+
+        error.variance = std::inner_product(errors.begin(), errors.end(), errors.begin(), 0.0,
+                                            std::plus<>(),
+                                            [mean = error.mean](double val, double) {
+                                                double diff = val - mean;
+                                                return diff * diff;
+                                            });
+
+        error.stddev = std::sqrt(error.variance / static_cast<double>(N));
+
+        auto it = std::max_element(errors.begin(), errors.end(), [](double a, double b) { return std::abs(a) < std::abs(b); });
+
+        error.max = (it != errors.end()) ? std::abs(*it) : 0.0;
+
+        CHECK_MESSAGE(error.mean == doctest::Approx(0.0), " -- ", error.mean);
+
+        if (std::abs(error.stddev) > 0.0002) {
+            CHECK_MESSAGE(error.stddev == doctest::Approx(0.0), " -- ", error.stddev);
+        }
+
+        if (std::abs(error.max) > 0.003) {
+            CHECK_MESSAGE(error.max == doctest::Approx(0.0), " -- ", error.max);
+        }
+
+        cumulative.mean.push_back(std::abs(error.mean));
+        cumulative.stddev.push_back(std::abs(error.stddev));
+        cumulative.max.push_back(std::abs(error.max));
+    }
+
+    // ... summarise
+    std::printf("\n");
+    std::printf("float4X\n");
+    std::printf("=======\n");
+
+    {
+        auto it = std::max_element(cumulative.mean.begin(), cumulative.mean.end(), [](double a, double b) { return std::abs(a) < std::abs(b); });
+        double mean = it != cumulative.mean.end() ? std::abs(*it) : 0.0;
+
+        std::printf("    max(mean)    %0.6f\n", mean);
+    }
+
+    {
+        auto it = std::max_element(cumulative.stddev.begin(), cumulative.stddev.end(), [](double a, double b) { return std::abs(a) < std::abs(b); });
+        double stddev = it != cumulative.stddev.end() ? std::abs(*it) : 0.0;
+
+        std::printf("    max(stddev)  %0.5f\n", stddev);
+    }
+
+    {
+        auto it = std::max_element(cumulative.max.begin(), cumulative.max.end(), [](double a, double b) { return std::abs(a) < std::abs(b); });
+        double max = it != cumulative.max.end() ? std::abs(*it) : 0.0;
+
+        std::printf("    max(max)     %0.6f\n", max);
+    }
+
+    std::printf("\n");
+}
+
 vector<test> debug() {
     vector<test> tests;
 

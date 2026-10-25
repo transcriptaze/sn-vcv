@@ -6,7 +6,5 @@
 - [x] validate
 - [ ] merge benchmark and sn code (i.e. make benchmarks standalone)
 - [ ] rework _sn-vco_ et al.
-
-```
-if (val >= TAU) val -= TAU;
-```
+- [ ] _sn-sine_  (for benchmarking)
+- [ ] _sn-sine4_ (float4)
