@@ -45,9 +45,10 @@ void SN::recompute() {
 
     float cosθ = std::cos(θ);
     float sinθ = std::sin(θ);
+    float tanθ = std::tan(θ);
 
-    float u = std::atan(-b * std::tan(θ) / a);
-    float v = std::atan((b / std::tan(θ)) * a);
+    float u = std::atan2(-b * tanθ, a);
+    float v = std::atan2(a * b, tanθ);
     float tx = a * std::cos(u) * cosθ - b * std::sin(u) * sinθ;
     float ty = b * std::sin(v) * cosθ + a * std::cos(v) * sinθ;
     float δxʼ = tx * δx;

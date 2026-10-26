@@ -270,7 +270,7 @@ void sn_vcox::processVCO(const ProcessArgs &args, size_t channels, ANTIALIAS ant
         double buffer[16];
         double out[16];
 
-        aa.sum.process(antialias, sum, out, channels);
+        aa.sum.process(antialias, sum, buffer, channels);
         dcf.sum.process(buffer, out, channels);
 
         for (size_t ch = 0; ch < channels; ch++) {
@@ -394,6 +394,7 @@ sn_vcoxWidget::sn_vcoxWidget(sn_vcox *module) {
     Vec xll(2.54, 11.43 + 2.54);
     Vec xrr(43.18, 11.43 + 2.54);
     Vec alias(middle - 5.08, top + 7 * dh - 6.35 + 1.27);
+    Vec debug(left, top + 7 * dh + 1.27);
 
     setModule(module);
     setPanel(createPanel(asset::plugin(pluginInstance, "res/sn-vcox.svg"),
@@ -433,6 +434,9 @@ sn_vcoxWidget::sn_vcoxWidget(sn_vcox *module) {
     addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xll), module, sn_vcox::XLR_LIGHT));
     addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_vcox::XRL_LIGHT));
     addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xrr), module, sn_vcox::XRR_LIGHT));
+
+    // ... debug
+    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(debug), module, sn_vcox::DEBUG_INPUT));
 }
 
 void sn_vcoxWidget::appendContextMenu(Menu *menu) {
