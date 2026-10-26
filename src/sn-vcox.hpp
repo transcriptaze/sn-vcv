@@ -28,6 +28,7 @@ struct sn_vcox : Module {
         AMPLITUDE_INPUT,
         DX_INPUT,
         DY_INPUT,
+        DEBUG_INPUT,
         INPUTS_LEN
     };
 
@@ -126,6 +127,9 @@ struct sn_vcox : Module {
         .out = DCF(DCBLOCK_NONE),
         .sum = DCF(DCBLOCK_NONE),
     };
+
+    // ... debug
+    dsp::SchmittTrigger debug;
 };
 
 struct sn_vcoxWidget : ModuleWidget {
