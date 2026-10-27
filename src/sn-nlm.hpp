@@ -17,12 +17,8 @@ struct hysteresis {
     bool increasing_;
 };
 
-struct source {
-    struct polyphase100 fir[16];
-    float buffer[4][16];
-};
-
 struct mixer {
+    struct polyphase100 interpolator[16];
     struct hysteresis hysteresis[16];
 };
 
@@ -78,20 +74,19 @@ struct sn_nlm : Module {
     void processBypass(const ProcessArgs &args) override;
     void processAUX(const ProcessArgs &args);
 
-    void mix2x4(source &p, source &q, mixer &r, sink &s, float gain);
-    float mix(float in1, float in2, float gain, struct hysteresis &h);
-    void mix(float in1[4], float in2[4], float out[4], float gain, struct hysteresis &h);
+    void mix2x4(InputId p, InputId q, mixer &r, sink &s);
 
-    float linear(float in1, float in2, float gain);
-    float hard_limit(float in1, float in2, float gain);
-    float soft_limit(float in1, float in2, float gain);
-    float soft_limit_cubic(float in1, float in2, float gain);
-    float expand(float in1, float in2, float gain);
-    float hysteresis(float in1, float in2, float gain, struct hysteresis &h);
+    float mix(float in, struct hysteresis &h);
+
+    float linear(float in);
+    float hard_limit(float in);
+    float soft_limit(float in);
+    float soft_limit_cubic(float in);
+    float expand(float in);
+    float hysteresis(float in, struct hysteresis &h);
 
     void filter(struct polyphase100 &polyphase, float in, float out[4]);
     float butterworth(struct iir4 &iir, float in[4]);
-    float bessel(struct iir4 &iir, float in[4]);
 
     // ... parameters
     float attenuation = 0.0f;
@@ -99,8 +94,7 @@ struct sn_nlm : Module {
     bool average = false;
     MIXFN mixfn = SOFT_LIMIT;
 
-    // ... groups
-    struct source sources[N_INPUTS];
+    // ... mix groups
     struct mixer mixers[N_MIXERS];
     struct sink sinks[N_OUTPUTS];
 

@@ -43,31 +43,26 @@
 - [x] AUX xy
 - [x] gain
 - [x] attenuation
-- [x] bypass
+- [ ] bypass
 - [x] average
 - [ ] groups
     - (?) 1x8
-    - [ ] 2x4
+    - [x] 2x4
     - [ ] 4x2
     - (?) 8x1
 
 - [ ] isConnected
 - [ ] channel count
-- (?) attenuation CV
-- (?) gain CV
+- [ ] attenuation CV
+- [ ] gain CV
 
-### mix
-- [ ] E(phi,k)
-- [x] linear
-- [x] hard limit
-- [x] soft limit
-- [ ] inverse softmax (transistor)
-- [ ] diode clipper
-- [ ] hysteresis
-    - https://www.desmos.com/calculator/qqlexwmbsd
-    - https://arxiv.org/pdf/2006.02784
-    - https://www.scispace.com/pdf/deep-learning-based-wave-digital-modeling-of-rate-dependent-bx32h3jl.pdf
-- [ ] inverse hysteresis
+### mixer
+- [ ] sn
+
+- https://www.desmos.com/calculator/qqlexwmbsd
+- https://arxiv.org/pdf/2006.02784
+- https://www.scispace.com/pdf/deep-learning-based-wave-digital-modeling-of-rate-dependent-bx32h3jl.pdf
+
 
 ### antialiasing: input
 - [x] 4th order Butterworth

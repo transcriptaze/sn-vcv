@@ -28,14 +28,6 @@ constexpr struct {
 };
 
 constexpr struct {
-    const double a[4];
-    const double b[5];
-} BESSEL_18kHz_4x{
-    .a = {-2.319879, 2.140213, -0.918352, 0.153327},
-    .b = {0.003457, 0.013827, 0.020740, 0.013827, 0.003457},
-};
-
-constexpr struct {
     const double taps[4][25];
 } POLYPHASE_18kHz_4x{
     // clang-format off
@@ -120,10 +112,10 @@ sn_nlm::sn_nlm() {
     configOutput(OUTY_OUTPUT, "y");
 
     // ... initialise interpolation filters
-    for (int i = 0; i < N_INPUTS; i++) {
+    for (int i = 0; i < N_MIXERS; i++) {
         for (int ch = 0; ch < CHANNELS; ch++) {
             for (int j = 0; j < 25; j++) {
-                sources[i].fir[ch].state[j] = 0.0f;
+                mixers[i].interpolator[ch].state[j] = 0.0f;
             }
         }
     }
@@ -216,22 +208,7 @@ void sn_nlm::process(const ProcessArgs &args) {
     attenuation = params[ATTENUATION_PARAM].getValue();
     gain = std::powf(2.0f, 2.0f * params[GAIN_PARAM].getValue());
 
-    // ... 4x oversampling + polyphase interpolation
-    float k = 1.0f - attenuation;
-
-    for (int i = 0; i < N_INPUTS; i++) {
-        for (int ch = 0; ch < CHANNELS; ch++) {
-            float v = inputs[INPUTS[i]].getPolyVoltage(ch);
-            source &src = sources[i];
-
-            filter(src.fir[ch], k * v, src.buffer[ch]);
-        }
-    }
-
-    // ... mix
-    float g = average ? gain / 2.0f : gain;
-
-    mix2x4(sources[0], sources[1], mixers[0], sinks[0], g);
+    mix2x4(IN1_INPUT, IN2_INPUT, mixers[0], sinks[0]);
 
     // ... decimate + anti-alias
     for (size_t i = 0; i < N_OUTPUTS; i++) {
@@ -247,8 +224,17 @@ void sn_nlm::process(const ProcessArgs &args) {
 }
 
 void sn_nlm::processBypass(const ProcessArgs &args) {
-    for (size_t ch = 0; ch < 1; ch++) {
-        outputs[OUTA_OUTPUT].setVoltage(0.0f, ch);
+    float k = 1.0f - attenuation;
+    float g = k * (average ? gain / 2.0f : gain);
+
+    for (size_t i = 0; i < N_OUTPUTS; i++) {
+        for (size_t ch = 0; ch < CHANNELS; ch++) {
+            float in1 = inputs[IN1_INPUT].getPolyVoltage(ch);
+            float in2 = inputs[IN2_INPUT].getPolyVoltage(ch);
+            float out = g * (in1 + in2);
+
+            outputs[OUTA_OUTPUT].setVoltage(out, ch);
+        }
     }
 
     processAUX(args);
@@ -264,62 +250,69 @@ void sn_nlm::processAUX(const ProcessArgs &args) {
         ramp = MAX_RAMP - ramp;
     }
 
+    float k = 1.0f - attenuation;
+    float g = k * (average ? gain / 2.0f : gain);
+
     double normalized = (static_cast<double>(ramp) / static_cast<double>(MAX_RAMP)) * 2.0 - 1.0;
     float outX = normalized * 5.0f;
-    float outY = mix(outX, outX, gain, AUX.hysteresis);
+    float outY = mix(g * (outX + outX), AUX.hysteresis);
 
     outputs[OUTX_OUTPUT].setVoltage(outX, 0);
     outputs[OUTY_OUTPUT].setVoltage(outY, 0);
 }
 
-void sn_nlm::mix2x4(source &p, source &q, mixer &r, sink &s, float gain) {
+void sn_nlm::mix2x4(InputId p, InputId q, mixer &r, sink &s) {
+    float k = 1.0f - attenuation;
+    float g = k * (average ? gain / 2.0f : gain);
+
     for (int ch = 0; ch < CHANNELS; ch++) {
-        mix(p.buffer[ch], q.buffer[ch], s.buffer[ch], gain, r.hysteresis[ch]);
+        float in1 = inputs[p].getPolyVoltage(ch);
+        float in2 = inputs[q].getPolyVoltage(ch);
+        float in = g * (in1 + in2);
+        float buffer[4];
+
+        filter(r.interpolator[ch], in, buffer);
+
+        for (int i = 0; i < 4; i++) {
+            s.buffer[ch][i] = mix(buffer[i], r.hysteresis[ch]);
+        }
     }
 }
 
-void sn_nlm::mix(float in1[4], float in2[4], float out[4], float gain, struct hysteresis &h) {
-    for (int i = 0; i < 4; i++) {
-        out[i] = mix(in1[i], in2[i], gain, h);
-    }
-}
-
-float sn_nlm::mix(float in1, float in2, float gain, struct hysteresis &h) {
+float sn_nlm::mix(float in, struct hysteresis &h) {
     switch (mixfn) {
     case HARD_LIMIT:
-        return hard_limit(in1, in2, gain);
+        return hard_limit(in);
 
     case SOFT_LIMIT:
-        return soft_limit(in1, in2, gain);
+        return soft_limit(in);
 
     case EXPAND:
-        return expand(in1, in2, gain);
+        return expand(in);
 
     case HYSTERESIS:
-        return hysteresis(in1, in2, gain, h);
+        return hysteresis(in, h);
 
     default:
-        return linear(in1, in2, gain);
+        return linear(in);
     }
 }
 
-float sn_nlm::linear(float in1, float in2, float gain) {
-    return gain * (in1 + in2);
+float sn_nlm::linear(float in) {
+    return in;
 }
 
-float sn_nlm::hard_limit(float in1, float in2, float gain) {
-    return clamp(gain * (in1 + in2), -5.0f, 5.0f);
+float sn_nlm::hard_limit(float in) {
+    return clamp(in, -5.0f, 5.0f);
 }
 
-float sn_nlm::soft_limit(float in1, float in2, float gain) {
-    float v = gain * (in1 + in2);
-
-    return 5.0f * std::tanh(v / 5.0f);
+float sn_nlm::soft_limit(float in) {
+    return 5.0f * std::tanh(in / 5.0f);
 }
 
 // cubic soft-clipping: f(x) = x - (x^3)/3
-float sn_nlm::soft_limit_cubic(float in1, float in2, float gain) {
-    float v = (gain * (in1 + in2)) / 5.0f; // normalize to -1..1 range
+float sn_nlm::soft_limit_cubic(float in) {
+    float v = in / 5.0f; // normalize to -1..1 range
 
     if (v <= -1.0f) {
         return -5.0f;
@@ -334,13 +327,15 @@ float sn_nlm::soft_limit_cubic(float in1, float in2, float gain) {
     return shaped * 7.5f;
 }
 
-float sn_nlm::expand(float in1, float in2, float gain) {
+float sn_nlm::expand(float in) {
+    float inʼ = in / gain; // NTS because premultiplied by gain in mixNxM
+
     float sensitivity = 0.25f;
     float dampened_gain = 1.0f + sensitivity * (gain - 1.0f);
-    dampened_gain = std::max(0.1f, dampened_gain); // Safety floor
+    dampened_gain = std::max(0.1f, dampened_gain); 
 
     float effective_gain = dampened_gain * 1.733f;
-    float v = effective_gain * (in1 + in2);
+    float v = effective_gain * inʼ;
     float abs_v = std::abs(v);
 
     // ... flattens center as gain increases
@@ -363,54 +358,27 @@ float sn_nlm::expand(float in1, float in2, float gain) {
     return (v >= 0.0f) ? shaped : -shaped;
 }
 
-float sn_nlm::hysteresis(float in1, float in2, float gain, struct hysteresis &H) {
-    float v = gain * (in1 + in2);
-
-    if (v > H.prev_h_) {
+float sn_nlm::hysteresis(float in, struct hysteresis &H) {
+    if (in > H.prev_h_) {
         H.increasing_ = true;
-    } else if (v < H.prev_h_) {
+    } else if (in < H.prev_h_) {
         H.increasing_ = false;
     }
 
     double target_b;
     if (H.increasing_) {
-        target_b = (BH.mu_rev_ * v) + (BH.b_sat_ * std::atan((v - BH.h_c_) * BH.sharpness_));
+        target_b = (BH.mu_rev_ * in) + (BH.b_sat_ * std::atan((in - BH.h_c_) * BH.sharpness_));
     } else {
-        target_b = (BH.mu_rev_ * v) + (BH.b_sat_ * std::atan((v + BH.h_c_) * BH.sharpness_));
+        target_b = (BH.mu_rev_ * in) + (BH.b_sat_ * std::atan((in + BH.h_c_) * BH.sharpness_));
     }
 
     double memory_inertia = 0.35;
     H.current_b_ += memory_inertia * (target_b - H.current_b_);
 
-    H.prev_h_ = v;
+    H.prev_h_ = in;
 
     return H.current_b_;
 }
-
-// void sn_nlm::filter(struct fir101 &fir, float in, float out[4]) {
-//     float _in[4] = {in, 0.0f, 0.0f, 0.0f};
-//
-//     for (size_t i = 0; i < 4; i++) {
-//         fir.delay_line[fir.head] = _in[i];
-//
-//         double acc = 0.0;
-//         size_t index = fir.head;
-//
-//         for (size_t j = 0; j < 101; ++j) {
-//             acc += FIR_18kHz_4x.taps[j] * fir.delay_line[index];
-//
-//             if (index == 0) {
-//                 index = 101 - 1;
-//             } else {
-//                 --index;
-//             }
-//         }
-//
-//         fir.head = (fir.head + 1) % 101;
-//
-//         out[i] = 4.0 * (float)acc;
-//     }
-// }
 
 void sn_nlm::filter(struct polyphase100 &polyphase, float in, float out[4]) {
     for (size_t i = 24; i > 0; --i) {
@@ -442,35 +410,6 @@ float sn_nlm::butterworth(struct iir4 &iir, float in[4]) {
         out -= BUTTERWORTH_18Kz_4x.a[1] * iir.y[1];
         out -= BUTTERWORTH_18Kz_4x.a[2] * iir.y[2];
         out -= BUTTERWORTH_18Kz_4x.a[3] * iir.y[3];
-
-        iir.x[3] = iir.x[2];
-        iir.x[2] = iir.x[1];
-        iir.x[1] = iir.x[0];
-        iir.x[0] = in[i];
-
-        iir.y[3] = iir.y[2];
-        iir.y[2] = iir.y[1];
-        iir.y[1] = iir.y[0];
-        iir.y[0] = out;
-    }
-
-    return iir.y[0];
-}
-
-float sn_nlm::bessel(struct iir4 &iir, float in[4]) {
-    for (size_t i = 0; i < 4; i++) {
-        double out = 0.0f;
-
-        out = BESSEL_18kHz_4x.b[0] * in[i];
-        out += BESSEL_18kHz_4x.b[1] * iir.x[0];
-        out += BESSEL_18kHz_4x.b[2] * iir.x[1];
-        out += BESSEL_18kHz_4x.b[3] * iir.x[2];
-        out += BESSEL_18kHz_4x.b[4] * iir.x[3];
-
-        out -= BESSEL_18kHz_4x.a[0] * iir.y[0];
-        out -= BESSEL_18kHz_4x.a[1] * iir.y[1];
-        out -= BESSEL_18kHz_4x.a[2] * iir.y[2];
-        out -= BESSEL_18kHz_4x.a[3] * iir.y[3];
 
         iir.x[3] = iir.x[2];
         iir.x[2] = iir.x[1];
