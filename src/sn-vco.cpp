@@ -1,6 +1,29 @@
 #include "sn-vco.hpp"
 #include "sn-vcox.hpp"
 
+const auto SN_VCO_INPUT_E = mm2px(Vec(7.33, 23.24));
+const auto SN_VCO_INPUT_S = mm2px(Vec(7.33, 36.25));
+const auto SN_VCO_INPUT_THETA = mm2px(Vec(7.33, 49.27));
+const auto SN_VCO_INPUT_A = mm2px(Vec(7.33, 62.28));
+const auto SN_VCO_INPUT_DX = mm2px(Vec(7.33, 75.29));
+const auto SN_VCO_INPUT_DY = mm2px(Vec(7.33, 88.31));
+const auto SN_VCO_INPUT_PHI = mm2px(Vec(7.33, 101.32));
+const auto SN_VCO_INPUT_DEBUG = mm2px(Vec(35.56, 62.28));
+const auto SN_VCO_INPUT_PITCH = mm2px(Vec(35.56, 36.25));
+const auto SN_VCO_INPUT_VELOCITY = mm2px(Vec(35.56, 49.27));
+const auto SN_VCO_OUTUT_AUX = mm2px(Vec(35.56, 75.29));
+const auto SN_VCO_OUTUT_TRIGGER = mm2px(Vec(35.56, 88.31));
+const auto SN_VCO_OUTUT_VCO = mm2px(Vec(35.56, 114.34));
+const auto SN_VCO_PARAM_E = mm2px(Vec(20.35, 23.24));
+const auto SN_VCO_PARAM_S = mm2px(Vec(20.35, 36.25));
+const auto SN_VCO_PARAM_THETA = mm2px(Vec(20.35, 49.27));
+const auto SN_VCO_PARAM_A = mm2px(Vec(20.35, 62.28));
+const auto SN_VCO_PARAM_DX = mm2px(Vec(20.35, 75.29));
+const auto SN_VCO_PARAM_DY = mm2px(Vec(20.35, 88.31));
+const auto SN_VCO_PARAM_PHI = mm2px(Vec(20.35, 101.32));
+const auto SN_VCO_PARAM_M = mm2px(Vec(20.35, 114.34));
+const auto SN_VCO_WIDGET_CHANNELS = mm2px(Vec(35.56, 23.24));
+
 const int sn_vco::CHANNELS = 1;
 const float sn_vco::VELOCITY = 1.0f;
 
@@ -16,9 +39,9 @@ sn_vco::sn_vco() {
     configParam(AMPLITUDE_PARAM, 0.0f, +1.0f, 1.0f, "a");
     configParam(DX_PARAM, -1.0f, +1.0f, 0.0f, "δx");
     configParam(DY_PARAM, -1.0f, +1.0f, 0.0f, "δy");
+    configParam(PHI_PARAM, -90.0f, +90.0f, 0.0f, "φ");
     configSwitch(M_PARAM, 1.f, 5.f, 1.f, "m", {"1", "2", "3", "4", "5"});
 
-    getParamQuantity(PLACEHOLDER_PARAM)->randomizeEnabled = false;
     getParamQuantity(M_PARAM)->randomizeEnabled = false;
 
     // ... inputs
@@ -432,8 +455,12 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
     addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_δy), module, sn_vco::DY_INPUT));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(param_δy), module, sn_vco::DY_PARAM));
 
+    // ... φ
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_VCO_INPUT_PHI, module, sn_vco::PHI_INPUT));
+    addParam(createParamCentered<RoundBlackKnob>(SN_VCO_PARAM_PHI, module, sn_vco::PHI_PARAM));
+
     // ... m,
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_m), module, sn_vco::M_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(SN_VCO_PARAM_M, module, sn_vco::M_PARAM));
 
     // ... pitch and velocity inputs
     addInput(createInputCentered<ThemedPJ301MPort>(mm2px(pitch), module, sn_vco::PITCH_INPUT));
@@ -455,7 +482,7 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
     addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xrr), module, sn_vco::XRR_LIGHT));
 
     // ... debug
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(debug), module, sn_vco::DEBUG_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_VCO_INPUT_DEBUG, module, sn_vco::DEBUG_INPUT));
 }
 
 void sn_vcoWidget::appendContextMenu(Menu *menu) {

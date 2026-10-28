@@ -23,7 +23,8 @@ new input theta v1,h3 PJ301M
 new input a     v1,h4 PJ301M
 new input dx    v1,h5 PJ301M
 new input dy    v1,h6 PJ301M
-new input debug v1,h8 PJ301M
+new input phi   v1,h7 PJ301M
+new input debug v3,h4 PJ301M
 
 new input pitch    v3,h2 PJ301M
 new input velocity v3,h3 PJ301M
@@ -38,18 +39,19 @@ new parameter theta v2,h3 RoundBlackKnob
 new parameter a     v2,h4 RoundBlackKnob
 new parameter dx    v2,h5 RoundBlackKnob
 new parameter dy    v2,h6 RoundBlackKnob
-new parameter m     v2,h7 RoundBlackKnob
+new parameter phi   v2,h7 RoundBlackKnob
+new parameter m     v2,h8 RoundBlackKnob
 
 new widget channels v3,h1 ChDsp
-new widget aliasing v2,h8 Custom
 
-new label 'ε'  v1+6.51mm,h1-3.81mm RobotoBold 12pt centre,baseline
-new label 's'  v1+6.51mm,h2-3.81mm RobotoBold 12pt centre,baseline
-new label 'θ'  v1+6.51mm,h3-3.81mm RobotoBold 12pt centre,baseline
-new label 'a'  v1+6.51mm,h4-3.81mm RobotoBold 12pt centre,baseline
-new label 'δx' v1+6.51mm,h5-3.81mm RobotoBold 12pt centre,baseline
-new label 'δy' v1+6.51mm,h6-3.81mm RobotoBold 12pt centre,baseline
-new label 'm'  v1+6.51mm,h7-3.81mm RobotoBold 12pt centre,baseline
+new label 'ε'  v1+6.51mm,h1-3.81mm RobotoCondensed-Italic 12pt centre,baseline
+new label 's'  v1+6.51mm,h2-3.81mm RobotoCondensed-Italic 12pt centre,baseline
+new label 'θ'  v1+6.51mm,h3-3.81mm RobotoCondensed-Italic 12pt centre,baseline
+new label 'a'  v1+6.51mm,h4-3.81mm RobotoCondensed-Italic 12pt centre,baseline
+new label 'δx' v1+6.51mm,h5-3.81mm RobotoCondensed-Italic 12pt centre,baseline
+new label 'δy' v1+6.51mm,h6-3.81mm RobotoCondensed-Italic 12pt centre,baseline
+new label 'φ'  v1+6.51mm,h7-3.81mm RobotoCondensed-Italic 12pt centre,baseline
+new label 'm'  v1+6.51mm,h8-3.81mm RobotoCondensed-Italic 12pt centre,baseline
 
 new label 'CHAN'      v3,h1-3.81mm RobotoBold 12pt centre,baseline
 new label 'V/OCT'     v3,h2-3.81mm RobotoBold 12pt centre,baseline

@@ -16,7 +16,7 @@ struct sn_vco : Module {
         AMPLITUDE_PARAM,
         DX_PARAM,
         DY_PARAM,
-        PLACEHOLDER_PARAM,
+        PHI_PARAM,
         M_PARAM,
         PARAMS_LEN
     };
@@ -30,6 +30,7 @@ struct sn_vco : Module {
         DY_INPUT,
         PITCH_INPUT,
         VELOCITY_INPUT,
+        PHI_INPUT,
         DEBUG_INPUT,
         INPUTS_LEN
     };

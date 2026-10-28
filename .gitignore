@@ -14,3 +14,4 @@ documentation/gemini
 documentation/aliasing/workfiles
 workdir
 bin
+.venv
