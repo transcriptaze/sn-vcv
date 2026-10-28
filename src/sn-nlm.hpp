@@ -1,4 +1,5 @@
 #include "plugin.hpp"
+#include "sn.hpp"
 
 namespace sn_nlm {
 
@@ -58,6 +59,7 @@ struct sn_nlm : Module {
         SOFT_LIMIT,
         EXPAND,
         HYSTERESIS,
+        SNX,
     };
 
     constexpr static int INPUTS[] = {IN1_INPUT, IN2_INPUT};
@@ -84,6 +86,7 @@ struct sn_nlm : Module {
     float soft_limit_cubic(float in);
     float expand(float in);
     float hysteresis(float in, struct hysteresis &h);
+    float sn(float in);
 
     void filter(struct polyphase100 &polyphase, float in, float out[4]);
     float butterworth(struct iir4 &iir, float in[4]);
@@ -105,6 +108,9 @@ struct sn_nlm : Module {
     } AUX{
         .phase = 0,
     };
+
+    // ... sn
+    struct SN _sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 
     // ... debug
     dsp::SchmittTrigger debug;

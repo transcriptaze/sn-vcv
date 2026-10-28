@@ -86,6 +86,7 @@ const std::vector<std::string> MIXERS = {
     "Soft limit",
     "Expander",
     "Hysteresis",
+    "sn",
 };
 
 sn_nlm::sn_nlm() {
@@ -142,6 +143,24 @@ sn_nlm::sn_nlm() {
     AUX.hysteresis.prev_h_ = 0.0;
     AUX.hysteresis.current_b_ = 0.0;
     AUX.hysteresis.increasing_ = true;
+
+    // ... sn
+    float e = -0.8f;
+    float s = 1.0f;
+    float θ = 0.f;
+    float a = 1.0f;
+    float δx = 0.f;
+    float δy = 0.f;
+    float m = 1.0f;
+
+    _sn.ε = std::tanh(s * e);
+    _sn.θ = θ * M_PI / 180.0f;
+    _sn.A = clamp(a, 0.0f, +1.0f);
+    _sn.δx = clamp(δx, -1.0f, +1.0f);
+    _sn.δy = clamp(δy, -1.0f, +1.0f);
+    _sn.m = m;
+
+    _sn.recompute();
 }
 
 json_t *sn_nlm::dataToJson() {
@@ -199,6 +218,10 @@ void sn_nlm::dataFromJson(json_t *root) {
 
         case HYSTERESIS:
             this->mixfn = HYSTERESIS;
+            break;
+
+        case SNX:
+            this->mixfn = SNX;
             break;
         }
     }
@@ -293,6 +316,9 @@ float sn_nlm::mix(float in, struct hysteresis &h) {
     case HYSTERESIS:
         return hysteresis(in, h);
 
+    case SNX:
+        return sn(in);
+
     default:
         return linear(in);
     }
@@ -332,7 +358,7 @@ float sn_nlm::expand(float in) {
 
     float sensitivity = 0.25f;
     float dampened_gain = 1.0f + sensitivity * (gain - 1.0f);
-    dampened_gain = std::max(0.1f, dampened_gain); 
+    dampened_gain = std::max(0.1f, dampened_gain);
 
     float effective_gain = dampened_gain * 1.733f;
     float v = effective_gain * inʼ;
@@ -378,6 +404,14 @@ float sn_nlm::hysteresis(float in, struct hysteresis &H) {
     H.prev_h_ = in;
 
     return H.current_b_;
+}
+
+float sn_nlm::sn(float in) {
+    float α = clamp(in / 5.0f, -1.0f, +1.0f);
+    float αʼ = 0.5f * M_PI * α;
+    float υ = _sn.υ(αʼ);
+
+    return 5.0f * υ;
 }
 
 void sn_nlm::filter(struct polyphase100 &polyphase, float in, float out[4]) {
