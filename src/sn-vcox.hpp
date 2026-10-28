@@ -15,7 +15,7 @@ struct sn_vcox : Module {
         AMPLITUDE_PARAM,
         DX_PARAM,
         DY_PARAM,
-        PLACEHOLDER_PARAM,
+        PHI_PARAM,
         M_PARAM,
         ATT_PARAM,
         PARAMS_LEN
@@ -28,6 +28,7 @@ struct sn_vcox : Module {
         AMPLITUDE_INPUT,
         DX_INPUT,
         DY_INPUT,
+        PHI_INPUT,
         DEBUG_INPUT,
         INPUTS_LEN
     };

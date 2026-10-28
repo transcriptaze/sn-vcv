@@ -8,7 +8,7 @@ const auto SN_VCO_INPUT_A = mm2px(Vec(7.33, 62.28));
 const auto SN_VCO_INPUT_DX = mm2px(Vec(7.33, 75.29));
 const auto SN_VCO_INPUT_DY = mm2px(Vec(7.33, 88.31));
 const auto SN_VCO_INPUT_PHI = mm2px(Vec(7.33, 101.32));
-const auto SN_VCO_INPUT_DEBUG = mm2px(Vec(35.56, 62.28));
+const auto SN_VCO_INPUT_DEBUG = mm2px(Vec(35.56, 98.78));
 const auto SN_VCO_INPUT_PITCH = mm2px(Vec(35.56, 36.25));
 const auto SN_VCO_INPUT_VELOCITY = mm2px(Vec(35.56, 49.27));
 const auto SN_VCO_OUTUT_AUX = mm2px(Vec(35.56, 75.29));
@@ -51,6 +51,7 @@ sn_vco::sn_vco() {
     configInput(AMPLITUDE_INPUT, "±5V a");
     configInput(DX_INPUT, "±5V δx");
     configInput(DY_INPUT, "±5V δy");
+    configInput(PHI_INPUT, "±5V φ");
 
     configInput(PITCH_INPUT, "1V/octave pitch");
     configInput(VELOCITY_INPUT, "0-10V velocity");

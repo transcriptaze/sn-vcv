@@ -24,7 +24,7 @@ new input a     v1,h4 PJ301M
 new input dx    v1,h5 PJ301M
 new input dy    v1,h6 PJ301M
 new input phi   v1,h7 PJ301M
-new input debug v3,h4 PJ301M
+new input debug v3,h7-2.54mm PJ301M
 
 new input pitch    v3,h2 PJ301M
 new input velocity v3,h3 PJ301M

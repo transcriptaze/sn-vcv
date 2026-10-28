@@ -1,5 +1,26 @@
 #include "sn-vcox.hpp"
 
+const auto SN_VCOX_INPUT_E = mm2px(Vec(7.33, 23.24));
+const auto SN_VCOX_INPUT_S = mm2px(Vec(7.33, 36.25));
+const auto SN_VCOX_INPUT_THETA = mm2px(Vec(7.33, 49.27));
+const auto SN_VCOX_INPUT_A = mm2px(Vec(7.33, 62.28));
+const auto SN_VCOX_INPUT_DX = mm2px(Vec(7.33, 75.29));
+const auto SN_VCOX_INPUT_DY = mm2px(Vec(7.33, 88.31));
+const auto SN_VCOX_INPUT_PHI = mm2px(Vec(7.33, 101.32));
+const auto SN_VCOX_INPUT_DEBUG = mm2px(Vec(35.56, 87.04));
+const auto SN_VCOX_OUTUT_AUX = mm2px(Vec(35.56, 75.29));
+const auto SN_VCOX_OUTUT_VCO = mm2px(Vec(35.56, 101.32));
+const auto SN_VCOX_OUTUT_SUM = mm2px(Vec(35.56, 114.34));
+const auto SN_VCOX_PARAM_E = mm2px(Vec(20.35, 23.24));
+const auto SN_VCOX_PARAM_S = mm2px(Vec(20.35, 36.25));
+const auto SN_VCOX_PARAM_THETA = mm2px(Vec(20.35, 49.27));
+const auto SN_VCOX_PARAM_A = mm2px(Vec(20.35, 62.28));
+const auto SN_VCOX_PARAM_DX = mm2px(Vec(20.35, 75.29));
+const auto SN_VCOX_PARAM_DY = mm2px(Vec(20.35, 88.31));
+const auto SN_VCOX_PARAM_PHI = mm2px(Vec(20.35, 101.32));
+const auto SN_VCOX_PARAM_M = mm2px(Vec(20.35, 114.34));
+const auto SN_VCOX_PARAM_ATT = mm2px(Vec(35.56, 29.75));
+
 const int sn_vcox::CHANNELS = 1;
 
 sn_vcox::sn_vcox() {
@@ -14,10 +35,10 @@ sn_vcox::sn_vcox() {
     configParam(AMPLITUDE_PARAM, 0.0f, +1.0f, 1.0f, "a");
     configParam(DX_PARAM, -1.0f, +1.0f, 0.0f, "δx");
     configParam(DY_PARAM, -1.0f, +1.0f, 0.0f, "δy");
+    configParam(PHI_PARAM, -90.0f, +90.0f, 0.0f, "φ");
     configSwitch(M_PARAM, 1.f, 5.f, 2.f, "m", {"1", "2", "3", "4", "5"});
     configParam(ATT_PARAM, 0.0f, +1.0f, 1.0f, "ɡ");
 
-    getParamQuantity(PLACEHOLDER_PARAM)->randomizeEnabled = false;
     getParamQuantity(M_PARAM)->randomizeEnabled = false;
     getParamQuantity(ATT_PARAM)->randomizeEnabled = false;
 
@@ -28,6 +49,7 @@ sn_vcox::sn_vcox() {
     configInput(AMPLITUDE_INPUT, "±5V a");
     configInput(DX_INPUT, "±5V δx");
     configInput(DY_INPUT, "±5V δy");
+    configInput(PHI_INPUT, "±5V φ");
 
     // ... outputs
     configOutput(VCO_OUTPUT, "VCO");
@@ -338,6 +360,7 @@ void sn_vcox::recompute(const ProcessArgs &args, DCBLOCK dcblocking) {
     float A = params[AMPLITUDE_PARAM].getValue();
     float δx = params[DX_PARAM].getValue();
     float δy = params[DY_PARAM].getValue();
+    float φ = params[PHI_PARAM].getValue();
     float m = params[M_PARAM].getValue();
 
     // ... add inputs
@@ -347,11 +370,13 @@ void sn_vcox::recompute(const ProcessArgs &args, DCBLOCK dcblocking) {
     A += clamp(inputs[AMPLITUDE_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
     δx += clamp(inputs[DX_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
     δy += clamp(inputs[DY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    φ += 90.0f * clamp(inputs[PHI_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
 
     // ... preconditioning
     e = clamp(e, -1.0f, +1.0f);
     s = clamp(s, 0.0f, +5.0f);
     θ = clamp(θ, -89.95f, +89.95f);
+    φ = clamp(φ, -89.95f, +89.95f);
 
     // ... recalculate SN transform
     sn.ε = std::tanh(s * e);
@@ -359,6 +384,7 @@ void sn_vcox::recompute(const ProcessArgs &args, DCBLOCK dcblocking) {
     sn.A = clamp(A, 0.0f, +1.0f);
     sn.δx = clamp(δx, -1.0f, +1.0f);
     sn.δy = clamp(δy, -1.0f, +1.0f);
+    sn.Φ = φ * M_PI / 180.0f;
     sn.m = m;
 
     sn.recompute();
@@ -384,7 +410,6 @@ sn_vcoxWidget::sn_vcoxWidget(sn_vcox *module) {
     Vec param_A(middle, top + 3 * dh);
     Vec param_δx(middle, top + 4 * dh);
     Vec param_δy(middle, top + 5 * dh);
-    Vec param_m(middle, top + 6 * dh);
     Vec param_att(right, top + 0.5 * dh);
 
     Vec aux(right, top + 4 * dh);
@@ -393,8 +418,6 @@ sn_vcoxWidget::sn_vcoxWidget(sn_vcox *module) {
 
     Vec xll(2.54, 11.43 + 2.54);
     Vec xrr(43.18, 11.43 + 2.54);
-    Vec alias(middle - 5.08, top + 7 * dh - 6.35 + 1.27);
-    Vec debug(left, top + 7 * dh + 1.27);
 
     setModule(module);
     setPanel(createPanel(asset::plugin(pluginInstance, "res/sn-vcox.svg"),
@@ -412,6 +435,7 @@ sn_vcoxWidget::sn_vcoxWidget(sn_vcox *module) {
     addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_A), module, sn_vcox::AMPLITUDE_INPUT));
     addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_δx), module, sn_vcox::DX_INPUT));
     addInput(createInputCentered<ThemedPJ301MPort>(mm2px(input_δy), module, sn_vcox::DY_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_VCOX_INPUT_PHI, module, sn_vcox::PHI_INPUT));
 
     addParam(createParamCentered<RoundBlackKnob>(mm2px(param_e), module, sn_vcox::ECCENTRICITY_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(param_s), module, sn_vcox::SENSITIVITY_PARAM));
@@ -419,7 +443,8 @@ sn_vcoxWidget::sn_vcoxWidget(sn_vcox *module) {
     addParam(createParamCentered<RoundBlackKnob>(mm2px(param_A), module, sn_vcox::AMPLITUDE_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(param_δx), module, sn_vcox::DX_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(param_δy), module, sn_vcox::DY_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(param_m), module, sn_vcox::M_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(SN_VCOX_PARAM_PHI, module, sn_vcox::PHI_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(SN_VCOX_PARAM_M, module, sn_vcox::M_PARAM));
 
     // ... ATT
     addParam(createParamCentered<RoundBlackKnob>(mm2px(param_att), module, sn_vcox::ATT_PARAM));
@@ -436,7 +461,7 @@ sn_vcoxWidget::sn_vcoxWidget(sn_vcox *module) {
     addChild(createLightCentered<XLeftLight<BrightRedLight>>(mm2px(xrr), module, sn_vcox::XRR_LIGHT));
 
     // ... debug
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(debug), module, sn_vcox::DEBUG_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_VCOX_INPUT_DEBUG, module, sn_vcox::DEBUG_INPUT));
 }
 
 void sn_vcoxWidget::appendContextMenu(Menu *menu) {
