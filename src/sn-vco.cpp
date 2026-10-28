@@ -343,6 +343,7 @@ void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
     float A = params[AMPLITUDE_PARAM].getValue();
     float δx = params[DX_PARAM].getValue();
     float δy = params[DY_PARAM].getValue();
+    float φ = params[PHI_PARAM].getValue();
     float m = params[M_PARAM].getValue();
 
     // ... modulate with inputs
@@ -352,11 +353,13 @@ void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
     A += clamp(inputs[AMPLITUDE_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
     δx += clamp(inputs[DX_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
     δy += clamp(inputs[DY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    φ += 90.0f * clamp(inputs[PHI_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
 
     // ... preconditioning
     e = clamp(e, -1.0f, +1.0f);
     s = clamp(s, 0.0f, +5.0f);
     θ = clamp(θ, -89.95f, +89.95f);
+    φ = clamp(φ, -89.95f, +89.95f);
 
     // ... recalculate SN parameters
     sn.ε = std::tanh(s * e);
@@ -364,6 +367,7 @@ void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
     sn.A = clamp(A, 0.0f, +1.0f);
     sn.δx = clamp(δx, -1.0f, +1.0f);
     sn.δy = clamp(δy, -1.0f, +1.0f);
+    sn.Φ = φ * M_PI / 180.0f;
     sn.m = m;
 
     sn.recompute();
@@ -372,20 +376,6 @@ void sn_vco::recompute(const ProcessArgs &args, size_t channels) {
 int sn_vco::channels() {
     return inputs[PITCH_INPUT].isConnected() ? inputs[PITCH_INPUT].getChannels() : CHANNELS;
 }
-
-// float sn_vco::velocity(int channel) {
-//     if (inputs[VELOCITY_INPUT].isConnected()) {
-//         int N = inputs[VELOCITY_INPUT].getChannels();
-//
-//         if (channel < N) {
-//             return inputs[VELOCITY_INPUT].getPolyVoltage(channel) / 10.0f;
-//         } else {
-//             return inputs[VELOCITY_INPUT].getVoltage() / 10.0f;
-//         }
-//     }
-//
-//     return VELOCITY;
-// }
 
 sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
     float left = 7.331;

@@ -107,7 +107,7 @@ struct sn_vco : Module {
         int krate;
         int count;
     } update{
-        .krate = 0,
+        .krate = 2,
         .count = 0,
     };
 
