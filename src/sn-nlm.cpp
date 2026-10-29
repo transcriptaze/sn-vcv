@@ -72,23 +72,6 @@ constexpr struct {
     // clang-format on
 };
 
-struct {
-    double mu_rev_ = 0.15;
-    double b_sat_ = 1.5;
-    double h_c_ = 2.5;
-    double sharpness_ = 1.0;
-} BH;
-
-// mix funtion menu options
-const std::vector<std::string> MIXERS = {
-    "Linear",
-    "Hard limit",
-    "Soft limit",
-    "Expander",
-    "Hysteresis",
-    "sn",
-};
-
 sn_nlm::sn_nlm() {
     INFO("sn-nlm v0.0.0 %d", N_INPUTS);
 
@@ -112,7 +95,7 @@ sn_nlm::sn_nlm() {
     configOutput(OUTX_OUTPUT, "x");
     configOutput(OUTY_OUTPUT, "y");
 
-    // ... initialise interpolation filters
+    // ... initialise mixers
     for (int i = 0; i < N_MIXERS; i++) {
         for (int ch = 0; ch < CHANNELS; ch++) {
             for (int j = 0; j < 25; j++) {
@@ -121,16 +104,6 @@ sn_nlm::sn_nlm() {
         }
     }
 
-    // ... initialise mixers
-    for (size_t i = 0; i < N_MIXERS; i++) {
-        for (size_t ch = 0; ch < CHANNELS; ch++) {
-            mixers[i].hysteresis[ch].prev_h_ = 0.0;
-            mixers[i].hysteresis[ch].current_b_ = 0.0;
-            mixers[i].hysteresis[ch].increasing_ = true;
-        }
-    }
-
-    // ... initialise decimation filters
     for (size_t i = 0; i < 1; i++) {
         for (size_t ch = 0; ch < CHANNELS; ch++) {
             for (size_t j = 0; j < 4; j++) {
@@ -139,10 +112,6 @@ sn_nlm::sn_nlm() {
             }
         }
     }
-
-    AUX.hysteresis.prev_h_ = 0.0;
-    AUX.hysteresis.current_b_ = 0.0;
-    AUX.hysteresis.increasing_ = true;
 
     // ... sn
     float e = -0.8f;
@@ -169,7 +138,6 @@ json_t *sn_nlm::dataToJson() {
     json_object_set_new(root, "attenuation", json_real(attenuation));
     json_object_set_new(root, "gain", json_real(gain));
     json_object_set_new(root, "average", json_boolean(average));
-    json_object_set_new(root, "mixer", json_integer(mixfn));
 
     return root;
 }
@@ -178,7 +146,6 @@ void sn_nlm::dataFromJson(json_t *root) {
     json_t *attenuation = json_object_get(root, "attenuation");
     json_t *gain = json_object_get(root, "gain");
     json_t *average = json_object_get(root, "average");
-    json_t *mixer = json_object_get(root, "mixer");
 
     if (attenuation) {
         float v = json_number_value(attenuation);
@@ -196,34 +163,6 @@ void sn_nlm::dataFromJson(json_t *root) {
 
     if (average) {
         this->average = json_boolean_value(average);
-    }
-
-    if (mixer) {
-        switch (json_integer_value(mixer)) {
-        case LINEAR:
-            this->mixfn = LINEAR;
-            break;
-
-        case HARD_LIMIT:
-            this->mixfn = HARD_LIMIT;
-            break;
-
-        case SOFT_LIMIT:
-            this->mixfn = SOFT_LIMIT;
-            break;
-
-        case EXPAND:
-            this->mixfn = EXPAND;
-            break;
-
-        case HYSTERESIS:
-            this->mixfn = HYSTERESIS;
-            break;
-
-        case SNX:
-            this->mixfn = SNX;
-            break;
-        }
     }
 }
 
@@ -278,7 +217,7 @@ void sn_nlm::processAUX(const ProcessArgs &args) {
 
     double normalized = (static_cast<double>(ramp) / static_cast<double>(MAX_RAMP)) * 2.0 - 1.0;
     float outX = normalized * 5.0f;
-    float outY = mix(g * (outX + outX), AUX.hysteresis);
+    float outY = mix(g * (outX + outX));
 
     outputs[OUTX_OUTPUT].setVoltage(outX, 0);
     outputs[OUTY_OUTPUT].setVoltage(outY, 0);
@@ -297,116 +236,12 @@ void sn_nlm::mix2x4(InputId p, InputId q, mixer &r, sink &s) {
         filter(r.interpolator[ch], in, buffer);
 
         for (int i = 0; i < 4; i++) {
-            s.buffer[ch][i] = mix(buffer[i], r.hysteresis[ch]);
+            s.buffer[ch][i] = mix(buffer[i]);
         }
     }
 }
 
-float sn_nlm::mix(float in, struct hysteresis &h) {
-    switch (mixfn) {
-    case HARD_LIMIT:
-        return hard_limit(in);
-
-    case SOFT_LIMIT:
-        return soft_limit(in);
-
-    case EXPAND:
-        return expand(in);
-
-    case HYSTERESIS:
-        return hysteresis(in, h);
-
-    case SNX:
-        return sn(in);
-
-    default:
-        return linear(in);
-    }
-}
-
-float sn_nlm::linear(float in) {
-    return in;
-}
-
-float sn_nlm::hard_limit(float in) {
-    return clamp(in, -5.0f, 5.0f);
-}
-
-float sn_nlm::soft_limit(float in) {
-    return 5.0f * std::tanh(in / 5.0f);
-}
-
-// cubic soft-clipping: f(x) = x - (x^3)/3
-float sn_nlm::soft_limit_cubic(float in) {
-    float v = in / 5.0f; // normalize to -1..1 range
-
-    if (v <= -1.0f) {
-        return -5.0f;
-    }
-
-    if (v >= 1.0f) {
-        return 5.0f;
-    }
-
-    float shaped = v - (v * v * v) / 3.0f;
-
-    return shaped * 7.5f;
-}
-
-float sn_nlm::expand(float in) {
-    float inʼ = in / gain; // NTS because premultiplied by gain in mixNxM
-
-    float sensitivity = 0.25f;
-    float dampened_gain = 1.0f + sensitivity * (gain - 1.0f);
-    dampened_gain = std::max(0.1f, dampened_gain);
-
-    float effective_gain = dampened_gain * 1.733f;
-    float v = effective_gain * inʼ;
-    float abs_v = std::abs(v);
-
-    // ... flattens center as gain increases
-    float m_low = 0.1f / std::sqrt(dampened_gain);
-
-    // ... ends steepness
-    float m_high = 2.1f;
-
-    // .... (supposedly) widens centre as gain increases (T and W expand outward)
-    float width_multiplier = 1.0f + 1.2f * (dampened_gain - 1.0f);
-    float T = 14.5f * width_multiplier;
-    float W = 5.8f * width_multiplier;
-
-    float delta_m = m_high - m_low;
-    float inner_pos = (abs_v - T) / W;
-    float inner_neg = -T / W;
-
-    float shaped = m_low * abs_v + 0.5f * delta_m * (abs_v + W * (std::log(std::cosh(inner_pos)) - std::log(std::cosh(inner_neg))));
-
-    return (v >= 0.0f) ? shaped : -shaped;
-}
-
-float sn_nlm::hysteresis(float in, struct hysteresis &H) {
-    if (in > H.prev_h_) {
-        H.increasing_ = true;
-    } else if (in < H.prev_h_) {
-        H.increasing_ = false;
-    }
-
-    double target_b;
-    if (H.increasing_) {
-        target_b = (BH.mu_rev_ * in) + (BH.b_sat_ * std::atan((in - BH.h_c_) * BH.sharpness_));
-    } else {
-        target_b = (BH.mu_rev_ * in) + (BH.b_sat_ * std::atan((in + BH.h_c_) * BH.sharpness_));
-    }
-
-    double memory_inertia = 0.35;
-    H.current_b_ += memory_inertia * (target_b - H.current_b_);
-
-    H.prev_h_ = in;
-
-    return H.current_b_;
-}
-
-float sn_nlm::sn(float in) {
+float sn_nlm::mix(float in) {
     float α = clamp(in / 5.0f, -1.0f, +1.0f);
     float αʼ = 0.5f * M_PI * α;
     float υ = _sn.υ(αʼ);
@@ -493,10 +328,6 @@ void sn_nlmWidget::appendContextMenu(Menu *menu) {
     menu->addChild(createMenuLabel("sn-nlm settings"));
 
     menu->addChild(createBoolPtrMenuItem("Average", "", &module->average));
-
-    menu->addChild(createIndexPtrSubmenuItem("Mix function",
-                                             MIXERS,
-                                             &module->mixfn));
 }
 
 } // namespace sn_nlm

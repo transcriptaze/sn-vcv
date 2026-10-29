@@ -12,15 +12,8 @@ struct polyphase100 {
     float state[25];
 };
 
-struct hysteresis {
-    double prev_h_;
-    double current_b_;
-    bool increasing_;
-};
-
 struct mixer {
     struct polyphase100 interpolator[16];
-    struct hysteresis hysteresis[16];
 };
 
 struct sink {
@@ -53,15 +46,6 @@ struct sn_nlm : Module {
         LIGHTS_LEN
     };
 
-    enum MIXFN {
-        LINEAR,
-        HARD_LIMIT,
-        SOFT_LIMIT,
-        EXPAND,
-        HYSTERESIS,
-        SNX,
-    };
-
     constexpr static int INPUTS[] = {IN1_INPUT, IN2_INPUT};
     constexpr static int N_INPUTS = sizeof(INPUTS) / sizeof(int);
     constexpr static int N_MIXERS = 1;
@@ -77,16 +61,7 @@ struct sn_nlm : Module {
     void processAUX(const ProcessArgs &args);
 
     void mix2x4(InputId p, InputId q, mixer &r, sink &s);
-
-    float mix(float in, struct hysteresis &h);
-
-    float linear(float in);
-    float hard_limit(float in);
-    float soft_limit(float in);
-    float soft_limit_cubic(float in);
-    float expand(float in);
-    float hysteresis(float in, struct hysteresis &h);
-    float sn(float in);
+    float mix(float in);
 
     void filter(struct polyphase100 &polyphase, float in, float out[4]);
     float butterworth(struct iir4 &iir, float in[4]);
@@ -95,7 +70,6 @@ struct sn_nlm : Module {
     float attenuation = 0.0f;
     float gain = 1.0f;
     bool average = false;
-    MIXFN mixfn = SOFT_LIMIT;
 
     // ... mix groups
     struct mixer mixers[N_MIXERS];
@@ -104,7 +78,6 @@ struct sn_nlm : Module {
     // ... AUX
     struct {
         uint32_t phase;
-        struct hysteresis hysteresis;
     } AUX{
         .phase = 0,
     };
