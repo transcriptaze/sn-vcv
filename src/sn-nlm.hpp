@@ -23,6 +23,14 @@ struct sink {
 
 struct sn_nlm : Module {
     enum ParamId {
+        ECCENTRICITY_PARAM,
+        SENSITIVITY_PARAM,
+        ROTATION_PARAM,
+        AMPLITUDE_PARAM,
+        DX_PARAM,
+        DY_PARAM,
+        PHI_PARAM,
+        M_PARAM,
         ATTENUATION_PARAM,
         GAIN_PARAM,
         PARAMS_LEN
@@ -31,6 +39,21 @@ struct sn_nlm : Module {
     enum InputId {
         IN1_INPUT,
         IN2_INPUT,
+        IN3_INPUT,
+        IN4_INPUT,
+        IN5_INPUT,
+        IN6_INPUT,
+        IN7_INPUT,
+        IN8_INPUT,
+
+        ECCENTRICITY_INPUT,
+        SENSITIVITY_INPUT,
+        ROTATION_INPUT,
+        AMPLITUDE_INPUT,
+        DX_INPUT,
+        DY_INPUT,
+        PHI_INPUT,
+
         DEBUG_INPUT,
         INPUTS_LEN
     };

@@ -1,19 +1,23 @@
-new module sn-nlm 1U 9H
+new module sn-nlm 1U 13H
 
 set background fundamental
 
-new guide v1 vertical   7.33mm
-new guide v2 vertical   20.35mm
-new guide v3 vertical   35.56mm
-new guide h0 horizontal 7.62mm
-new guide h1 horizontal 23.238mm
-new guide h2 horizontal 36.252mm
-new guide h3 horizontal 49.266mm
-new guide h4 horizontal 62.28mm
-new guide h5 horizontal 75.294mm
-new guide h6 horizontal 88.308mm
-new guide h7 horizontal 101.322mm
-new guide h8 horizontal 114.336mm
+new guide v1  vertical 7.33mm
+new guide v2  vertical 24.13mm
+new guide v3  vertical 38.07mm
+new guide v4x vertical 55.85mm
+new guide v4  vertical 57.12mm
+
+new guide h0  horizontal 7.62mm
+new guide h1  horizontal 23.238mm
+new guide h2  horizontal 36.252mm
+new guide h2x horizontal 42.759mm
+new guide h3  horizontal 49.266mm
+new guide h4  horizontal 62.28mm
+new guide h5  horizontal 75.294mm
+new guide h6  horizontal 88.308mm
+new guide h7  horizontal 101.322mm
+new guide h8  horizontal 114.336mm
 
 new label 'SN NLM' centre,h0 'RobotoCondensed-Bold' 10pt centre,middle #222222,#ebebeb
 
@@ -23,35 +27,72 @@ new input in3   v1,h3 PJ301M
 new input in4   v1,h4 PJ301M
 new input in5   v1,h5 PJ301M
 new input in6   v1,h6 PJ301M
-new input debug v1,h8 PJ301M
+new input in7   v1,h7 PJ301M
+new input in8   v1,h8 PJ301M
 
-new output x   v3,h5 PJ301M
-new output y   v3,h6 PJ301M
-new output out v3,h8 PJ301M
+new input e     v2,h1 PJ301M
+new input s     v2,h2 PJ301M
+new input theta v2,h3 PJ301M
+new input a     v2,h4 PJ301M
+new input dx    v2,h5 PJ301M
+new input dy    v2,h6 PJ301M
+new input phi   v2,h7 PJ301M
+new input debug v4,h7-2.54mm PJ301M
 
-new parameter attenuation v3,h1 RoundBlackKnob
-new parameter gain        v3,h2 RoundBlackKnob
+new output x v4,h5 PJ301M
+new output y v4,h6 PJ301M
+new output a v4,h8 PJ301M
 
-new widget channels v3,h1 ChDsp
+new parameter e     v3,h1 RoundBlackKnob
+new parameter s     v3,h2 RoundBlackKnob
+new parameter theta v3,h3 RoundBlackKnob
+new parameter a     v3,h4 RoundBlackKnob
+new parameter dx    v3,h5 RoundBlackKnob
+new parameter dy    v3,h6 RoundBlackKnob
+new parameter phi   v3,h7 RoundBlackKnob
+new parameter m     v3,h8 RoundBlackKnob
 
-new label 'IN1' v1+6.51mm,h1-3.81mm RobotoBold 8pt centre,baseline
-new label 'IN2' v1+6.51mm,h2-3.81mm RobotoBold 8pt centre,baseline
-new label 'IN3' v1+6.51mm,h3-3.81mm RobotoBold 8pt centre,baseline
-new label 'IN4' v1+6.51mm,h4-3.81mm RobotoBold 8pt centre,baseline
-new label 'IN5' v1+6.51mm,h5-3.81mm RobotoBold 8pt centre,baseline
-new label 'IN6' v1+6.51mm,h6-3.81mm RobotoBold 8pt centre,baseline
+new parameter attenuation v4x,h1  RoundBlackKnob
+new parameter gain        v4x,h2x RoundBlackKnob
 
-new label 'ATT'  v3+0mm,h1-6.35mm RobotoBold 8pt centre,baseline
-new label 'GAIN' v3+0mm,h2+8.81mm RobotoBold 8pt centre,baseline
+new label 'IN1' v1+3.81mm,h1-3.81mm RobotoCondensed-Italic  8pt left,baseline
+new label 'IN2' v1+3.81mm,h2-3.81mm RobotoCondensed-Italic  8pt left,baseline
+new label 'IN3' v1+3.81mm,h3-3.81mm RobotoCondensed-Italic  8pt left,baseline
+new label 'IN4' v1+3.81mm,h4-3.81mm RobotoCondensed-Italic  8pt left,baseline
+new label 'IN5' v1+3.81mm,h5-3.81mm RobotoCondensed-Italic  8pt left,baseline
+new label 'IN6' v1+3.81mm,h6-3.81mm RobotoCondensed-Italic  8pt left,baseline
+new label 'IN7' v1+3.81mm,h7-3.81mm RobotoCondensed-Italic  8pt left,baseline
+new label 'IN8' v1+3.81mm,h8-3.81mm RobotoCondensed-Italic  8pt left,baseline
 
-new label 'X'         v3,h5-5.08mm RobotoBold 8pt centre,baseline #ffffff,#222222
-new label 'Y'         v3,h6-5.08mm RobotoBold 8pt centre,baseline #ffffff,#222222
-new label 'OUT'       v3,h8-5.08mm RobotoBold 8pt centre,baseline #ffffff,#222222
+new label 'ε'  v2+6.51mm,h1-3.81mm RobotoCondensed-Italic 12pt centre,baseline
+new label 's'  v2+6.51mm,h2-3.81mm RobotoCondensed-Italic 12pt centre,baseline
+new label 'θ'  v2+6.51mm,h3-3.81mm RobotoCondensed-Italic 12pt centre,baseline
+new label 'a'  v2+6.51mm,h4-3.81mm RobotoCondensed-Italic 12pt centre,baseline
+new label 'δx' v2+6.51mm,h5-3.81mm RobotoCondensed-Italic 12pt centre,baseline
+new label 'δy' v2+6.51mm,h6-3.81mm RobotoCondensed-Italic 12pt centre,baseline
+new label 'φ'  v2+6.51mm,h7-3.81mm RobotoCondensed-Italic 12pt centre,baseline
+new label 'm'  v2+6.51mm,h8-3.81mm RobotoCondensed-Italic 12pt centre,baseline
 
-decorate (parameter attenuation) with CircularGraduations (scale 1.1)
-decorate (parameter gain) with CircularGraduations (scale 1.1)
+new label 'ATT'  v4+0mm,h1+8.81mm  RobotoBold 8pt centre,baseline
+new label 'GAIN' v4+0mm,h2x+8.81mm RobotoBold 8pt centre,baseline
 
-decorate (output x   +0mm,+5.08mm) with Pad (stretch 1,2.5)
-decorate (output out +0mm,-2.54mm) with Pad (stretch 1,1.5)
+new label 'X' v4,h5-5.08mm RobotoBold 8pt centre,baseline #ffffff,#222222
+new label 'Y' v4,h6-5.08mm RobotoBold 8pt centre,baseline #ffffff,#222222
+new label 'A' v4,h8-5.08mm RobotoBold 8pt centre,baseline #ffffff,#222222
+
+decorate (parameter e)     with CircularGraduations (scale 1.25)
+decorate (parameter s)     with CircularGraduations (scale 1.25)
+decorate (parameter theta) with CircularGraduations (scale 1.25)
+decorate (parameter a)     with CircularGraduations (scale 1.25)
+decorate (parameter dx)    with CircularGraduations (scale 1.25)
+decorate (parameter dy)    with CircularGraduations (scale 1.25)
+decorate (parameter phi)   with CircularGraduations (scale 1.25)
+decorate (parameter m)     with CircularGraduations (scale 1.25)
+
+decorate (parameter attenuation) with CircularGraduations (scale 1.25)
+decorate (parameter gain)        with CircularGraduations (scale 1.25)
+
+decorate (output x +0mm,+5.08mm) with Pad (stretch 1,2.5)
+decorate (output a +0mm,-2.54mm) with Pad (stretch 1,1.5)
 
 

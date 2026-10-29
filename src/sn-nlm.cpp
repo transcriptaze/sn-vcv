@@ -2,19 +2,35 @@
 
 namespace sn_nlm {
 
-const auto SN_NLM_IN1 = mm2px(Vec(7.33, 23.24));
-const auto SN_NLM_IN2 = mm2px(Vec(7.33, 36.25));
-const auto SN_NLM_IN3 = mm2px(Vec(7.33, 49.27));
-const auto SN_NLM_IN4 = mm2px(Vec(7.33, 62.28));
-const auto SN_NLM_IN5 = mm2px(Vec(7.33, 75.29));
-const auto SN_NLM_IN6 = mm2px(Vec(7.33, 88.31));
-const auto SN_NLM_DEBUG = mm2px(Vec(7.33, 114.34));
-const auto SN_NLM_OUTX = mm2px(Vec(35.56, 75.29));
-const auto SN_NLM_OUTY = mm2px(Vec(35.56, 88.31));
-const auto SN_NLM_OUTA = mm2px(Vec(35.56, 114.34));
-const auto SN_NLM_ATTENUATION = mm2px(Vec(35.56, 23.24));
-const auto SN_NLM_GAIN = mm2px(Vec(35.56, 36.25));
-const auto SN_NLM_WIDGET_CHANNELS = mm2px(Vec(35.56, 23.24));
+const auto SN_NLM_INPUT_IN1 = mm2px(Vec(7.33, 23.24));
+const auto SN_NLM_INPUT_IN2 = mm2px(Vec(7.33, 36.25));
+const auto SN_NLM_INPUT_IN3 = mm2px(Vec(7.33, 49.27));
+const auto SN_NLM_INPUT_IN4 = mm2px(Vec(7.33, 62.28));
+const auto SN_NLM_INPUT_IN5 = mm2px(Vec(7.33, 75.29));
+const auto SN_NLM_INPUT_IN6 = mm2px(Vec(7.33, 88.31));
+const auto SN_NLM_INPUT_IN7 = mm2px(Vec(7.33, 101.32));
+const auto SN_NLM_INPUT_IN8 = mm2px(Vec(7.33, 114.34));
+const auto SN_NLM_INPUT_E = mm2px(Vec(24.13, 23.24));
+const auto SN_NLM_INPUT_S = mm2px(Vec(24.13, 36.25));
+const auto SN_NLM_INPUT_THETA = mm2px(Vec(24.13, 49.27));
+const auto SN_NLM_INPUT_A = mm2px(Vec(24.13, 62.28));
+const auto SN_NLM_INPUT_DX = mm2px(Vec(24.13, 75.29));
+const auto SN_NLM_INPUT_DY = mm2px(Vec(24.13, 88.31));
+const auto SN_NLM_INPUT_PHI = mm2px(Vec(24.13, 101.32));
+const auto SN_NLM_INPUT_DEBUG = mm2px(Vec(57.12, 98.78));
+const auto SN_NLM_OUTPUT_X = mm2px(Vec(57.12, 75.29));
+const auto SN_NLM_OUTPUT_Y = mm2px(Vec(57.12, 88.31));
+const auto SN_NLM_OUTPUT_A = mm2px(Vec(57.12, 114.34));
+const auto SN_NLM_PARAM_E = mm2px(Vec(38.07, 23.24));
+const auto SN_NLM_PARAM_S = mm2px(Vec(38.07, 36.25));
+const auto SN_NLM_PARAM_THETA = mm2px(Vec(38.07, 49.27));
+const auto SN_NLM_PARAM_A = mm2px(Vec(38.07, 62.28));
+const auto SN_NLM_PARAM_DX = mm2px(Vec(38.07, 75.29));
+const auto SN_NLM_PARAM_DY = mm2px(Vec(38.07, 88.31));
+const auto SN_NLM_PARAM_PHI = mm2px(Vec(38.07, 101.32));
+const auto SN_NLM_PARAM_M = mm2px(Vec(38.07, 114.34));
+const auto SN_NLM_PARAM_ATTENUATION = mm2px(Vec(55.85, 23.24));
+const auto SN_NLM_PARAM_GAIN = mm2px(Vec(55.85, 42.76));
 
 constexpr double TWO_TO_32 = 4294967296.0; // 2^32
 constexpr uint32_t MAX_RAMP = 2147483647U;
@@ -305,20 +321,43 @@ sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {
     addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     // ... inputs
-    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_IN1, module, sn_nlm::IN1_INPUT));
-    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_IN2, module, sn_nlm::IN2_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_IN1, module, sn_nlm::IN1_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_IN2, module, sn_nlm::IN2_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_IN3, module, sn_nlm::IN3_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_IN4, module, sn_nlm::IN4_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_IN5, module, sn_nlm::IN5_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_IN6, module, sn_nlm::IN6_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_IN7, module, sn_nlm::IN7_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_IN8, module, sn_nlm::IN8_INPUT));
+
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_E, module, sn_nlm::ECCENTRICITY_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_S, module, sn_nlm::SENSITIVITY_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_THETA, module, sn_nlm::ROTATION_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_A, module, sn_nlm::AMPLITUDE_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_DX, module, sn_nlm::DX_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_DY, module, sn_nlm::DY_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_PHI, module, sn_nlm::PHI_INPUT));
 
     // ... outputs
-    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTA, module, sn_nlm::OUTA_OUTPUT));
-    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTX, module, sn_nlm::OUTX_OUTPUT));
-    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTY, module, sn_nlm::OUTY_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTPUT_A, module, sn_nlm::OUTA_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTPUT_X, module, sn_nlm::OUTX_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTPUT_Y, module, sn_nlm::OUTY_OUTPUT));
 
     // ... parameters
-    addParam(createParamCentered<RoundBlackKnob>(SN_NLM_ATTENUATION, module, sn_nlm::ATTENUATION_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(SN_NLM_GAIN, module, sn_nlm::GAIN_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_E, module, sn_nlm::ECCENTRICITY_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_S, module, sn_nlm::SENSITIVITY_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_THETA, module, sn_nlm::ROTATION_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_A, module, sn_nlm::AMPLITUDE_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_DX, module, sn_nlm::DX_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_DY, module, sn_nlm::DY_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_PHI, module, sn_nlm::PHI_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_M, module, sn_nlm::M_PARAM));
+
+    addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_ATTENUATION, module, sn_nlm::ATTENUATION_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_GAIN, module, sn_nlm::GAIN_PARAM));
 
     // ... debug
-    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_DEBUG, module, sn_nlm::DEBUG_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_DEBUG, module, sn_nlm::DEBUG_INPUT));
 }
 
 void sn_nlmWidget::appendContextMenu(Menu *menu) {
