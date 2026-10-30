@@ -13,22 +13,20 @@ const auto SN_NLM_INPUT_IN8 = mm2px(Vec(7.33, 114.34));
 const auto SN_NLM_INPUT_E = mm2px(Vec(24.13, 23.24));
 const auto SN_NLM_INPUT_S = mm2px(Vec(24.13, 36.25));
 const auto SN_NLM_INPUT_THETA = mm2px(Vec(24.13, 49.27));
-const auto SN_NLM_INPUT_A = mm2px(Vec(24.13, 62.28));
-const auto SN_NLM_INPUT_DX = mm2px(Vec(24.13, 75.29));
-const auto SN_NLM_INPUT_DY = mm2px(Vec(24.13, 88.31));
-const auto SN_NLM_INPUT_PHI = mm2px(Vec(24.13, 101.32));
-const auto SN_NLM_INPUT_DEBUG = mm2px(Vec(57.12, 98.78));
+const auto SN_NLM_INPUT_DX = mm2px(Vec(24.13, 62.28));
+const auto SN_NLM_INPUT_DY = mm2px(Vec(24.13, 75.29));
+const auto SN_NLM_INPUT_PHI = mm2px(Vec(24.13, 88.31));
+const auto SN_NLM_INPUT_DEBUG = mm2px(Vec(7.33, 7.62));
 const auto SN_NLM_OUTPUT_X = mm2px(Vec(57.12, 75.29));
 const auto SN_NLM_OUTPUT_Y = mm2px(Vec(57.12, 88.31));
 const auto SN_NLM_OUTPUT_A = mm2px(Vec(57.12, 114.34));
 const auto SN_NLM_PARAM_E = mm2px(Vec(38.07, 23.24));
 const auto SN_NLM_PARAM_S = mm2px(Vec(38.07, 36.25));
 const auto SN_NLM_PARAM_THETA = mm2px(Vec(38.07, 49.27));
-const auto SN_NLM_PARAM_A = mm2px(Vec(38.07, 62.28));
-const auto SN_NLM_PARAM_DX = mm2px(Vec(38.07, 75.29));
-const auto SN_NLM_PARAM_DY = mm2px(Vec(38.07, 88.31));
-const auto SN_NLM_PARAM_PHI = mm2px(Vec(38.07, 101.32));
-const auto SN_NLM_PARAM_M = mm2px(Vec(38.07, 114.34));
+const auto SN_NLM_PARAM_DX = mm2px(Vec(38.07, 62.28));
+const auto SN_NLM_PARAM_DY = mm2px(Vec(38.07, 75.29));
+const auto SN_NLM_PARAM_PHI = mm2px(Vec(38.07, 88.31));
+const auto SN_NLM_PARAM_M = mm2px(Vec(38.07, 101.32));
 const auto SN_NLM_PARAM_ATTENUATION = mm2px(Vec(55.85, 23.24));
 const auto SN_NLM_PARAM_GAIN = mm2px(Vec(55.85, 42.76));
 
@@ -94,12 +92,24 @@ sn_nlm::sn_nlm() {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
     // ... params
+
+    configParam(ECCENTRICITY_PARAM, -1.0f, +1.0f, 0.0f, "ε");
+    configParam(SENSITIVITY_PARAM, 0.0f, +5.0f, 2.5f, "s");
+    configParam(ROTATION_PARAM, -90.0f, +90.0f, 0.0f, "θ");
+    configParam(AMPLITUDE_PARAM, 0.0f, +1.0f, 1.0f, "a");
+    configParam(DX_PARAM, -1.0f, +1.0f, 0.0f, "δx");
+    configParam(DY_PARAM, -1.0f, +1.0f, 0.0f, "δy");
+    configParam(PHI_PARAM, -90.0f, +90.0f, 0.0f, "φ");
+    configSwitch(M_PARAM, 1.f, 5.f, 1.f, "m", {"1", "2", "3", "4", "5"});
+
     configParam(ATTENUATION_PARAM, 0.0f, 1.0f, 0.0f, "attenuation", "");
     configParam<LogGain>(GAIN_PARAM, -1.0f, 1.0f, 0.0f, "gain", "");
 
     getParamQuantity(ATTENUATION_PARAM)->displayPrecision = 1;
+
     getParamQuantity(ATTENUATION_PARAM)->randomizeEnabled = false;
     getParamQuantity(GAIN_PARAM)->randomizeEnabled = false;
+    getParamQuantity(M_PARAM)->randomizeEnabled = false;
 
     // ... inputs
     configInput(IN1_INPUT, "±5V in1");
@@ -154,6 +164,7 @@ json_t *sn_nlm::dataToJson() {
     json_object_set_new(root, "attenuation", json_real(attenuation));
     json_object_set_new(root, "gain", json_real(gain));
     json_object_set_new(root, "average", json_boolean(average));
+    json_object_set_new(root, "k-rate", json_integer(update.krate));
 
     return root;
 }
@@ -162,6 +173,7 @@ void sn_nlm::dataFromJson(json_t *root) {
     json_t *attenuation = json_object_get(root, "attenuation");
     json_t *gain = json_object_get(root, "gain");
     json_t *average = json_object_get(root, "average");
+    json_t *krate = json_object_get(root, "k-rate");
 
     if (attenuation) {
         float v = json_number_value(attenuation);
@@ -180,12 +192,20 @@ void sn_nlm::dataFromJson(json_t *root) {
     if (average) {
         this->average = json_boolean_value(average);
     }
+    if (krate) {
+        int v = json_integer_value(krate);
+
+        if (v >= 0 && v < 4) {
+            update.krate = v;
+        }
+    }
 }
 
 void sn_nlm::process(const ProcessArgs &args) {
     attenuation = params[ATTENUATION_PARAM].getValue();
     gain = std::powf(2.0f, 2.0f * params[GAIN_PARAM].getValue());
 
+    recompute(args);
     mix2x4(IN1_INPUT, IN2_INPUT, mixers[0], sinks[0]);
 
     // ... decimate + anti-alias
@@ -237,6 +257,49 @@ void sn_nlm::processAUX(const ProcessArgs &args) {
 
     outputs[OUTX_OUTPUT].setVoltage(outX, 0);
     outputs[OUTY_OUTPUT].setVoltage(outY, 0);
+}
+
+void sn_nlm::recompute(const ProcessArgs &args) {
+    // ... update parameters?
+    if (--update.count > 0) {
+        return;
+    }
+
+    update.count = KRATE[update.krate];
+
+    // ... param values
+    float e = params[ECCENTRICITY_PARAM].getValue();
+    float s = params[SENSITIVITY_PARAM].getValue();
+    float θ = params[ROTATION_PARAM].getValue();
+    float δx = params[DX_PARAM].getValue();
+    float δy = params[DY_PARAM].getValue();
+    float φ = params[PHI_PARAM].getValue();
+    float m = params[M_PARAM].getValue();
+
+    // ... modulate with inputs
+    e += clamp(inputs[ECCENTRICITY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    s += 5.0f * clamp(inputs[SENSITIVITY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    θ += 90.0f * clamp(inputs[ROTATION_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    δx += clamp(inputs[DX_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    δy += clamp(inputs[DY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    φ += 90.0f * clamp(inputs[PHI_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+
+    // ... preconditioning
+    e = clamp(e, -1.0f, +1.0f);
+    s = clamp(s, 0.0f, +5.0f);
+    θ = clamp(θ, -89.95f, +89.95f);
+    φ = clamp(φ, -89.95f, +89.95f);
+
+    // ... recalculate SN parameters
+    _sn.ε = std::tanh(s * e);
+    _sn.θ = θ * M_PI / 180.0f;
+    _sn.A = 1.0f;
+    _sn.δx = clamp(δx, -0.99f, +0.99f);
+    _sn.δy = clamp(δy, -0.99f, +0.99f);
+    _sn.Φ = φ * M_PI / 180.0f;
+    _sn.m = m;
+
+    _sn.recompute();
 }
 
 void sn_nlm::mix2x4(InputId p, InputId q, mixer &r, sink &s) {
@@ -333,7 +396,7 @@ sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {
     addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_E, module, sn_nlm::ECCENTRICITY_INPUT));
     addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_S, module, sn_nlm::SENSITIVITY_INPUT));
     addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_THETA, module, sn_nlm::ROTATION_INPUT));
-    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_A, module, sn_nlm::AMPLITUDE_INPUT));
+    //  addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_A, module, sn_nlm::AMPLITUDE_INPUT));
     addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_DX, module, sn_nlm::DX_INPUT));
     addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_DY, module, sn_nlm::DY_INPUT));
     addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_PHI, module, sn_nlm::PHI_INPUT));
@@ -347,7 +410,7 @@ sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {
     addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_E, module, sn_nlm::ECCENTRICITY_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_S, module, sn_nlm::SENSITIVITY_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_THETA, module, sn_nlm::ROTATION_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_A, module, sn_nlm::AMPLITUDE_PARAM));
+    //  addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_A, module, sn_nlm::AMPLITUDE_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_DX, module, sn_nlm::DX_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_DY, module, sn_nlm::DY_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_PHI, module, sn_nlm::PHI_PARAM));
@@ -367,6 +430,9 @@ void sn_nlmWidget::appendContextMenu(Menu *menu) {
     menu->addChild(createMenuLabel("sn-nlm settings"));
 
     menu->addChild(createBoolPtrMenuItem("Average", "", &module->average));
+    menu->addChild(createIndexPtrSubmenuItem("k-rate",
+                                             KRATES,
+                                             &module->update.krate));
 }
 
 } // namespace sn_nlm

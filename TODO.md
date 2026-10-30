@@ -37,13 +37,11 @@
 - [ ] Unit tests
 
 ## sn-nlm
-- Baxandall: https://electronics.stackexchange.com/questions/770950/issue-deriving-transfer-function-from-james-baxandall-tonestack-circuit
-
 
 - [x] AUX xy
 - [x] gain
 - [x] attenuation
-- [ ] bypass
+- [x] bypass
 - [x] average
 - [ ] groups
     - (?) 1x8
@@ -55,9 +53,17 @@
 - [ ] channel count
 - [ ] attenuation CV
 - [ ] gain CV
+- [ ] front panel
+     - [ ] line joining input to param
+     - [ ] outputs 1-4
+     - [ ] group widget
 
 ### mixer
-- [ ] sn
+- [x] sn
+- [x] interpolation
+- [ ] antialiasing
+- [ ] DC blocking
+- [ ] SIMD
 
 - https://www.desmos.com/calculator/qqlexwmbsd
 - https://arxiv.org/pdf/2006.02784
@@ -93,6 +99,7 @@
 4. https://www.youtube.com/watch?v=fxzrpfezezE
 5. https://www.youtube.com/watch?v=3depB4EZT7c
 6. https://www.soundonsound.com/techniques/synthesizing-strings-string-machines
+7. Baxandall: https://electronics.stackexchange.com/questions/770950/issue-deriving-transfer-function-from-james-baxandall-tonestack-circuit
 
 
 ## Notes and References

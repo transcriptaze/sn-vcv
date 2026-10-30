@@ -26,7 +26,7 @@ struct sn_nlm : Module {
         ECCENTRICITY_PARAM,
         SENSITIVITY_PARAM,
         ROTATION_PARAM,
-        AMPLITUDE_PARAM,
+        AMPLITUDE_PARAM, // NTS: placeholder - not used
         DX_PARAM,
         DY_PARAM,
         PHI_PARAM,
@@ -49,7 +49,7 @@ struct sn_nlm : Module {
         ECCENTRICITY_INPUT,
         SENSITIVITY_INPUT,
         ROTATION_INPUT,
-        AMPLITUDE_INPUT,
+        AMPLITUDE_INPUT, // NTS: placeholder - not used
         DX_INPUT,
         DY_INPUT,
         PHI_INPUT,
@@ -83,6 +83,7 @@ struct sn_nlm : Module {
     void processBypass(const ProcessArgs &args) override;
     void processAUX(const ProcessArgs &args);
 
+    void recompute(const ProcessArgs &args);
     void mix2x4(InputId p, InputId q, mixer &r, sink &s);
     float mix(float in);
 
@@ -97,6 +98,15 @@ struct sn_nlm : Module {
     // ... mix groups
     struct mixer mixers[N_MIXERS];
     struct sink sinks[N_OUTPUTS];
+
+    // ... recompute
+    struct {
+        int krate;
+        int count;
+    } update{
+        .krate = 2,
+        .count = 0,
+    };
 
     // ... AUX
     struct {
