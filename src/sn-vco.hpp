@@ -31,6 +31,7 @@ struct sn_vco : Module {
         PITCH_INPUT,
         VELOCITY_INPUT,
         PHI_INPUT,
+        RESET_INPUT,
         DEBUG_INPUT,
         INPUTS_LEN
     };
@@ -62,9 +63,11 @@ struct sn_vco : Module {
     int channels();
 
     // ... instance variables
-    dsp::PulseGenerator trigger;
     float frequency[16] = {dsp::FREQ_C4};
     float velocity[16] = {0.f};
+
+    dsp::PulseGenerator trigger;
+    dsp::SchmittTrigger reset;
 
     struct AUX aux = {
         .mode = POLY,

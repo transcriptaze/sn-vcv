@@ -1,30 +1,6 @@
 # TODO
 
-- [ ] [Antialiasing](https://github.com/transcriptaze/sn-vcv/issues/3)
-      - [x] Context menu
-      - [x] sn-vco
-      - [x] sn-vcox
-      - [ ] ALIASING.md
-      - (?) PID
-
-- [ ] Optimisation
-      - [ ] Baseline
-      - https://community.vcvrack.com/t/anyone-has-done-profiling-on-a-module-code/7537/
-      - https://wordsandbuttons.online/challenge_your_performance_intuition_with_cpp_sine.html
-      - https://github.com/grafana/pyroscope
-      - https://stackoverflow.com/questions/11445619/profiling-c-on-mac-os-x
-      - https://stackoverflow.com/questions/3764978/why-hypot-function-is-so-slow
-      - https://mattkretz.github.io/2019/01/18/optimizing-hypot-for-simd.html
-
-- [ ] Dithering
-- [ ] Phase parameter/input
-- [ ] External sync
-- [ ] Phase modulation (all-pass filters, dispersion, etc)
-
-- [ ] Set k-rate in ms
-- [ ] Move sn_vco::dcblocking and sn_vc::antialias to  DCB and AA
-- [ ] Polyphase decimator
-- [ ] Default to AA filter depending on sampling rate
+## In Progress
 
 - [x] DC blocking
 - [x] Clamp input frequency
@@ -33,7 +9,31 @@
 - [x] Initialise module in sn-vco-channels
 - [x] Invoke parent step() in sn-vc-channels
 
+- [x] Phase parameter/input
+    - [ ] Rather use lowercase phi symbol on front panel
+- [x] RESET input
+    - [ ] Rename LFO sync input
+
+- [ ] [Antialiasing](https://github.com/transcriptaze/sn-vcv/issues/3)
+      - [x] Context menu
+      - [x] sn-vco
+      - [x] sn-vcox
+      - [ ] Polyphase decimator
+      - [ ] ALIASING.md
+      - (?) PID
+
+- [ ] Move sn_vco::dcblocking and sn_vc::antialias to  DCB and AA
+- [ ] Default to AA filter depending on sampling rate
+
+### To Be Done
+
+- (?) Set k-rate in ms
+- [ ] Hard sync
+- [ ] Soft sync
 - [ ] Unit tests
+- [ ] Dithering
+- [ ] Phase modulation (all-pass filters, dispersion, etc)
+
 
 ## R & D
 
@@ -57,4 +57,9 @@
 8. https://www.youtube.com/watch?v=yV52TMdGkng
 9. https://surge-synthesizer.github.io/manual-xt/#string
 
-
+10. https://community.vcvrack.com/t/anyone-has-done-profiling-on-a-module-code/7537/
+11. https://wordsandbuttons.online/challenge_your_performance_intuition_with_cpp_sine.html
+12. https://github.com/grafana/pyroscope
+13. https://stackoverflow.com/questions/11445619/profiling-c-on-mac-os-x
+14. https://stackoverflow.com/questions/3764978/why-hypot-function-is-so-slow
+15. https://mattkretz.github.io/2019/01/18/optimizing-hypot-for-simd.html

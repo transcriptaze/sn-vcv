@@ -8,12 +8,15 @@ const auto SN_VCO_INPUT_A = mm2px(Vec(7.33, 62.28));
 const auto SN_VCO_INPUT_DX = mm2px(Vec(7.33, 75.29));
 const auto SN_VCO_INPUT_DY = mm2px(Vec(7.33, 88.31));
 const auto SN_VCO_INPUT_PHI = mm2px(Vec(7.33, 101.32));
-const auto SN_VCO_INPUT_DEBUG = mm2px(Vec(35.56, 98.78));
 const auto SN_VCO_INPUT_PITCH = mm2px(Vec(35.56, 36.25));
 const auto SN_VCO_INPUT_VELOCITY = mm2px(Vec(35.56, 49.27));
-const auto SN_VCO_OUTUT_AUX = mm2px(Vec(35.56, 75.29));
-const auto SN_VCO_OUTUT_TRIGGER = mm2px(Vec(35.56, 88.31));
-const auto SN_VCO_OUTUT_VCO = mm2px(Vec(35.56, 114.34));
+const auto SN_VCO_INPUT_RESET = mm2px(Vec(35.56, 62.28));
+const auto SN_VCO_INPUT_DEBUG = mm2px(Vec(7.33, 7.62));
+
+const auto SN_VCO_OUTPUT_AUX = mm2px(Vec(35.56, 75.29));
+const auto SN_VCO_OUTPUT_TRIGGER = mm2px(Vec(35.56, 88.31));
+const auto SN_VCO_OUTPUT_VCO = mm2px(Vec(35.56, 114.34));
+
 const auto SN_VCO_PARAM_E = mm2px(Vec(20.35, 23.24));
 const auto SN_VCO_PARAM_S = mm2px(Vec(20.35, 36.25));
 const auto SN_VCO_PARAM_THETA = mm2px(Vec(20.35, 49.27));
@@ -22,13 +25,14 @@ const auto SN_VCO_PARAM_DX = mm2px(Vec(20.35, 75.29));
 const auto SN_VCO_PARAM_DY = mm2px(Vec(20.35, 88.31));
 const auto SN_VCO_PARAM_PHI = mm2px(Vec(20.35, 101.32));
 const auto SN_VCO_PARAM_M = mm2px(Vec(20.35, 114.34));
+
 const auto SN_VCO_WIDGET_CHANNELS = mm2px(Vec(35.56, 23.24));
 
 const int sn_vco::CHANNELS = 1;
 const float sn_vco::VELOCITY = 1.0f;
 
 sn_vco::sn_vco() {
-    INFO("sn-vco v2.0.1");
+    INFO("sn-vco v2.0.1x");
 
     // ... params
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -55,6 +59,7 @@ sn_vco::sn_vco() {
 
     configInput(PITCH_INPUT, "1V/octave pitch");
     configInput(VELOCITY_INPUT, "0-10V velocity");
+    configInput(RESET_INPUT, "Reset");
 
     configInput(DEBUG_INPUT, "debug");
 
@@ -63,7 +68,7 @@ sn_vco::sn_vco() {
     configOutput(AUX_OUTPUT, "AUX");
     configOutput(AUX_TRIGGER, "Trigger");
 
-    // ... reset trigger
+    // ... reset AUX trigger
     trigger.reset();
 
     // ... anti-aliasing
@@ -164,6 +169,13 @@ void sn_vco::process(const ProcessArgs &args) {
     lights[XRR_LIGHT].setBrightnessSmooth(xrr ? 1.0 : 0.f, args.sampleTime);
 
     // ... generate
+
+    if (reset.process(inputs[RESET_INPUT].getVoltage())) {
+        for (size_t ch = 0; ch < channels; ch++) {
+            vco[ch].α = 0.0f;
+        }
+    }
+
     recompute(args, channels);
     processVCO(args, channels, expanded);
     processAUX(args, expanded);
@@ -453,9 +465,10 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
     // ... m,
     addParam(createParamCentered<RoundBlackKnob>(SN_VCO_PARAM_M, module, sn_vco::M_PARAM));
 
-    // ... pitch and velocity inputs
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(pitch), module, sn_vco::PITCH_INPUT));
-    addInput(createInputCentered<ThemedPJ301MPort>(mm2px(velocity), module, sn_vco::VELOCITY_INPUT));
+    // ... pitch, velocity and reset inputs
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_VCO_INPUT_PITCH, module, sn_vco::PITCH_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_VCO_INPUT_VELOCITY, module, sn_vco::VELOCITY_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_VCO_INPUT_RESET, module, sn_vco::RESET_INPUT));
 
     // ... aux, trigger and VCO outputs
     addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(aux), module, sn_vco::AUX_OUTPUT));
