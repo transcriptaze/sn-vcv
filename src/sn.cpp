@@ -41,21 +41,21 @@ const std::vector<std::string> ALIASING = {
 
 // SN
 void SN::recompute() {
-    const float εʼ = std::sqrt(1.0f - ε * ε);
-    const float a = (ε < 0.0f) ? εʼ : 1.0f;
-    const float b = (ε > 0.0f) ? εʼ : 1.0f;
+    const double εʼ = std::sqrt(1.0f - ε * ε);
+    const double a = (ε < 0.0f) ? εʼ : 1.0f;
+    const double b = (ε > 0.0f) ? εʼ : 1.0f;
 
-    const float cosθ = std::cos(θ);
-    const float sinθ = std::sin(θ);
-    const float tanθ = std::tan(θ);
+    const double cosθ = std::cos(θ);
+    const double sinθ = std::sin(θ);
+    const double tanθ = std::tan(θ);
 
-    const float u = std::atan2(-b * tanθ, a);
-    const float v = std::atan2(a * b, tanθ);
+    const double u = std::atan2(-b * tanθ, a);
+    const double v = std::atan2(a * b, tanθ);
 
-    const float tx = a * std::cos(u) * cosθ - b * std::sin(u) * sinθ;
-    const float ty = b * std::sin(v) * cosθ + a * std::cos(v) * sinθ;
-    const float δxʼ = tx * δx;
-    const float δyʼ = ty * δy;
+    const double tx = a * std::cos(u) * cosθ - b * std::sin(u) * sinθ;
+    const double ty = b * std::sin(v) * cosθ + a * std::cos(v) * sinθ;
+    const double δxʼ = tx * δx;
+    const double δyʼ = ty * δy;
     const double δθ = Φ - θ;
 
     ζ.pʼ = A * a * cosθ;

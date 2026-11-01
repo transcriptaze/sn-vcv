@@ -81,17 +81,17 @@ typedef struct AUX {
 
 // SN
 typedef struct Ζ {
-    float pʼ;
-    float qʼ;
-    float rʼ;
-    float sʼ;
-    float tʼ;
-    float uʼ;
-    float φ;
+    double pʼ;
+    double qʼ;
+    double rʼ;
+    double sʼ;
+    double tʼ;
+    double uʼ;
+    double φ;
 } Ζ;
 
 typedef struct SN {
-    SN(float ε, float θ, float A, float δx, float δy, float Φ, float m) {
+    SN(double ε, double θ, double A, double δx, double δy, double Φ, double m) {
         this->ε = ε;
         this->θ = θ;
         this->A = A;
@@ -101,13 +101,13 @@ typedef struct SN {
         this->m = m;
     }
 
-    float ε;
-    float θ;
-    float A;
-    float δx;
-    float δy;
-    float Φ;
-    float m;
+    double ε;
+    double θ;
+    double A;
+    double δx;
+    double δy;
+    double Φ;
+    double m;
 
     struct Ζ ζ = {
         .pʼ = 1.f,
