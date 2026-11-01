@@ -10,6 +10,7 @@
 
 - [ ] Optimisation
       - [ ] Baseline
+      - https://lemire.me/blog/2026/10/26/billion-query-per-second-lookup-tables-in-c/
       - https://community.vcvrack.com/t/anyone-has-done-profiling-on-a-module-code/7537/
       - https://wordsandbuttons.online/challenge_your_performance_intuition_with_cpp_sine.html
       - https://github.com/grafana/pyroscope
@@ -44,9 +45,9 @@
 - [x] bypass
 - [x] average
 - [ ] groups
-    - (?) 1x8
-    - [x] 2x4
+    - [ ] 2x4
     - [ ] 4x2
+    - (?) 1x8
     - (?) 8x1
 
 - [ ] isConnected
@@ -100,6 +101,7 @@
 5. https://www.youtube.com/watch?v=3depB4EZT7c
 6. https://www.soundonsound.com/techniques/synthesizing-strings-string-machines
 7. Baxandall: https://electronics.stackexchange.com/questions/770950/issue-deriving-transfer-function-from-james-baxandall-tonestack-circuit
+8. https://lemire.me/blog/2026/10/26/billion-query-per-second-lookup-tables-in-c/
 
 
 ## Notes and References
