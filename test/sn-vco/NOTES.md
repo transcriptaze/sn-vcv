@@ -15,8 +15,16 @@ Working notes for optimising _sn-vco_ infrastructure.
 
 ### performance
 
-  |            | sn-debug | vcv | squinky | sn-vco | sn-vco_4x1 | sn-vco_4x2 |
-  |:-----------|----------|-----|---------|--------|------------|------------|
-  | baseline   | 8%       | 25% |         | 34%    | 48.75%     | 49.5%      |
-  | υ4         |          |     |         | 30%    | 45%        | 48.75%     |
+  |             | sn-debug | vcv | squinky | sn-vco | sn-vco_4x1 | sn-vco_4x2 |
+  |:------------|----------|-----|---------|--------|------------|------------|
+  | baseline    | 8%       | 25% |         | 34%    | 48.75%     | 49.5%      |
+  | υ4          |          |     |         | 30%    | 45%        | 48.75%     |
+
+### sn-debug
+
+  |               | load |
+  |:--------------|------|
+  | baseline      | 8%   |
+  | per-channel α | 9%   |
+
 
