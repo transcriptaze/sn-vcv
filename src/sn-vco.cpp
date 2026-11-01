@@ -171,7 +171,7 @@ void sn_vco::process(const ProcessArgs &args) {
     // ... generate
 
     if (reset.process(inputs[RESET_INPUT].getVoltage())) {
-        for (size_t ch = 0; ch < channels; ch++) {
+        for (int ch = 0; ch < channels; ch++) {
             vco[ch].α = 0.0f;
         }
     }
