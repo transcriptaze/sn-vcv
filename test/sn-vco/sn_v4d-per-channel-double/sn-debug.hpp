@@ -30,7 +30,7 @@ struct sn_debug : Module {
     void processVCO(const ProcessArgs &args, int channels);
 
     double φ[16] = {};
-    struct SN sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
+    struct SN sn = SN(0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 };
 
 struct sn_debugWidget : ModuleWidget {
