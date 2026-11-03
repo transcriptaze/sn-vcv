@@ -86,6 +86,7 @@ json_t *sn_vco::dataToJson() {
     json_object_set_new(root, "aux-gain", json_integer(aux.gain));
     json_object_set_new(root, "anti-alias", json_integer(antialias));
     json_object_set_new(root, "dc-blocking", json_integer(dcblocking));
+    json_object_set_new(root, "soft-sync", json_boolean(softSync.enabled));
 
     return root;
 }
@@ -96,6 +97,7 @@ void sn_vco::dataFromJson(json_t *root) {
     json_t *gain = json_object_get(root, "aux-gain");
     json_t *antialias = json_object_get(root, "anti-alias");
     json_t *dcblocking = json_object_get(root, "dc-blocking");
+    json_t *softSync = json_object_get(root, "soft-sync");
 
     if (krate) {
         int v = json_integer_value(krate);
@@ -130,6 +132,10 @@ void sn_vco::dataFromJson(json_t *root) {
 
     if (dcblocking) {
         this->dcblocking = DCF::int2mode(json_integer_value(dcblocking), this->dcblocking);
+    }
+
+    if (softSync) {
+        this->softSync.enabled = json_boolean_value(softSync);
     }
 }
 
@@ -171,8 +177,12 @@ void sn_vco::process(const ProcessArgs &args) {
     // ... generate
 
     if (reset.process(inputs[RESET_INPUT].getVoltage())) {
-        for (int ch = 0; ch < channels; ch++) {
-            vco[ch].α = 0.0f;
+        if (softSync.enabled) {
+            softSync.backward = !softSync.backward;
+        } else {
+            for (int ch = 0; ch < channels; ch++) {
+                vco[ch].α = 0.0f;
+            }
         }
     }
 
@@ -198,6 +208,10 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
     bool connected = outputs[VCO_OUTPUT].isConnected();
     float dt = args.sampleTime;
     int oversampling = AA::oversampling(antialias);
+
+    if (softSync.enabled && softSync.backward) {
+        dt = -dt;
+    }
 
     double δ[4];
     double phase[4][16];
@@ -498,6 +512,8 @@ void sn_vcoWidget::appendContextMenu(Menu *menu) {
     menu->addChild(createIndexPtrSubmenuItem("k-rate",
                                              KRATES,
                                              &module->update.krate));
+
+    menu->addChild(createBoolPtrMenuItem("Soft sync", "", &module->softSync.enabled));
 
     menu->addChild(createIndexPtrSubmenuItem("AUX mode",
                                              AUX_MODES,

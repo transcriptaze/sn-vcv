@@ -31,8 +31,8 @@ headless: format install
 
 debug: build
 	mkdir -p workdir/sn/plugins-mac-arm64
-	cp -r dist/*.vcvplugin ./workdir/sn/plugins-mac-arm64
-	$(BIN) --user ~/Development/sn/sn-vcv/workdir/sn
+	cp -r dist/*.vcvplugin ./workdir/debug/plugins-mac-arm64
+	$(BIN) --user ~/Development/sn/sn-vcv/workdir/debug
 
 sn: build
 	mkdir -p workdir/sn/plugins-mac-arm64

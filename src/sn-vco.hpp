@@ -114,6 +114,15 @@ struct sn_vco : Module {
         .count = 0,
     };
 
+    // ... sync
+    struct {
+        bool enabled;
+        bool backward;
+    } softSync = {
+        .enabled = false,
+        .backward = false,
+    };
+
     // ... expanders
     struct {
         sn_expander<sn_vco_message> left;
