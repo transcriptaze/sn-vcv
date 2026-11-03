@@ -7,6 +7,7 @@
 2. DC blocking filters for _sn-vco_ and _sn-vcox_.
 3. Phase parameter and input for _sn-vco_ and _sn-vcox_.
 3. Reset input to _sn-vco_.
+4. 'soft sync'.
 
 ### Updates
 1. Clamped input range for _sn-vco_ to [C1,C8].

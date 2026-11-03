@@ -8,11 +8,15 @@
 - [x] Fix tags in plugin.json
 - [x] Initialise module in sn-vco-channels
 - [x] Invoke parent step() in sn-vc-channels
-
+- [x] Hard sync
+- [x] Soft sync
 - [x] Phase parameter/input
     - [ ] Rather use lowercase phi symbol on front panel
+
 - [x] RESET input
-    - [ ] Rename LFO sync input
+    - [ ] Rename to SYNC
+
+- [ ] TRIG out
 
 - [ ] [Antialiasing](https://github.com/transcriptaze/sn-vcv/issues/3)
       - [x] Context menu
@@ -20,7 +24,6 @@
       - [x] sn-vcox
       - [ ] Polyphase decimator
       - [ ] ALIASING.md
-      - (?) PID
 
 - [ ] Move sn_vco::dcblocking and sn_vc::antialias to  DCB and AA
 - [ ] Default to AA filter depending on sampling rate
@@ -28,8 +31,6 @@
 ### To Be Done
 
 - (?) Set k-rate in ms
-- [ ] Hard sync
-- [ ] Soft sync
 - [ ] Unit tests
 - [ ] Dithering
 - [ ] Phase modulation (all-pass filters, dispersion, etc)
