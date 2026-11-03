@@ -6,6 +6,7 @@
 4. [Can someone explain waveshaping to me?](https://dsp.stackexchange.com/questions/46461/can-someone-explain-waveshaping-to-me?noredirect=1&lq=1)
 5. [Monotonic, symmetrical soft-clipping polynomial](https://dsp.stackexchange.com/questions/36202/monotonic-symmetrical-soft-clipping-polynomial)
 6. [When concatenating sine waves, how do I phase shift in order to prevent "pops" caused by sudden jumps in amplitude?](https://dsp.stackexchange.com/questions/83009/when-concatenating-sine-waves-how-do-i-phase-shift-in-order-to-prevent-pops-c)
+7. https://dsp.stackexchange.com/questions/36628/how-does-parallel-structure-implementation-of-iir-speed-up-the-process-what-ha
 
 
 ## Aliasing
