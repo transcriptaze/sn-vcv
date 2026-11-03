@@ -27,7 +27,7 @@ new input phi   v1,h7 PJ301M
 
 new input pitch    v3,h2 PJ301M
 new input velocity v3,h3 PJ301M
-new input reset    v3,h4 PJ301M
+new input sync     v3,h4 PJ301M
 
 new input debug v1,h0 PJ301M
 
@@ -58,7 +58,7 @@ new label 'm'  v1+6.51mm,h8-3.81mm RobotoCondensed-Italic 12pt centre,baseline
 new label 'CHAN'      v3,h1-3.81mm  RobotoBold 7pt centre,baseline
 new label 'V/OCT'     v3,h2-3.81mm  RobotoBold 7pt centre,baseline
 new label 'VELOCITY'  v3,h3-3.81mm  RobotoBold 7pt centre,baseline
-new label 'RESET'     v3,h4-4.445mm RobotoBold 7pt centre,bottom
+new label 'SYNC'      v3,h4-4.445mm RobotoBold 7pt centre,bottom
 new label 'AUX'       v3,h5-3.81mm  RobotoBold 7pt centre,baseline #ffffff,#222222
 new label 'TRIG'      v3,h6-3.81mm  RobotoBold 7pt centre,baseline #ffffff,#222222
 new label 'VCO'       v3,h8-3.81mm  RobotoBold 7pt centre,baseline #ffffff,#222222

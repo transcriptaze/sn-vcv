@@ -14,7 +14,7 @@
     - [ ] Rather use lowercase phi symbol on front panel
 
 - [x] RESET input
-    - [ ] Rename to SYNC
+    - [x] Rename to SYNC
 
 - [ ] TRIG out
 

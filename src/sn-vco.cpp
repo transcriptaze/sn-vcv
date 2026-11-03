@@ -10,7 +10,7 @@ const auto SN_VCO_INPUT_DY = mm2px(Vec(7.33, 88.31));
 const auto SN_VCO_INPUT_PHI = mm2px(Vec(7.33, 101.32));
 const auto SN_VCO_INPUT_PITCH = mm2px(Vec(35.56, 36.25));
 const auto SN_VCO_INPUT_VELOCITY = mm2px(Vec(35.56, 49.27));
-const auto SN_VCO_INPUT_RESET = mm2px(Vec(35.56, 62.28));
+const auto SN_VCO_INPUT_SYNC = mm2px(Vec(35.56, 62.28));
 const auto SN_VCO_INPUT_DEBUG = mm2px(Vec(7.33, 7.62));
 
 const auto SN_VCO_OUTPUT_AUX = mm2px(Vec(35.56, 75.29));
@@ -59,7 +59,7 @@ sn_vco::sn_vco() {
 
     configInput(PITCH_INPUT, "1V/octave pitch");
     configInput(VELOCITY_INPUT, "0-10V velocity");
-    configInput(RESET_INPUT, "Reset");
+    configInput(SYNC_INPUT, "Sync");
 
     configInput(DEBUG_INPUT, "debug");
 
@@ -176,7 +176,7 @@ void sn_vco::process(const ProcessArgs &args) {
 
     // ... generate
 
-    if (reset.process(inputs[RESET_INPUT].getVoltage())) {
+    if (sync.process(inputs[SYNC_INPUT].getVoltage())) {
         if (softSync.enabled) {
             softSync.backward = !softSync.backward;
         } else {
@@ -482,7 +482,7 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
     // ... pitch, velocity and reset inputs
     addInput(createInputCentered<ThemedPJ301MPort>(SN_VCO_INPUT_PITCH, module, sn_vco::PITCH_INPUT));
     addInput(createInputCentered<ThemedPJ301MPort>(SN_VCO_INPUT_VELOCITY, module, sn_vco::VELOCITY_INPUT));
-    addInput(createInputCentered<ThemedPJ301MPort>(SN_VCO_INPUT_RESET, module, sn_vco::RESET_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_VCO_INPUT_SYNC, module, sn_vco::SYNC_INPUT));
 
     // ... aux, trigger and VCO outputs
     addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(aux), module, sn_vco::AUX_OUTPUT));
