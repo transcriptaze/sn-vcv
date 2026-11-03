@@ -33,7 +33,8 @@ new input debug v1,h0 PJ301M
 
 new output aux     v3,h5 PJ301M
 new output trigger v3,h6 PJ301M
-new output vco     v3,h8 PJ301M
+new output vco     v3,h7 PJ301M
+new output sync    v3,h8 PJ301M
 
 new parameter e     v2,h1 RoundBlackKnob
 new parameter s     v2,h2 RoundBlackKnob
@@ -61,7 +62,8 @@ new label 'VELOCITY'  v3,h3-3.81mm  RobotoBold 7pt centre,baseline
 new label 'SYNC'      v3,h4-4.445mm RobotoBold 7pt centre,bottom
 new label 'AUX'       v3,h5-3.81mm  RobotoBold 7pt centre,baseline #ffffff,#222222
 new label 'TRIG'      v3,h6-3.81mm  RobotoBold 7pt centre,baseline #ffffff,#222222
-new label 'VCO'       v3,h8-3.81mm  RobotoBold 7pt centre,baseline #ffffff,#222222
+new label 'VCO'       v3,h7-4.445mm RobotoBold 7pt centre,baseline #ffffff,#222222
+new label 'SYNC'      v3,h8-4.445mm RobotoBold 7pt centre,bottom   #ffffff,#222222
 
 decorate (parameter e)     with CircularGraduations (scale 1.1)
 decorate (parameter s)     with CircularGraduations (scale 1.1)
@@ -72,6 +74,6 @@ decorate (parameter dy)    with CircularGraduations (scale 1.1)
 decorate (parameter m)     with CircularGraduations (scale 1.1)
 
 decorate (output aux +0mm,+5.08mm) with Pad (stretch 1,2.5)
-decorate (output vco +0mm,-2.54mm) with Pad (stretch 1,1.5)
+decorate (output vco +0mm,+5.08mm) with Pad (stretch 1,2.5)
 
 

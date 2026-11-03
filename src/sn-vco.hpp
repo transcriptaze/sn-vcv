@@ -40,6 +40,7 @@ struct sn_vco : Module {
         AUX_OUTPUT,
         AUX_TRIGGER,
         VCO_OUTPUT,
+        SYNC_OUTPUT,
         OUTPUTS_LEN
     };
 
@@ -66,8 +67,9 @@ struct sn_vco : Module {
     float frequency[16] = {dsp::FREQ_C4};
     float velocity[16] = {0.f};
 
+    dsp::SchmittTrigger syncIn;
+    dsp::PulseGenerator syncOut;
     dsp::PulseGenerator trigger;
-    dsp::SchmittTrigger sync;
 
     struct AUX aux = {
         .mode = POLY,

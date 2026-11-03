@@ -37,6 +37,7 @@ struct sn_vcox : Module {
         AUX_OUTPUT,
         VCO_OUTPUT,
         VCO_SUM_OUTPUT,
+        SYNC_OUTPUT,
         OUTPUTS_LEN
     };
 
@@ -91,6 +92,9 @@ struct sn_vcox : Module {
         .phase = 0.f,
         .out = {.osc = 0.f, .sum = 0.f},
     };
+
+    // ... sync
+    dsp::PulseGenerator syncOut;
 
     // ... state update
     struct {

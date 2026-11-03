@@ -7,10 +7,11 @@ const auto SN_VCOX_INPUT_A = mm2px(Vec(7.33, 62.28));
 const auto SN_VCOX_INPUT_DX = mm2px(Vec(7.33, 75.29));
 const auto SN_VCOX_INPUT_DY = mm2px(Vec(7.33, 88.31));
 const auto SN_VCOX_INPUT_PHI = mm2px(Vec(7.33, 101.32));
-const auto SN_VCOX_INPUT_DEBUG = mm2px(Vec(35.56, 87.04));
-const auto SN_VCOX_OUTUT_AUX = mm2px(Vec(35.56, 75.29));
-const auto SN_VCOX_OUTUT_VCO = mm2px(Vec(35.56, 101.32));
-const auto SN_VCOX_OUTUT_SUM = mm2px(Vec(35.56, 114.34));
+const auto SN_VCOX_INPUT_DEBUG = mm2px(Vec(7.33, 7.62));
+const auto SN_VCOX_OUTPUT_AUX = mm2px(Vec(35.56, 62.28));
+const auto SN_VCOX_OUTPUT_VCO = mm2px(Vec(35.56, 88.31));
+const auto SN_VCOX_OUTPUT_SUM = mm2px(Vec(35.56, 101.32));
+const auto SN_VCOX_OUTPUT_SYNC = mm2px(Vec(35.56, 114.34));
 const auto SN_VCOX_PARAM_E = mm2px(Vec(20.35, 23.24));
 const auto SN_VCOX_PARAM_S = mm2px(Vec(20.35, 36.25));
 const auto SN_VCOX_PARAM_THETA = mm2px(Vec(20.35, 49.27));
@@ -52,9 +53,10 @@ sn_vcox::sn_vcox() {
     configInput(PHI_INPUT, "±5V φ");
 
     // ... outputs
+    configOutput(AUX_OUTPUT, "AUX");
     configOutput(VCO_OUTPUT, "VCO");
     configOutput(VCO_SUM_OUTPUT, "VCO-Σ");
-    configOutput(AUX_OUTPUT, "AUX");
+    configOutput(SYNC_OUTPUT, "Sync");
 
     // ... expanders
     getLeftExpander().producerMessage = &expanders.left.messages[0];
@@ -62,6 +64,9 @@ sn_vcox::sn_vcox() {
 
     getRightExpander().producerMessage = &expanders.right.messages[0];
     getRightExpander().consumerMessage = &expanders.right.messages[1];
+
+    // ... reset SYNC trigger
+    syncOut.reset();
 }
 
 bool sn_vcox::isLinkedLeft() {
@@ -449,10 +454,11 @@ sn_vcoxWidget::sn_vcoxWidget(sn_vcox *module) {
     // ... ATT
     addParam(createParamCentered<RoundBlackKnob>(mm2px(param_att), module, sn_vcox::ATT_PARAM));
 
-    // ... aux, VCO and VCO-Σ outputs
-    addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(aux), module, sn_vcox::AUX_OUTPUT));
-    addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(vco), module, sn_vcox::VCO_OUTPUT));
-    addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(vcox), module, sn_vcox::VCO_SUM_OUTPUT));
+    // ... aux, VCO, VCO-Σ and SYNC outputs
+    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_VCOX_OUTPUT_AUX, module, sn_vcox::AUX_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_VCOX_OUTPUT_VCO, module, sn_vcox::VCO_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_VCOX_OUTPUT_SUM, module, sn_vcox::VCO_SUM_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_VCOX_OUTPUT_SYNC, module, sn_vcox::SYNC_OUTPUT));
 
     // ... expander indicators
     addChild(createLightCentered<XRightLight<DarkGreenLight>>(mm2px(xll), module, sn_vcox::XLL_LIGHT));

@@ -25,11 +25,13 @@ new input a     v1,h4 PJ301M
 new input dx    v1,h5 PJ301M
 new input dy    v1,h6 PJ301M
 new input phi   v1,h7 PJ301M
-new input debug v3,h6-1.27mm PJ301M
 
-new output aux     v3,h5 PJ301M
-new output vco     v3,h7 PJ301M
-new output sum     v3,h8 PJ301M
+new input debug v1,h0 PJ301M
+
+new output aux     v3,h4 PJ301M
+new output vco     v3,h6 PJ301M
+new output sum     v3,h7 PJ301M
+new output sync    v3,h8 PJ301M
 
 new parameter e     v2,h1 RoundBlackKnob
 new parameter s     v2,h2 RoundBlackKnob
@@ -51,10 +53,11 @@ new label 'δy' v1+6.51mm,h6-3.81mm RobotoCondensed-Italic 12pt centre,baseline
 new label 'φ'  v1+6.51mm,h7-3.81mm RobotoCondensed-Italic 12pt centre,baseline
 new label 'm'  v1+6.51mm,h8-3.81mm RobotoCondensed-Italic 12pt centre,baseline
 
-new label 'ATT'   v3,h1x+7.62mm  RobotoBold 12pt centre,baseline #222222,#ffffff
-new label 'AUX'   v3,h5-3.81mm   RobotoBold 12pt centre,baseline #ffffff,#222222
-new label 'VCO'   v3,h7-3.81mm   RobotoBold 12pt centre,baseline #ffffff,#222222
-new label 'VCO-Σ' v3,h8-3.81mm   RobotoBold 12pt centre,baseline #ffffff,#222222
+new label 'ATT'   v3,h1x+7.62mm  RobotoBold 7pt centre,baseline #222222,#ffffff
+new label 'AUX'   v3,h4-4.445mm  RobotoBold 7pt centre,baseline #ffffff,#222222
+new label 'VCO'   v3,h6-4.445mm  RobotoBold 7pt centre,baseline #ffffff,#222222
+new label 'VCO-Σ' v3,h7-4.445mm  RobotoBold 7pt centre,baseline #ffffff,#222222
+new label 'SYNC'  v3,h8-4.445mm  RobotoBold 7pt centre,baseline #ffffff,#222222
 
 decorate (parameter e)     with CircularGraduations (scale 1.1)
 decorate (parameter s)     with CircularGraduations (scale 1.1)
@@ -66,6 +69,6 @@ decorate (parameter phi)   with CircularGraduations (scale 1.1)
 decorate (parameter m)     with CircularGraduations (scale 1.1)
 
 decorate (output aux +0mm,-1.27mm) with Pad (stretch 1,1.5)
-decorate (output vco +0mm,+5.08mm) with Pad (stretch 1,2.75)
+decorate (output vco +0mm,+11.43mm) with Pad (stretch 1,4.0)
 
 

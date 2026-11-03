@@ -15,7 +15,8 @@ const auto SN_VCO_INPUT_DEBUG = mm2px(Vec(7.33, 7.62));
 
 const auto SN_VCO_OUTPUT_AUX = mm2px(Vec(35.56, 75.29));
 const auto SN_VCO_OUTPUT_TRIGGER = mm2px(Vec(35.56, 88.31));
-const auto SN_VCO_OUTPUT_VCO = mm2px(Vec(35.56, 114.34));
+const auto SN_VCO_OUTPUT_VCO = mm2px(Vec(35.56, 101.32));
+const auto SN_VCO_OUTPUT_SYNC = mm2px(Vec(35.56, 114.34));
 
 const auto SN_VCO_PARAM_E = mm2px(Vec(20.35, 23.24));
 const auto SN_VCO_PARAM_S = mm2px(Vec(20.35, 36.25));
@@ -65,8 +66,12 @@ sn_vco::sn_vco() {
 
     // ... outputs
     configOutput(VCO_OUTPUT, "VCO");
+    configOutput(SYNC_OUTPUT, "Sync");
     configOutput(AUX_OUTPUT, "AUX");
     configOutput(AUX_TRIGGER, "Trigger");
+
+    // ... reset SYNC trigger
+    syncOut.reset();
 
     // ... reset AUX trigger
     trigger.reset();
@@ -174,9 +179,8 @@ void sn_vco::process(const ProcessArgs &args) {
     lights[XLL_LIGHT].setBrightnessSmooth(xll ? 1.0 : 0.f, args.sampleTime);
     lights[XRR_LIGHT].setBrightnessSmooth(xrr ? 1.0 : 0.f, args.sampleTime);
 
-    // ... generate
-
-    if (sync.process(inputs[SYNC_INPUT].getVoltage())) {
+    // ... sync
+    if (syncIn.process(inputs[SYNC_INPUT].getVoltage())) {
         if (softSync.enabled) {
             softSync.backward = !softSync.backward;
         } else {
@@ -186,6 +190,7 @@ void sn_vco::process(const ProcessArgs &args) {
         }
     }
 
+    // ... generate
     recompute(args, channels);
     processVCO(args, channels, expanded);
     processAUX(args, expanded);
@@ -484,10 +489,11 @@ sn_vcoWidget::sn_vcoWidget(sn_vco *module) {
     addInput(createInputCentered<ThemedPJ301MPort>(SN_VCO_INPUT_VELOCITY, module, sn_vco::VELOCITY_INPUT));
     addInput(createInputCentered<ThemedPJ301MPort>(SN_VCO_INPUT_SYNC, module, sn_vco::SYNC_INPUT));
 
-    // ... aux, trigger and VCO outputs
+    // ... aux, trigger, sync and VCO outputs
     addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(aux), module, sn_vco::AUX_OUTPUT));
     addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(trigger), module, sn_vco::AUX_TRIGGER));
-    addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(vco), module, sn_vco::VCO_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_VCO_OUTPUT_VCO, module, sn_vco::VCO_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_VCO_OUTPUT_SYNC, module, sn_vco::SYNC_OUTPUT));
 
     // ... channels
     sn_vco_channels *lcd = createWidget<sn_vco_channels>(mm2px(channels));
