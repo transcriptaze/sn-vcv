@@ -312,7 +312,7 @@ void sn_nlm::mix2x4(InputId p, InputId q, mixer &r, sink &s) {
         float in = g * (in1 + in2);
         float buffer[4];
 
-        filter(r.interpolator[ch], in, buffer);
+        interpolate(r.interpolator[ch], in, buffer);
 
         for (int i = 0; i < 4; i++) {
             s.buffer[ch][i] = mix(buffer[i]);
@@ -328,10 +328,11 @@ float sn_nlm::mix(float in) {
     return 5.0f * υ;
 }
 
-void sn_nlm::filter(struct polyphase100 &polyphase, float in, float out[4]) {
+void sn_nlm::interpolate(struct polyphase100 &polyphase, float in, float out[4]) {
     for (size_t i = 24; i > 0; --i) {
         polyphase.state[i] = polyphase.state[i - 1];
     }
+
     polyphase.state[0] = in;
 
     for (size_t p = 0; p < 4; ++p) {
@@ -342,6 +343,38 @@ void sn_nlm::filter(struct polyphase100 &polyphase, float in, float out[4]) {
 
         out[p] = 4.0f * acc;
     }
+}
+
+float sn_nlm::decimate(struct polyphase100 &polyphase, float in[4]) {
+    int ix = 1;
+    for (int p = 0; p < 4; ++p) {
+        for (int i = 24; i > 0; --i) {
+            polyphase.state[ix] = polyphase.state[ix - 1];
+            ix++;
+        }
+    }
+
+    polyphase.state[0] = in[3];
+    polyphase.state[25] = in[2];
+    polyphase.state[50] = in[1];
+    polyphase.state[75] = in[0];
+
+    float out = 0.0f;
+
+    int jx = 0;
+    for (size_t p = 0; p < 4; ++p) {
+        float acc = 0.0f;
+
+        for (size_t i = 0; i < 25; ++i) {
+            acc += POLYPHASE_18kHz_4x.taps[p][i] * polyphase.state[jx];
+
+            jx++;
+        }
+
+        out += acc;
+    }
+
+    return out;
 }
 
 float sn_nlm::butterworth(struct iir4 &iir, float in[4]) {

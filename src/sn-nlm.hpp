@@ -87,7 +87,8 @@ struct sn_nlm : Module {
     void mix2x4(InputId p, InputId q, mixer &r, sink &s);
     float mix(float in);
 
-    void filter(struct polyphase100 &polyphase, float in, float out[4]);
+    void interpolate(struct polyphase100 &polyphase, float in, float out[4]);
+    float decimate(struct polyphase100 &polyphase, float in[4]);
     float butterworth(struct iir4 &iir, float in[4]);
 
     // ... parameters
