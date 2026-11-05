@@ -68,7 +68,7 @@ struct sn_vco : Module {
     float velocity[16] = {0.f};
 
     dsp::SchmittTrigger syncIn;
-    dsp::PulseGenerator syncOut;
+    dsp::PulseGenerator syncOut[16];
     dsp::PulseGenerator trigger;
 
     struct AUX aux = {

@@ -70,8 +70,10 @@ sn_vco::sn_vco() {
     configOutput(AUX_OUTPUT, "AUX");
     configOutput(AUX_TRIGGER, "Trigger");
 
-    // ... reset SYNC trigger
-    syncOut.reset();
+    // ... reset SYNC out
+    for (size_t ch = 0; ch < 16; ch++) {
+        syncOut[ch].reset();
+    }
 
     // ... reset AUX trigger
     trigger.reset();
@@ -180,12 +182,14 @@ void sn_vco::process(const ProcessArgs &args) {
     lights[XRR_LIGHT].setBrightnessSmooth(xrr ? 1.0 : 0.f, args.sampleTime);
 
     // ... sync
-    if (syncIn.process(inputs[SYNC_INPUT].getVoltage())) {
-        if (softSync.enabled) {
-            softSync.backward = !softSync.backward;
-        } else {
-            for (int ch = 0; ch < channels; ch++) {
-                vco[ch].α = 0.0f;
+    if (inputs[SYNC_INPUT].isConnected()) {
+        if (syncIn.process(inputs[SYNC_INPUT].getVoltage())) {
+            if (softSync.enabled) {
+                softSync.backward = !softSync.backward;
+            } else {
+                for (int ch = 0; ch < channels; ch++) {
+                    vco[ch].α = 0.0f;
+                }
             }
         }
     }
@@ -221,6 +225,7 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
     double δ[4];
     double phase[4][16];
     double in[4][16];
+    bool sync[16] = {false};
 
     for (int i = 0; i < oversampling; i++) {
         δ[i] = (i + 1.0) * dt / double(oversampling);
@@ -233,6 +238,12 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
             phase[i][ch] = vco[ch].α + freq * δ[i];
             while (phase[i][ch] >= 1.0) {
                 phase[i][ch] -= 1.0;
+                sync[ch] = true;
+            }
+
+            while (phase[i][ch] < 0.0) {
+                phase[i][ch] += 1.0;
+                sync[ch] = true;
             }
         }
 
@@ -275,6 +286,22 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
         }
 
         outputs[VCO_OUTPUT].setChannels(channels);
+    }
+
+    // .. SYNC out
+    if (outputs[SYNC_OUTPUT].isConnected()) {
+        for (size_t ch = 0; ch < channels; ch++) {
+            if (sync[ch]) {
+                syncOut[ch].trigger(0.00005f);
+            }
+        }
+
+        for (size_t ch = 0; ch < channels; ch++) {
+            bool triggered = syncOut[ch].process(args.sampleTime);
+            float out = triggered ? 10.f : 0.f;
+
+            outputs[SYNC_OUTPUT].setVoltage(out, ch);
+        }
     }
 }
 

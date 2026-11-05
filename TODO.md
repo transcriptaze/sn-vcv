@@ -8,15 +8,20 @@
 - [x] Fix tags in plugin.json
 - [x] Initialise module in sn-vco-channels
 - [x] Invoke parent step() in sn-vc-channels
-- [x] Hard sync
-- [x] Soft sync
 - [x] Phase parameter/input
     - [ ] Rather use lowercase phi symbol on front panel
 
-- [x] RESET input
-    - [x] Rename to SYNC
+- [ ] SYNC in
+    - [x] Hard sync
+    - [x] Soft sync
+    - (?) per channel
 
-- [ ] TRIG out
+- [ ] SYNC out
+    - [ ] sn-vco
+    - (?) sn-vcox
+    - [ ] sn-lfo
+    - (?) sn-lfox
+    - (?) per channel
 
 - [ ] [Antialiasing](https://github.com/transcriptaze/sn-vcv/issues/3)
       - [x] Context menu
