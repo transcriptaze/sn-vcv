@@ -11,16 +11,14 @@
 - [x] Phase parameter/input
     - [ ] Rather use lowercase phi symbol on front panel
 
-- [ ] SYNC in
+- [x] SYNC in
     - [x] Hard sync
     - [x] Soft sync
-    - (?) per channel
+    - [x] per channel sync
 
 - [ ] SYNC out
     - [ ] sn-vco
-    - (?) sn-vcox
     - [ ] sn-lfo
-    - (?) sn-lfox
     - (?) per channel
 
 - [ ] [Antialiasing](https://github.com/transcriptaze/sn-vcv/issues/3)

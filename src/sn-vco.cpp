@@ -183,11 +183,24 @@ void sn_vco::process(const ProcessArgs &args) {
 
     // ... sync
     if (inputs[SYNC_INPUT].isConnected()) {
-        if (syncIn.process(inputs[SYNC_INPUT].getVoltage())) {
-            if (softSync.enabled) {
-                softSync.backward = !softSync.backward;
-            } else {
-                for (int ch = 0; ch < channels; ch++) {
+        int sync = inputs[SYNC_INPUT].getChannels();
+
+        if (sync > 1) {
+            for (int ch = 0; ch < sync; ch++) {
+                if (syncIn[ch].process(inputs[SYNC_INPUT].getPolyVoltage(ch))) {
+                    if (softSync.enabled) {
+                        softSync.backward[ch] = !softSync.backward[ch];
+                    } else {
+                        vco[ch].α = 0.0f;
+                    }
+                }
+            }
+
+        } else if (syncIn[0].process(inputs[SYNC_INPUT].getVoltage())) {
+            for (int ch = 0; ch < channels; ch++) {
+                if (softSync.enabled) {
+                    softSync.backward[ch] = !softSync.backward[ch];
+                } else {
                     vco[ch].α = 0.0f;
                 }
             }
@@ -218,9 +231,9 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
     float dt = args.sampleTime;
     int oversampling = AA::oversampling(antialias);
 
-    if (softSync.enabled && softSync.backward) {
-        dt = -dt;
-    }
+    // if (softSync.enabled && softSync.backward) {
+    //     dt = -dt;
+    // }
 
     double δ[4];
     double phase[4][16];
@@ -232,7 +245,7 @@ void sn_vco::processVCO(const ProcessArgs &args, size_t channels, bool expanded)
     }
 
     for (size_t ch = 0; ch < channels; ch++) {
-        float freq = frequency[ch];
+        float freq = softSync.enabled && softSync.backward[ch] ? -frequency[ch] : frequency[ch];
 
         for (int i = 0; i < oversampling; i++) {
             phase[i][ch] = vco[ch].α + freq * δ[i];

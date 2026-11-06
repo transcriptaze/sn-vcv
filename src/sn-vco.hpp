@@ -67,7 +67,7 @@ struct sn_vco : Module {
     float frequency[16] = {dsp::FREQ_C4};
     float velocity[16] = {0.f};
 
-    dsp::SchmittTrigger syncIn;
+    dsp::SchmittTrigger syncIn[16];
     dsp::PulseGenerator syncOut[16];
     dsp::PulseGenerator trigger;
 
@@ -119,10 +119,10 @@ struct sn_vco : Module {
     // ... sync
     struct {
         bool enabled;
-        bool backward;
+        bool backward[16];
     } softSync = {
         .enabled = false,
-        .backward = false,
+        .backward = {false},
     };
 
     // ... expanders
