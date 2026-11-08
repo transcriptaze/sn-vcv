@@ -2,7 +2,7 @@
 
 Working notes for optimising _sn-vco_ infrastructure.
 
-## patches
+### benchmarks
 
 | patch         | module   | load                    | configuration                                         |
 |---------------|----------|-------------------------|-------------------------------------------------------|
@@ -12,8 +12,6 @@ Working notes for optimising _sn-vco_ infrastructure.
 | sn-vco_4x1    | sn-vco   | 18 modules, 16 channels | k-rate 1/256, 4x oversampling, 1x IIR, no DC blocking |
 | sn-vco_4x2    | sn-vco   | 18 modules, 16 channels | k-rate 1/256, 4x oversampling, 2x IIR, no DC blocking |
 
-
-### performance
 
 |             | sn-debug | vcv | squinky | sn-vco | sn-vco_4x1 | sn-vco_4x2 |
 |:------------|----------|-----|---------|--------|------------|------------|
@@ -34,3 +32,6 @@ Working notes for optimising _sn-vco_ infrastructure.
 | per-channel sn.υ4  (double) | 22.75% | per channel float_4 sn, fixed frequency, precomputed ζ (float)  |
 | per-channel sn.υ4d (double) | 22.75% | per channel float_4 sn, fixed frequency, precomputed ζ (double) |
 
+## R&D
+
+- sine wave interpolation: https://habr.com/en/articles/1096724/

@@ -16,6 +16,7 @@
       - https://stackoverflow.com/questions/11445619/profiling-c-on-mac-os-x
       - https://stackoverflow.com/questions/3764978/why-hypot-function-is-so-slow
       - https://mattkretz.github.io/2019/01/18/optimizing-hypot-for-simd.html
+      - https://habr.com/en/articles/1096724/
 
 - [ ] Dithering
 - [ ] Phase parameter/input
@@ -45,6 +46,7 @@
 5. https://www.youtube.com/watch?v=3depB4EZT7c
 6. https://www.soundonsound.com/techniques/synthesizing-strings-string-machines
 8. https://lemire.me/blog/2026/10/26/billion-query-per-second-lookup-tables-in-c/
+9. https://habr.com/en/articles/1096724/
 
 ## Notes and References
 

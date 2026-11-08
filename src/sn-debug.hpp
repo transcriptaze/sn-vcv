@@ -1,9 +1,21 @@
 #include "plugin.hpp"
 #include "sn.hpp"
+#include "sn_double.hpp"
 
 struct sn_debug : Module {
     static const int CHANNELS;
     static const float VELOCITY;
+
+    enum MODE {
+        BASELINE,
+        BASELINE_PER_CHANNEL,
+        BASELINE_STD_ARRAY,
+        SINE,
+        SN_V,
+        SN_V4,
+        SN_V4_DOUBLE,
+        SN_V4D,
+    };
 
     enum ParamId {
         PARAMS_LEN
@@ -25,12 +37,58 @@ struct sn_debug : Module {
 
     sn_debug();
 
+    json_t *dataToJson() override;
+    void dataFromJson(json_t *) override;
     void process(const ProcessArgs &args) override;
 
-    void processVCO(const ProcessArgs &args, int channels);
+    void process_baseline(const ProcessArgs &args);
+    void process_baseline_per_channel(const ProcessArgs &args);
+    void process_baseline_std_array(const ProcessArgs &args);
+    void process_sine(const ProcessArgs &args);
+    void process_sn_υ(const ProcessArgs &args);
+    void process_sn_υ4(const ProcessArgs &args);
+    void process_sn_υ4_double(const ProcessArgs &args);
+    void process_sn_υ4d(const ProcessArgs &args);
 
+    MODE mode = BASELINE;
     double φ[16] = {};
     struct SN sn = SN(0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+
+    struct {
+        uint32_t α = 0;
+    } baseline;
+
+    struct {
+        uint32_t α[16] = {};
+    } baseline_per_channel;
+
+    struct {
+        std::array<uint32_t, 16> α = {};
+    } baseline_std_array;
+
+    struct {
+        double φ[16] = {};
+    } sine;
+
+    struct {
+        double φ[16] = {};
+        struct SN sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
+    } sn_υ;
+
+    struct {
+        float φ[16] = {};
+        struct SN sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
+    } sn_υ4;
+
+    struct {
+        double φ[16] = {};
+        struct SN sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
+    } sn_υ4_double;
+
+    struct {
+        double φ[16] = {};
+        struct SN_DOUBLE sn = SN_DOUBLE(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
+    } sn_υ4d;
 };
 
 struct sn_debugWidget : ModuleWidget {
