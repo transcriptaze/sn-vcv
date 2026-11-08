@@ -26,8 +26,9 @@ Working notes for optimising _sn-vco_ infrastructure.
 | baseline                    | 8.5%   | triangular, fixed frequency                                       |
 | per-channel α               | 9.0%   | per channel triangular, fixed frequency                           |
 | per-channel α (std::array)  | 8.75%  | per channel triangular, fixed frequency                           |
-| per-channel sine            | 15.0%  | per channel sine, fixed frequency                                 |
-| per-channel sine4           | 15.5%  | per channel simd::sine, fixed frequency                           |
+| per-channel sine            | 15.0%  | per channel sine, fixed frequency, std::sin                       |
+| per-channel sinef           | 13.75% | per channel sine, fixed frequency, std::sinf                      |
+| per-channel sine4           | 15.5%  | per channel simd::sine, fixed frequency, rack::simd:sin           |
 | per-channel sine (fast)     | 10.25% | per channel simd::sine, fixed frequency, polynomial approximation |
 | per-channel sine (lookup)   | 12.25% | per channel simd::sine, fixed frequency, 1024 entry lookup table  |
 | per-channel sn.υ            | 22.5%  | per channel sn, fixed frequency, precomputed ζ                    |

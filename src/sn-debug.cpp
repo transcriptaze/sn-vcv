@@ -16,6 +16,7 @@ const std::vector<std::string> MODES = {
     "baseline (per channel)",
     "baseline (per channel, std::array)",
     "sine",
+    "sinef",
     "sine4",
     "sine (fast)",
     "sine (lookup)",
@@ -66,6 +67,8 @@ void sn_debug::dataFromJson(json_t *root) {
             mode = BASELINE_STD_ARRAY;
         } else if (s == MODES[SINE]) {
             mode = SINE;
+        } else if (s == MODES[SINEF]) {
+            mode = SINEF;
         } else if (s == MODES[SINE4]) {
             mode = SINE4;
         } else if (s == MODES[SINE_FAST]) {
@@ -102,6 +105,10 @@ void sn_debug::process(const ProcessArgs &args) {
 
     case SINE:
         process_sine(args);
+        break;
+
+    case SINEF:
+        process_sinef(args);
         break;
 
     case SINE4:
@@ -230,6 +237,27 @@ void sn_debug::process_sine(const ProcessArgs &args) {
     }
 }
 
+void sn_debug::process_sinef(const ProcessArgs &args) {
+    int channels = inputs[PITCH_INPUT].isConnected() ? inputs[PITCH_INPUT].getChannels() : CHANNELS;
+
+    const double f = 200.0;
+    const double δt = args.sampleTime;
+    const double δφ = f * δt;
+
+    outputs[VCO_OUTPUT].setChannels(channels);
+
+    for (int ch = 0; ch < channels; ch++) {
+        inputs[PITCH_INPUT].getPolyVoltage(ch);
+
+        sine.φ[ch] += δφ;
+
+        const float α = 2.0 * M_PI * sine.φ[ch];
+        const float out = 5.0f * std::sinf(α);
+
+        outputs[VCO_OUTPUT].setVoltage(out, ch);
+    }
+}
+
 void sn_debug::process_sine4(const ProcessArgs &args) {
     int channels = inputs[PITCH_INPUT].isConnected() ? inputs[PITCH_INPUT].getChannels() : CHANNELS;
 
@@ -299,12 +327,8 @@ void sn_debug::process_sine_lookup(const ProcessArgs &args) {
             sine.φ[ch] -= 1.0;
         }
 
-        // const int32_t α = sine.φ[ch] * static_cast<double>(0x7ffffffeL);
-        // const double sine = static_cast<double>(get_sine32_linear(α)) / double(0x7ffffffeL);
-
-        uint32_t α = static_cast<uint32_t>(sine.φ[ch] * 4294967296.0); // 2^32
-        const double sine = static_cast<double>(get_sine32_linear(α)) / double(0x7ffffffeL);
-
+        uint32_t α = static_cast<uint32_t>(sine.φ[ch] * 4294967296.0);                // 2^32
+        const double sine = static_cast<double>(get_sine32_linear(α)) / 2147483646.0; // i.e. double(AC);
         const float out = 5.0f * sine;
 
         outputs[VCO_OUTPUT].setVoltage(out, ch);
