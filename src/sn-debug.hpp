@@ -11,6 +11,9 @@ struct sn_debug : Module {
         BASELINE_PER_CHANNEL,
         BASELINE_STD_ARRAY,
         SINE,
+        SINE4,
+        SINE_FAST,
+        SINE_LOOKUP,
         SN_V,
         SN_V4,
         SN_V4_DOUBLE,
@@ -45,6 +48,9 @@ struct sn_debug : Module {
     void process_baseline_per_channel(const ProcessArgs &args);
     void process_baseline_std_array(const ProcessArgs &args);
     void process_sine(const ProcessArgs &args);
+    void process_sine4(const ProcessArgs &args);
+    void process_sine_fast(const ProcessArgs &args);
+    void process_sine_lookup(const ProcessArgs &args);
     void process_sn_υ(const ProcessArgs &args);
     void process_sn_υ4(const ProcessArgs &args);
     void process_sn_υ4_double(const ProcessArgs &args);
@@ -69,6 +75,18 @@ struct sn_debug : Module {
     struct {
         double φ[16] = {};
     } sine;
+
+    struct {
+        float φ[16] = {};
+    } sine4;
+
+    struct {
+        float φ[16] = {};
+    } sine_fast;
+
+    struct {
+        double φ[16] = {};
+    } sine_lookup;
 
     struct {
         double φ[16] = {};

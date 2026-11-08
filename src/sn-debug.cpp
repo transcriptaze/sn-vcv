@@ -1,3 +1,6 @@
+#include <string>
+
+#include "lib/sine.hpp"
 #include "sn-debug.hpp"
 
 using rack::simd::float_4;
@@ -13,6 +16,9 @@ const std::vector<std::string> MODES = {
     "baseline (per channel)",
     "baseline (per channel, std::array)",
     "sine",
+    "sine4",
+    "sine (fast)",
+    "sine (lookup)",
     "sn::υ",
     "sn::υ4",
     "sn::υ4 (double)",
@@ -39,7 +45,7 @@ sn_debug::sn_debug() {
 json_t *sn_debug::dataToJson() {
     json_t *root = json_object();
 
-    json_object_set_new(root, "mode", json_integer(mode));
+    json_object_set_new(root, "mode", json_string(MODES[mode].c_str()));
 
     return root;
 }
@@ -48,38 +54,34 @@ void sn_debug::dataFromJson(json_t *root) {
     json_t *m = json_object_get(root, "mode");
 
     if (m) {
-        switch (json_integer_value(m)) {
-        case BASELINE:
+        std::string s(json_string_value(m));
+
+        INFO(">>>> sn-debug::mode %s", s.c_str());
+
+        if (s == MODES[BASELINE]) {
             mode = BASELINE;
-            break;
-
-        case BASELINE_PER_CHANNEL:
+        } else if (s == MODES[BASELINE_PER_CHANNEL]) {
             mode = BASELINE_PER_CHANNEL;
-            break;
-
-        case BASELINE_STD_ARRAY:
+        } else if (s == MODES[BASELINE_STD_ARRAY]) {
             mode = BASELINE_STD_ARRAY;
-            break;
-
-        case SINE:
+        } else if (s == MODES[SINE]) {
             mode = SINE;
-            break;
-
-        case SN_V:
+        } else if (s == MODES[SINE4]) {
+            mode = SINE4;
+        } else if (s == MODES[SINE_FAST]) {
+            mode = SINE_FAST;
+        } else if (s == MODES[SINE_LOOKUP]) {
+            mode = SINE_LOOKUP;
+        } else if (s == MODES[SN_V]) {
             mode = SN_V;
-            break;
-
-        case SN_V4:
+        } else if (s == MODES[SN_V4]) {
             mode = SN_V4;
-            break;
-
-        case SN_V4_DOUBLE:
+        } else if (s == MODES[SN_V4_DOUBLE]) {
             mode = SN_V4_DOUBLE;
-            break;
-
-        case SN_V4D:
+        } else if (s == MODES[SN_V4D]) {
             mode = SN_V4D;
-            break;
+        } else if (s == MODES[SN_V]) {
+            mode = SN_V;
         }
     }
 }
@@ -100,6 +102,18 @@ void sn_debug::process(const ProcessArgs &args) {
 
     case SINE:
         process_sine(args);
+        break;
+
+    case SINE4:
+        process_sine4(args);
+        break;
+
+    case SINE_FAST:
+        process_sine_fast(args);
+        break;
+
+    case SINE_LOOKUP:
+        process_sine_lookup(args);
         break;
 
     case SN_V:
@@ -123,7 +137,7 @@ void sn_debug::process(const ProcessArgs &args) {
 void sn_debug::process_baseline(const ProcessArgs &args) {
     int channels = inputs[PITCH_INPUT].isConnected() ? inputs[PITCH_INPUT].getChannels() : CHANNELS;
 
-    uint32_t δα = static_cast<uint32_t>((20.0 / args.sampleRate) * TWO_TO_32);
+    uint32_t δα = static_cast<uint32_t>((200.0 / args.sampleRate) * TWO_TO_32);
 
     baseline.α += δα;
     bool msb = (baseline.α >> 31) & 1;
@@ -149,7 +163,7 @@ void sn_debug::process_baseline(const ProcessArgs &args) {
 void sn_debug::process_baseline_per_channel(const ProcessArgs &args) {
     int channels = inputs[PITCH_INPUT].isConnected() ? inputs[PITCH_INPUT].getChannels() : CHANNELS;
 
-    uint32_t δα = static_cast<uint32_t>((20.0 / args.sampleRate) * TWO_TO_32);
+    uint32_t δα = static_cast<uint32_t>((200.0 / args.sampleRate) * TWO_TO_32);
 
     outputs[VCO_OUTPUT].setChannels(channels);
 
@@ -173,7 +187,7 @@ void sn_debug::process_baseline_per_channel(const ProcessArgs &args) {
 
 void sn_debug::process_baseline_std_array(const ProcessArgs &args) {
     int channels = inputs[PITCH_INPUT].isConnected() ? inputs[PITCH_INPUT].getChannels() : CHANNELS;
-    uint32_t δα = static_cast<uint32_t>((20.0 / args.sampleRate) * TWO_TO_32);
+    uint32_t δα = static_cast<uint32_t>((200.0 / args.sampleRate) * TWO_TO_32);
 
     outputs[VCO_OUTPUT].setChannels(channels);
 
@@ -209,8 +223,89 @@ void sn_debug::process_sine(const ProcessArgs &args) {
 
         sine.φ[ch] += δφ;
 
-        const double α = sine.φ[ch];
+        const double α = 2.0 * M_PI * sine.φ[ch];
         const float out = 5.0f * std::sin(α);
+
+        outputs[VCO_OUTPUT].setVoltage(out, ch);
+    }
+}
+
+void sn_debug::process_sine4(const ProcessArgs &args) {
+    int channels = inputs[PITCH_INPUT].isConnected() ? inputs[PITCH_INPUT].getChannels() : CHANNELS;
+
+    const double f = 200.0;
+    const double δt = args.sampleTime;
+    const double δφ = f * δt;
+
+    outputs[VCO_OUTPUT].setChannels(channels);
+
+    for (int ch = 0; ch < channels; ch++) {
+        inputs[PITCH_INPUT].getPolyVoltage(ch);
+
+        sine.φ[ch] += δφ;
+
+        const double α = 2.0 * M_PI * sine.φ[ch];
+        const float out = 5.0f * rack::simd::sin(α);
+
+        outputs[VCO_OUTPUT].setVoltage(out, ch);
+    }
+}
+
+void sn_debug::process_sine_fast(const ProcessArgs &args) {
+    int channels = inputs[PITCH_INPUT].isConnected() ? inputs[PITCH_INPUT].getChannels() : CHANNELS;
+
+    const double f = 200.0;
+    const double δt = args.sampleTime;
+    const double δφ = f * δt;
+
+    outputs[VCO_OUTPUT].setChannels(channels);
+
+    for (int ch = 0; ch < channels; ch++) {
+        inputs[PITCH_INPUT].getPolyVoltage(ch);
+
+        sine.φ[ch] += δφ;
+
+        while (sine.φ[ch] >= 1.0) {
+            sine.φ[ch] -= 1.0;
+        }
+
+        const float α = static_cast<float>(sine.φ[ch]);
+
+        float cosα = α;
+        cosα -= 0.25f + std::floor(cosα + 0.25f);
+        cosα *= 16.0f * (std::abs(cosα) - 0.5f);
+        cosα += 0.224f * α * (std::abs(cosα) - 1.0f);
+
+        const float out = 5.0f * cosα;
+
+        outputs[VCO_OUTPUT].setVoltage(out, ch);
+    }
+}
+
+void sn_debug::process_sine_lookup(const ProcessArgs &args) {
+    int channels = inputs[PITCH_INPUT].isConnected() ? inputs[PITCH_INPUT].getChannels() : CHANNELS;
+
+    const double f = 200.0;
+    const double δt = args.sampleTime;
+    const double δφ = f * δt;
+
+    outputs[VCO_OUTPUT].setChannels(channels);
+
+    for (int ch = 0; ch < channels; ch++) {
+        inputs[PITCH_INPUT].getPolyVoltage(ch);
+
+        sine.φ[ch] += δφ;
+        while (sine.φ[ch] >= 1.0) {
+            sine.φ[ch] -= 1.0;
+        }
+
+        // const int32_t α = sine.φ[ch] * static_cast<double>(0x7ffffffeL);
+        // const double sine = static_cast<double>(get_sine32_linear(α)) / double(0x7ffffffeL);
+
+        uint32_t α = static_cast<uint32_t>(sine.φ[ch] * 4294967296.0); // 2^32
+        const double sine = static_cast<double>(get_sine32_linear(α)) / double(0x7ffffffeL);
+
+        const float out = 5.0f * sine;
 
         outputs[VCO_OUTPUT].setVoltage(out, ch);
     }
@@ -230,7 +325,7 @@ void sn_debug::process_sn_υ(const ProcessArgs &args) {
 
         sn_υ.φ[ch] += δφ;
 
-        const double α = sn_υ.φ[ch];
+        const double α = 2.0 * M_PI * sn_υ.φ[ch];
         const float out = 5.0f * sn_υ.sn.υ(α);
 
         outputs[VCO_OUTPUT].setVoltage(out, ch);
@@ -251,7 +346,7 @@ void sn_debug::process_sn_υ4(const ProcessArgs &args) {
 
         sn_υ4.φ[ch] += δφ;
 
-        const float α = sn_υ4.φ[ch];
+        const float α = 2.0 * M_PI * sn_υ4.φ[ch];
         const float_4 out = 5.0f * sn_υ4.sn.υ4(α, δφ);
 
         outputs[VCO_OUTPUT].setVoltage(out[0], ch);
@@ -272,7 +367,7 @@ void sn_debug::process_sn_υ4_double(const ProcessArgs &args) {
 
         sn_υ4.φ[ch] += δφ;
 
-        const double α = sn_υ4.φ[ch];
+        const double α = 2.0 * M_PI * sn_υ4.φ[ch];
         const float_4 out = 5.0f * sn_υ4_double.sn.υ4(α, δφ);
 
         outputs[VCO_OUTPUT].setVoltage(out[0], ch);
@@ -293,7 +388,7 @@ void sn_debug::process_sn_υ4d(const ProcessArgs &args) {
 
         sn_υ4d.φ[ch] += δφ;
 
-        const double α = sn_υ4d.φ[ch];
+        const double α = 2.0 * M_PI * sn_υ4d.φ[ch];
         const float_4 out = 5.0f * sn_υ4d.sn.υ4(α, δφ);
 
         outputs[VCO_OUTPUT].setVoltage(out[0], ch);

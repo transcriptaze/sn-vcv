@@ -6,6 +6,5 @@
 - [x] validate
 - [ ] merge benchmark and sn code (i.e. make benchmarks standalone)
 - [ ] rework _sn-vco_ et al.
-- [ ] _sn-sine_  (for benchmarking)
 - [ ] _sn-sine4_ (float4)
 - [ ] https://habr.com/en/articles/1096724/
