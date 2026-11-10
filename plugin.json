@@ -61,6 +61,15 @@
       "tags": [
         "Mixer"
       ]
+    },
+    {
+      "slug": "sn-debug",
+      "name": "sn-debug",
+      "description": "Debug module.",
+      "manualUrl": "https://github.com/transcriptaze/sn-vcv/blob/main/documentation/MANUAL.md#sn-debug",
+      "tags": [
+        "Utility"
+      ]
     }
   ]
 }

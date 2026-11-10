@@ -112,12 +112,12 @@ sn_nlm::sn_nlm() {
     getParamQuantity(M_PARAM)->randomizeEnabled = false;
 
     // ... inputs
-    configInput(IN1_INPUT, "±5V in1");
-    configInput(IN2_INPUT, "±5V in2");
+    configInput(IN1_INPUT, "±5V in");
+    configInput(IN2_INPUT, "±5V in");
     configInput(DEBUG_INPUT, "debug");
 
     // ... outputs
-    configOutput(OUTA_OUTPUT, "outA");
+    configOutput(OUTA_OUTPUT, "±5V out");
     configOutput(OUTX_OUTPUT, "x");
     configOutput(OUTY_OUTPUT, "y");
 
