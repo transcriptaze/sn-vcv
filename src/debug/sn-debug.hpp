@@ -39,6 +39,15 @@ struct sn_debug : rack::Module {
     void process_FIR4(const ProcessArgs &args);
 
     MODE mode = BASELINE;
+
+    struct {
+        double φ = 0.0;
+    } baseline;
+
+    struct {
+        double φ = 0.0;
+        float state[100] = {};
+    } fir4;
 };
 
 struct sn_debugWidget : rack::ModuleWidget {

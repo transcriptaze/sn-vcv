@@ -62,6 +62,7 @@
 ### mixer
 - [x] sn
 - [x] interpolation
+- [ ] decimator
 - [ ] antialiasing
 - [ ] DC blocking
 - [ ] SIMD
