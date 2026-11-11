@@ -13,7 +13,7 @@ bessel:
 
 fir:
 # 	python3 FIR.py
-	python3 FIR_10kHz.py
+	python3 FIR4_10kHz.py
 
 polyphase:
 	python3 polyphase.py

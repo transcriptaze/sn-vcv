@@ -48,6 +48,7 @@ struct sn_debug : rack::Module {
     void process_FIR4(const ProcessArgs &args);
 
     float butterworth(struct iir4 &iir, double in[4]);
+    float polyphase(double in[4]);
 
     MODE mode = BASELINE;
 
@@ -68,7 +69,8 @@ struct sn_debug : rack::Module {
 
     struct {
         double φ = 0.0;
-        float state[100] = {};
+        double delay_line[4][25] = {};
+        int head = 0;
     } fir4;
 };
 

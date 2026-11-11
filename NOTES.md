@@ -14,6 +14,9 @@
 ```
 sn-vco: f:1046.5  N:20  P:22.658   P(20kHz+):19.141  ratio:0.845
 ```
+2. https://tomverbeure.github.io/2026/01/25/Notes-on-Basic-Polyphase-Decimation.html
+3. https://ws.binghamton.edu/fowler/fowler%20personal%20page/EE521_files/IV-05%20Polyphase%20Filters_2003.pdf
+
 
 ## Geometry
 

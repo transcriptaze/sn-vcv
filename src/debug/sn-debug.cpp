@@ -64,6 +64,51 @@ constexpr struct {
 
 constexpr struct {
     const double taps[4][25];
+} POLYPHASE_10kHz_4x{
+    // clang-format off
+    .taps = {
+        {
+            -2.42040533e-04,  4.82833284e-04,  8.97327522e-04, -5.09275348e-04,
+            -2.81962722e-03, -9.86552627e-04,  5.69285724e-03,  6.40632933e-03,
+            -7.13508758e-03, -1.89446092e-02,  1.00544510e-03,  5.46940328e-02,
+             9.96337580e-02,  9.22150994e-02,  3.99046100e-02, -7.91877410e-03,
+            -1.79257577e-02, -2.79879473e-03,  7.53968071e-03,  4.00764923e-03,
+            -2.06728701e-03, -2.40725216e-03,  5.06565066e-05,  9.07480719e-04,
+             2.84429089e-04,
+        },
+        {
+            -8.63520763e-05,  6.69590756e-04,  7.61514313e-04, -1.15536763e-03,
+            -2.95283356e-03,  4.71526304e-04,  7.00220748e-03,  4.23781240e-03,
+            -1.14606405e-02, -1.78223232e-02,  1.23057555e-02,  6.89507948e-02,
+             1.03479700e-01,  8.17458427e-02,  2.54987073e-02, -1.42059792e-02,
+            -1.52467354e-02,  1.10259796e-03,  7.68908141e-03,  2.19380873e-03,
+            -2.72021883e-03, -1.81820490e-03,  4.80434600e-04,  8.20956807e-04,
+             9.11930380e-05,
+        },
+        {
+             9.11930380e-05,  8.20956807e-04,  4.80434600e-04, -1.81820490e-03,
+            -2.72021883e-03,  2.19380873e-03,  7.68908141e-03,  1.10259796e-03,
+            -1.52467354e-02, -1.42059792e-02,  2.54987073e-02,  8.17458427e-02,
+             1.03479700e-01,  6.89507948e-02,  1.23057555e-02, -1.78223232e-02,
+            -1.14606405e-02,  4.23781240e-03,  7.00220748e-03,  4.71526304e-04,
+            -2.95283356e-03, -1.15536763e-03,  7.61514313e-04,  6.69590756e-04,
+            -8.63520763e-05,
+        },
+        {
+             2.84429089e-04,  9.07480719e-04,  5.06565066e-05, -2.40725216e-03,
+            -2.06728701e-03,  4.00764923e-03,  7.53968071e-03, -2.79879473e-03,
+            -1.79257577e-02, -7.91877410e-03,  3.99046100e-02,  9.22150994e-02,
+             9.96337580e-02,  5.46940328e-02,  1.00544510e-03, -1.89446092e-02,
+            -7.13508758e-03,  6.40632933e-03,  5.69285724e-03, -9.86552627e-04,
+            -2.81962722e-03, -5.09275348e-04,  8.97327522e-04,  4.82833284e-04,
+            -2.42040533e-04,
+        },
+    },
+    // clang-format on
+};
+
+constexpr struct {
+    const double taps[4][25];
 } POLYPHASE_18kHz_4x{
     // clang-format off
     .taps = {
@@ -269,35 +314,8 @@ void sn_debug::process_FIR4(const ProcessArgs &args) {
         in[p] = static_cast<float>(5.0 * std::sin(α));
     }
 
-    // ... polyphase decimator
-    int ix = 1;
-    for (int p = 0; p < 4; ++p) {
-        for (int i = 24; i > 0; --i) {
-            fir4.state[ix] = fir4.state[ix - 1];
-            ix++;
-        }
-    }
-
-    fir4.state[0] = in[3];
-    fir4.state[25] = in[2];
-    fir4.state[50] = in[1];
-    fir4.state[75] = in[0];
-
     float ref = in[3];
-    float out = 0.0f;
-
-    int jx = 0;
-    for (size_t p = 0; p < 4; ++p) {
-        float acc = 0.0f;
-
-        for (size_t i = 0; i < 25; ++i) {
-            acc += POLYPHASE_18kHz_4x.taps[p][i] * fir4.state[jx];
-
-            jx++;
-        }
-
-        out += acc;
-    }
+    float out = polyphase(in);
 
     outputs[OUTA_OUTPUT].setChannels(2);
     outputs[OUTA_OUTPUT].setVoltage(ref, 0);
@@ -331,6 +349,28 @@ float sn_debug::butterworth(struct iir4 &iir, double in[4]) {
     }
 
     return iir.y[0];
+}
+
+float sn_debug::polyphase(double in[4]) {
+    fir4.head = (fir4.head + 1) % 25;
+
+    fir4.delay_line[0][fir4.head] = in[3];
+    fir4.delay_line[1][fir4.head] = in[2];
+    fir4.delay_line[2][fir4.head] = in[1];
+    fir4.delay_line[3][fir4.head] = in[0];
+
+    float out[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+
+    for (size_t i = 0; i < 25; i++) {
+        int ix = (fir4.head + 25 - i) % 25;
+
+        out[0] += POLYPHASE_10kHz_4x.taps[0][i] * fir4.delay_line[0][ix];
+        out[1] += POLYPHASE_10kHz_4x.taps[1][i] * fir4.delay_line[1][ix];
+        out[2] += POLYPHASE_10kHz_4x.taps[2][i] * fir4.delay_line[2][ix];
+        out[3] += POLYPHASE_10kHz_4x.taps[3][i] * fir4.delay_line[3][ix];
+    }
+
+    return out[0] + out[1] + out[2] + out[3];
 }
 
 sn_debugWidget::sn_debugWidget(sn_debug *module) {
