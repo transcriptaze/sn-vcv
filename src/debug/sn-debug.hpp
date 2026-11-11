@@ -6,8 +6,15 @@ struct sn_debug : rack::Module {
     static const int CHANNELS;
     static const float VELOCITY;
 
+    struct iir4 {
+        double x[4] = {};
+        double y[4] = {};
+    };
+
     enum MODE {
         BASELINE,
+        IIR,
+        FIR,
         FIR4,
     };
 
@@ -36,13 +43,28 @@ struct sn_debug : rack::Module {
     void process(const ProcessArgs &args) override;
 
     void process_baseline(const ProcessArgs &args);
+    void process_IIR(const ProcessArgs &args);
+    void process_FIR(const ProcessArgs &args);
     void process_FIR4(const ProcessArgs &args);
+
+    float butterworth(struct iir4 &iir, double in[4]);
 
     MODE mode = BASELINE;
 
     struct {
         double φ = 0.0;
     } baseline;
+
+    struct {
+        double φ = 0.0;
+        struct iir4 iir;
+    } iir;
+
+    struct {
+        double φ = 0.0;
+        double delay_line[100] = {};
+        int head = 0;
+    } fir;
 
     struct {
         double φ = 0.0;

@@ -14,6 +14,55 @@ const auto SN_DEBUG_INPUT_IN1 = mm2px(Vec(7.33, 36.25));
 const auto SN_DEBUG_OUTPUT_A = mm2px(Vec(7.33, 114.34));
 
 constexpr struct {
+    const double a[4];
+    const double b[5];
+} BUTTERWORTH_10kHz_4x{
+    .a = {-3.146633, 3.785516, -2.054454, 0.423306},
+    .b = {0.000483, 0.001934, 0.002901, 0.001934, 0.000483},
+};
+
+constexpr struct {
+    const double a[4];
+    const double b[5];
+} BUTTERWORTH_18kHz_4x{
+    .a = {-2.470272, 2.477971, -1.154635, 0.208848},
+    .b = {0.003870, 0.015478, 0.023217, 0.015478, 0.003870},
+};
+
+constexpr struct {
+    const double taps[100];
+} FIR_10kHz_4x{
+    // clang-format off
+    .taps = {
+       -2.42040533e-04, -8.63520763e-05,  9.11930380e-05,  2.84429089e-04,
+        4.82833284e-04,  6.69590756e-04,  8.20956807e-04,  9.07480719e-04,
+        8.97327522e-04,  7.61514313e-04,  4.80434600e-04,  5.06565066e-05,
+       -5.09275348e-04, -1.15536763e-03, -1.81820490e-03, -2.40725216e-03,
+       -2.81962722e-03, -2.95283356e-03, -2.72021883e-03, -2.06728701e-03,
+       -9.86552627e-04,  4.71526304e-04,  2.19380873e-03,  4.00764923e-03,
+        5.69285724e-03,  7.00220748e-03,  7.68908141e-03,  7.53968071e-03,
+        6.40632933e-03,  4.23781240e-03,  1.10259796e-03, -2.79879473e-03,
+       -7.13508758e-03, -1.14606405e-02, -1.52467354e-02, -1.79257577e-02,
+       -1.89446092e-02, -1.78223232e-02, -1.42059792e-02, -7.91877410e-03,
+        1.00544510e-03,  1.23057555e-02,  2.54987073e-02,  3.99046100e-02,
+        5.46940328e-02,  6.89507948e-02,  8.17458427e-02,  9.22150994e-02,
+        9.96337580e-02,  1.03479700e-01,  1.03479700e-01,  9.96337580e-02,
+        9.22150994e-02,  8.17458427e-02,  6.89507948e-02,  5.46940328e-02,
+        3.99046100e-02,  2.54987073e-02,  1.23057555e-02,  1.00544510e-03,
+       -7.91877410e-03, -1.42059792e-02, -1.78223232e-02, -1.89446092e-02,
+       -1.79257577e-02, -1.52467354e-02, -1.14606405e-02, -7.13508758e-03,
+       -2.79879473e-03,  1.10259796e-03,  4.23781240e-03,  6.40632933e-03,
+        7.53968071e-03,  7.68908141e-03,  7.00220748e-03,  5.69285724e-03,
+        4.00764923e-03,  2.19380873e-03,  4.71526304e-04, -9.86552627e-04,
+       -2.06728701e-03, -2.72021883e-03, -2.95283356e-03, -2.81962722e-03,
+       -2.40725216e-03, -1.81820490e-03, -1.15536763e-03, -5.09275348e-04,
+        5.06565066e-05,  4.80434600e-04,  7.61514313e-04,  8.97327522e-04,
+        9.07480719e-04,  8.20956807e-04,  6.69590756e-04,  4.82833284e-04,
+        2.84429089e-04,  9.11930380e-05, -8.63520763e-05, -2.42040533e-04,    },
+    // clang-format on
+};
+
+constexpr struct {
     const double taps[4][25];
 } POLYPHASE_18kHz_4x{
     // clang-format off
@@ -60,6 +109,8 @@ constexpr struct {
 
 std::vector<std::pair<sn_debug::MODE, std::string>> MODES = {
     {sn_debug::BASELINE, "baseline"},
+    {sn_debug::IIR, "IIR"},
+    {sn_debug::FIR, "FIR"},
     {sn_debug::FIR4, "FIR4"},
 };
 
@@ -107,6 +158,14 @@ void sn_debug::process(const ProcessArgs &args) {
         process_baseline(args);
         break;
 
+    case IIR:
+        process_IIR(args);
+        break;
+
+    case FIR:
+        process_FIR(args);
+        break;
+
     case FIR4:
         process_FIR4(args);
     }
@@ -127,9 +186,71 @@ void sn_debug::process_baseline(const ProcessArgs &args) {
         in[p] = static_cast<float>(5.0 * std::sin(α));
     }
 
+    float ref = in[3];
     float out = in[3];
 
-    outputs[OUTA_OUTPUT].setVoltage(out);
+    outputs[OUTA_OUTPUT].setChannels(2);
+    outputs[OUTA_OUTPUT].setVoltage(ref, 0);
+    outputs[OUTA_OUTPUT].setVoltage(out, 1);
+}
+
+void sn_debug::process_IIR(const ProcessArgs &args) {
+    const float pitch = inputs[IN1_INPUT].getVoltage();
+    const float f = dsp::FREQ_C4 * std::pow(2.f, pitch);
+    const double δt = args.sampleTime;
+    const double δφ = f * δt / 4;
+
+    double in[4];
+
+    for (int p = 0; p < 4; p++) {
+        iir.φ += δφ;
+
+        const double α = 2.0 * M_PI * iir.φ;
+        in[p] = static_cast<float>(5.0 * std::sin(α));
+    }
+
+    float ref = in[3];
+    float out = butterworth(iir.iir, in);
+
+    outputs[OUTA_OUTPUT].setChannels(2);
+    outputs[OUTA_OUTPUT].setVoltage(ref, 0);
+    outputs[OUTA_OUTPUT].setVoltage(out, 1);
+}
+
+void sn_debug::process_FIR(const ProcessArgs &args) {
+    const float pitch = inputs[IN1_INPUT].getVoltage();
+    const float f = dsp::FREQ_C4 * std::pow(2.f, pitch);
+    const double δt = args.sampleTime;
+    const double δφ = f * δt / 4;
+
+    double in[4];
+
+    for (int p = 0; p < 4; p++) {
+        fir.φ += δφ;
+
+        const double α = 2.0 * M_PI * fir.φ;
+        in[p] = static_cast<float>(5.0 * std::sin(α));
+    }
+
+    float ref = in[3];
+    float out = 0.0f;
+
+    for (int p = 0; p < 4; p++) {
+        fir.delay_line[fir.head] = in[p];
+
+        out = 0.0f;
+
+        for (int i = 0; i < 100; ++i) {
+            int ix = (fir.head + 100 - i) % 100;
+            out += FIR_10kHz_4x.taps[i] * fir.delay_line[ix];
+        }
+
+        fir.head = (fir.head + 1) % 100;
+    }
+
+    outputs[OUTA_OUTPUT].setChannels(2);
+    outputs[OUTA_OUTPUT].setVoltage(ref, 0);
+    outputs[OUTA_OUTPUT].setVoltage(out, 1);
 }
 
 void sn_debug::process_FIR4(const ProcessArgs &args) {
@@ -142,9 +263,9 @@ void sn_debug::process_FIR4(const ProcessArgs &args) {
     double in[4];
 
     for (int p = 0; p < 4; p++) {
-        baseline.φ += δφ;
+        fir4.φ += δφ;
 
-        const double α = 2.0 * M_PI * baseline.φ;
+        const double α = 2.0 * M_PI * fir4.φ;
         in[p] = static_cast<float>(5.0 * std::sin(α));
     }
 
@@ -162,6 +283,7 @@ void sn_debug::process_FIR4(const ProcessArgs &args) {
     fir4.state[50] = in[1];
     fir4.state[75] = in[0];
 
+    float ref = in[3];
     float out = 0.0f;
 
     int jx = 0;
@@ -177,7 +299,38 @@ void sn_debug::process_FIR4(const ProcessArgs &args) {
         out += acc;
     }
 
-    outputs[OUTA_OUTPUT].setVoltage(out);
+    outputs[OUTA_OUTPUT].setChannels(2);
+    outputs[OUTA_OUTPUT].setVoltage(ref, 0);
+    outputs[OUTA_OUTPUT].setVoltage(out, 1);
+}
+
+float sn_debug::butterworth(struct iir4 &iir, double in[4]) {
+    for (size_t i = 0; i < 4; i++) {
+        double out = 0.0f;
+
+        out = BUTTERWORTH_10kHz_4x.b[0] * in[i];
+        out += BUTTERWORTH_10kHz_4x.b[1] * iir.x[0];
+        out += BUTTERWORTH_10kHz_4x.b[2] * iir.x[1];
+        out += BUTTERWORTH_10kHz_4x.b[3] * iir.x[2];
+        out += BUTTERWORTH_10kHz_4x.b[4] * iir.x[3];
+
+        out -= BUTTERWORTH_10kHz_4x.a[0] * iir.y[0];
+        out -= BUTTERWORTH_10kHz_4x.a[1] * iir.y[1];
+        out -= BUTTERWORTH_10kHz_4x.a[2] * iir.y[2];
+        out -= BUTTERWORTH_10kHz_4x.a[3] * iir.y[3];
+
+        iir.x[3] = iir.x[2];
+        iir.x[2] = iir.x[1];
+        iir.x[1] = iir.x[0];
+        iir.x[0] = in[i];
+
+        iir.y[3] = iir.y[2];
+        iir.y[2] = iir.y[1];
+        iir.y[1] = iir.y[0];
+        iir.y[0] = out;
+    }
+
+    return iir.y[0];
 }
 
 sn_debugWidget::sn_debugWidget(sn_debug *module) {
