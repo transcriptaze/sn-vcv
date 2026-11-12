@@ -34,14 +34,6 @@ constexpr double TWO_TO_32 = 4294967296.0; // 2^32
 constexpr uint32_t MAX_RAMP = 2147483647U;
 
 constexpr struct {
-    const double a[4];
-    const double b[5];
-} BUTTERWORTH_18Kz_4x{
-    .a = {-2.470272, 2.477971, -1.154635, 0.208848},
-    .b = {0.003870, 0.015478, 0.023217, 0.015478, 0.003870},
-};
-
-constexpr struct {
     const double taps[4][25];
 } POLYPHASE_18kHz_4x{
     // clang-format off
@@ -125,16 +117,19 @@ sn_nlm::sn_nlm() {
     for (int i = 0; i < N_MIXERS; i++) {
         for (int ch = 0; ch < CHANNELS; ch++) {
             for (int j = 0; j < 25; j++) {
-                mixers[i].interpolator[ch].state[j] = 0.0f;
+                mixers[i].filter[ch].interpolator[j] = 0.0f;
             }
         }
     }
 
-    for (size_t i = 0; i < 1; i++) {
-        for (size_t ch = 0; ch < CHANNELS; ch++) {
-            for (size_t j = 0; j < 4; j++) {
-                sinks[i].iir[ch].x[j] = 0.0f;
-                sinks[i].iir[ch].y[j] = 0.0f;
+    for (int i = 0; i < N_MIXERS; i++) {
+        for (int ch = 0; ch < CHANNELS; ch++) {
+            mixers[i].filter[ch].head = 0;
+
+            for (int j = 0; j < 4; j++) {
+                for (int k = 0; k < 25; k++) {
+                    mixers[i].filter[ch].decimator[j][k] = 0.0f;
+                }
             }
         }
     }
@@ -206,16 +201,7 @@ void sn_nlm::process(const ProcessArgs &args) {
     gain = std::powf(2.0f, 2.0f * params[GAIN_PARAM].getValue());
 
     recompute(args);
-    mix2x4(IN1_INPUT, IN2_INPUT, mixers[0], sinks[0]);
-
-    // ... decimate + anti-alias
-    for (size_t i = 0; i < N_OUTPUTS; i++) {
-        for (size_t ch = 0; ch < CHANNELS; ch++) {
-            float out = butterworth(sinks[i].iir[ch], sinks[i].buffer[ch]);
-
-            outputs[OUTA_OUTPUT].setVoltage(out, ch);
-        }
-    }
+    mix2x4(mixers[0], IN1_INPUT, IN2_INPUT, OUTA_OUTPUT);
 
     // ... AUX
     processAUX(args);
@@ -302,7 +288,7 @@ void sn_nlm::recompute(const ProcessArgs &args) {
     _sn.recompute();
 }
 
-void sn_nlm::mix2x4(InputId p, InputId q, mixer &r, sink &s) {
+void sn_nlm::mix2x4(mixer &m, InputId p, InputId q, OutputId r) {
     float k = 1.0f - attenuation;
     float g = k * (average ? gain / 2.0f : gain);
 
@@ -312,11 +298,16 @@ void sn_nlm::mix2x4(InputId p, InputId q, mixer &r, sink &s) {
         float in = g * (in1 + in2);
         float buffer[4];
 
-        interpolate(r.interpolator[ch], in, buffer);
+        interpolate(m.filter[ch], in, buffer);
 
+        float mixed[4];
         for (int i = 0; i < 4; i++) {
-            s.buffer[ch][i] = mix(buffer[i]);
+            mixed[i] = mix(buffer[i]);
         }
+
+        float out = decimate(m.filter[ch], mixed);
+
+        outputs[r].setVoltage(out, ch);
     }
 }
 
@@ -328,82 +319,43 @@ float sn_nlm::mix(float in) {
     return 5.0f * υ;
 }
 
-void sn_nlm::interpolate(struct polyphase100 &polyphase, float in, float out[4]) {
+void sn_nlm::interpolate(struct polyphase100 &filter, float in, float out[4]) {
     for (size_t i = 24; i > 0; --i) {
-        polyphase.state[i] = polyphase.state[i - 1];
+        filter.interpolator[i] = filter.interpolator[i - 1];
     }
 
-    polyphase.state[0] = in;
+    filter.interpolator[0] = in;
 
     for (size_t p = 0; p < 4; ++p) {
         double acc = 0.0;
         for (size_t i = 0; i < 25; ++i) {
-            acc += polyphase.state[i] * POLYPHASE_18kHz_4x.taps[p][i];
+            acc += filter.interpolator[i] * POLYPHASE_18kHz_4x.taps[p][i];
         }
 
         out[p] = 4.0f * acc;
     }
 }
 
-float sn_nlm::decimate(struct polyphase100 &polyphase, float in[4]) {
-    int ix = 1;
-    for (int p = 0; p < 4; ++p) {
-        for (int i = 24; i > 0; --i) {
-            polyphase.state[ix] = polyphase.state[ix - 1];
-            ix++;
-        }
+float sn_nlm::decimate(struct polyphase100 &filter, float in[4]) {
+    filter.head = (filter.head + 1) % 25;
+
+    filter.decimator[0][filter.head] = in[3];
+    filter.decimator[1][filter.head] = in[2];
+    filter.decimator[2][filter.head] = in[1];
+    filter.decimator[3][filter.head] = in[0];
+
+    float out[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+
+    for (size_t i = 0; i < 25; i++) {
+        int ix = (filter.head + 25 - i) % 25;
+
+        out[0] += POLYPHASE_18kHz_4x.taps[0][i] * filter.decimator[0][ix];
+        out[1] += POLYPHASE_18kHz_4x.taps[1][i] * filter.decimator[1][ix];
+        out[2] += POLYPHASE_18kHz_4x.taps[2][i] * filter.decimator[2][ix];
+        out[3] += POLYPHASE_18kHz_4x.taps[3][i] * filter.decimator[3][ix];
     }
 
-    polyphase.state[0] = in[3];
-    polyphase.state[25] = in[2];
-    polyphase.state[50] = in[1];
-    polyphase.state[75] = in[0];
-
-    float out = 0.0f;
-
-    int jx = 0;
-    for (size_t p = 0; p < 4; ++p) {
-        float acc = 0.0f;
-
-        for (size_t i = 0; i < 25; ++i) {
-            acc += POLYPHASE_18kHz_4x.taps[p][i] * polyphase.state[jx];
-
-            jx++;
-        }
-
-        out += acc;
-    }
-
-    return out;
-}
-
-float sn_nlm::butterworth(struct iir4 &iir, float in[4]) {
-    for (size_t i = 0; i < 4; i++) {
-        double out = 0.0f;
-
-        out = BUTTERWORTH_18Kz_4x.b[0] * in[i];
-        out += BUTTERWORTH_18Kz_4x.b[1] * iir.x[0];
-        out += BUTTERWORTH_18Kz_4x.b[2] * iir.x[1];
-        out += BUTTERWORTH_18Kz_4x.b[3] * iir.x[2];
-        out += BUTTERWORTH_18Kz_4x.b[4] * iir.x[3];
-
-        out -= BUTTERWORTH_18Kz_4x.a[0] * iir.y[0];
-        out -= BUTTERWORTH_18Kz_4x.a[1] * iir.y[1];
-        out -= BUTTERWORTH_18Kz_4x.a[2] * iir.y[2];
-        out -= BUTTERWORTH_18Kz_4x.a[3] * iir.y[3];
-
-        iir.x[3] = iir.x[2];
-        iir.x[2] = iir.x[1];
-        iir.x[1] = iir.x[0];
-        iir.x[0] = in[i];
-
-        iir.y[3] = iir.y[2];
-        iir.y[2] = iir.y[1];
-        iir.y[1] = iir.y[0];
-        iir.y[0] = out;
-    }
-
-    return iir.y[0];
+    return out[0] + out[1] + out[2] + out[3];
 }
 
 sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {

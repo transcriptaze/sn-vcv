@@ -38,7 +38,6 @@
 - [ ] Unit tests
 
 ## sn-nlm
-
 - [x] AUX xy
 - [x] gain
 - [x] attenuation
@@ -49,6 +48,7 @@
     - [ ] 4x2
     - (?) 1x8
     - (?) 8x1
+- [ ] CV mix (no filtering)
 
 - [ ] isConnected
 - [ ] channel count
@@ -62,8 +62,7 @@
 ### mixer
 - [x] sn
 - [x] interpolation
-- [ ] decimator
-- [ ] antialiasing
+- [x] decimator
 - [ ] DC blocking
 - [ ] SIMD
 

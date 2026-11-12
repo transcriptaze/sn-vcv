@@ -9,16 +9,13 @@ struct iir4 {
 };
 
 struct polyphase100 {
-    float state[25];
+    float interpolator[25];
+    float decimator[4][25];
+    int head = 0;
 };
 
 struct mixer {
-    struct polyphase100 interpolator[16];
-};
-
-struct sink {
-    struct iir4 iir[16];
-    float buffer[16][4];
+    struct polyphase100 filter[16];
 };
 
 struct sn_nlm : Module {
@@ -84,12 +81,11 @@ struct sn_nlm : Module {
     void processAUX(const ProcessArgs &args);
 
     void recompute(const ProcessArgs &args);
-    void mix2x4(InputId p, InputId q, mixer &r, sink &s);
+    void mix2x4(mixer &m, InputId p, InputId q, OutputId r);
     float mix(float in);
 
     void interpolate(struct polyphase100 &polyphase, float in, float out[4]);
     float decimate(struct polyphase100 &polyphase, float in[4]);
-    float butterworth(struct iir4 &iir, float in[4]);
 
     // ... parameters
     float attenuation = 0.0f;
@@ -98,7 +94,6 @@ struct sn_nlm : Module {
 
     // ... mix groups
     struct mixer mixers[N_MIXERS];
-    struct sink sinks[N_OUTPUTS];
 
     // ... recompute
     struct {
