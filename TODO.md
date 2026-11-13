@@ -44,20 +44,17 @@
 - [x] bypass
 - [x] average
 - [ ] groups
-    - [ ] 2x4
+    - [x] 2x4
     - [ ] 4x2
-    - (?) 1x8
-    - (?) 8x1
-- [ ] CV mix (no filtering)
 
 - [ ] isConnected
-- [ ] channel count
-- [ ] attenuation CV
-- [ ] gain CV
+- (?) attenuation CV
+- (?) gain CV
 - [ ] front panel
      - [ ] line joining input to param
      - [ ] outputs 1-4
-     - [ ] group widget
+
+- [ ] CV mix (unipolar, no filtering)
 
 ### mixer
 - [x] sn

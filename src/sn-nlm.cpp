@@ -17,9 +17,12 @@ const auto SN_NLM_INPUT_DX = mm2px(Vec(24.13, 62.28));
 const auto SN_NLM_INPUT_DY = mm2px(Vec(24.13, 75.29));
 const auto SN_NLM_INPUT_PHI = mm2px(Vec(24.13, 88.31));
 const auto SN_NLM_INPUT_DEBUG = mm2px(Vec(7.33, 7.62));
-const auto SN_NLM_OUTPUT_X = mm2px(Vec(57.12, 75.29));
-const auto SN_NLM_OUTPUT_Y = mm2px(Vec(57.12, 88.31));
-const auto SN_NLM_OUTPUT_A = mm2px(Vec(57.12, 114.34));
+const auto SN_NLM_OUTPUT_A = mm2px(Vec(57.12, 62.28));
+const auto SN_NLM_OUTPUT_B = mm2px(Vec(57.12, 75.29));
+const auto SN_NLM_OUTPUT_C = mm2px(Vec(57.12, 88.31));
+const auto SN_NLM_OUTPUT_D = mm2px(Vec(57.12, 101.32));
+const auto SN_NLM_OUTPUT_X = mm2px(Vec(44.42, 114.34));
+const auto SN_NLM_OUTPUT_Y = mm2px(Vec(57.12, 114.34));
 const auto SN_NLM_PARAM_E = mm2px(Vec(38.07, 23.24));
 const auto SN_NLM_PARAM_S = mm2px(Vec(38.07, 36.25));
 const auto SN_NLM_PARAM_THETA = mm2px(Vec(38.07, 49.27));
@@ -114,7 +117,7 @@ sn_nlm::sn_nlm() {
     configOutput(OUTY_OUTPUT, "y");
 
     // ... initialise mixers
-    for (int i = 0; i < N_MIXERS; i++) {
+    for (int i = 0; i < 4; i++) {
         for (int ch = 0; ch < CHANNELS; ch++) {
             for (int j = 0; j < 25; j++) {
                 mixers[i].filter[ch].interpolator[j] = 0.0f;
@@ -122,7 +125,7 @@ sn_nlm::sn_nlm() {
         }
     }
 
-    for (int i = 0; i < N_MIXERS; i++) {
+    for (int i = 0; i < 4; i++) {
         for (int ch = 0; ch < CHANNELS; ch++) {
             mixers[i].filter[ch].head = 0;
 
@@ -202,6 +205,9 @@ void sn_nlm::process(const ProcessArgs &args) {
 
     recompute(args);
     mix2x4(mixers[0], IN1_INPUT, IN2_INPUT, OUTA_OUTPUT);
+    mix2x4(mixers[1], IN3_INPUT, IN4_INPUT, OUTB_OUTPUT);
+    mix2x4(mixers[2], IN5_INPUT, IN6_INPUT, OUTC_OUTPUT);
+    mix2x4(mixers[3], IN7_INPUT, IN8_INPUT, OUTD_OUTPUT);
 
     // ... AUX
     processAUX(args);
@@ -211,14 +217,20 @@ void sn_nlm::processBypass(const ProcessArgs &args) {
     float k = 1.0f - attenuation;
     float g = k * (average ? gain / 2.0f : gain);
 
-    for (size_t i = 0; i < N_OUTPUTS; i++) {
-        for (size_t ch = 0; ch < CHANNELS; ch++) {
-            float in1 = inputs[IN1_INPUT].getPolyVoltage(ch);
-            float in2 = inputs[IN2_INPUT].getPolyVoltage(ch);
-            float out = g * (in1 + in2);
+    for (size_t ch = 0; ch < CHANNELS; ch++) {
+        float in1 = inputs[IN1_INPUT].getPolyVoltage(ch);
+        float in2 = inputs[IN2_INPUT].getPolyVoltage(ch);
+        float in3 = inputs[IN3_INPUT].getPolyVoltage(ch);
+        float in4 = inputs[IN4_INPUT].getPolyVoltage(ch);
+        float in5 = inputs[IN5_INPUT].getPolyVoltage(ch);
+        float in6 = inputs[IN6_INPUT].getPolyVoltage(ch);
+        float in7 = inputs[IN7_INPUT].getPolyVoltage(ch);
+        float in8 = inputs[IN8_INPUT].getPolyVoltage(ch);
 
-            outputs[OUTA_OUTPUT].setVoltage(out, ch);
-        }
+        outputs[OUTA_OUTPUT].setVoltage(g * (in1 + in2), ch);
+        outputs[OUTB_OUTPUT].setVoltage(g * (in3 + in4), ch);
+        outputs[OUTC_OUTPUT].setVoltage(g * (in5 + in6), ch);
+        outputs[OUTD_OUTPUT].setVoltage(g * (in7 + in8), ch);
     }
 
     processAUX(args);
@@ -388,6 +400,10 @@ sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {
 
     // ... outputs
     addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTPUT_A, module, sn_nlm::OUTA_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTPUT_B, module, sn_nlm::OUTB_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTPUT_C, module, sn_nlm::OUTC_OUTPUT));
+    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTPUT_D, module, sn_nlm::OUTD_OUTPUT));
+
     addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTPUT_X, module, sn_nlm::OUTX_OUTPUT));
     addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTPUT_Y, module, sn_nlm::OUTY_OUTPUT));
 

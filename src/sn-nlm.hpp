@@ -57,6 +57,9 @@ struct sn_nlm : Module {
 
     enum OutputId {
         OUTA_OUTPUT,
+        OUTB_OUTPUT,
+        OUTC_OUTPUT,
+        OUTD_OUTPUT,
         OUTX_OUTPUT,
         OUTY_OUTPUT,
         OUTPUTS_LEN
@@ -68,8 +71,6 @@ struct sn_nlm : Module {
 
     constexpr static int INPUTS[] = {IN1_INPUT, IN2_INPUT};
     constexpr static int N_INPUTS = sizeof(INPUTS) / sizeof(int);
-    constexpr static int N_MIXERS = 1;
-    constexpr static int N_OUTPUTS = 1;
     constexpr static int CHANNELS = 1;
 
     sn_nlm();
@@ -93,7 +94,7 @@ struct sn_nlm : Module {
     bool average = false;
 
     // ... mix groups
-    struct mixer mixers[N_MIXERS];
+    struct mixer mixers[4];
 
     // ... recompute
     struct {
