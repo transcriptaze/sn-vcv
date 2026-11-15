@@ -35,15 +35,17 @@ int main(int argc, char *argv[]) {
             uint32_t α = static_cast<uint32_t>(φ[ch] * 4294967296.0);                    // 2^32
             const double out = static_cast<double>(get_sine32_linear(α)) / 2147483646.0; // i.e. double(AC);
 
-            // double reference = std::sin(2.0 * M_PI * φʼ);
-            // double err = std::abs(out - reference);
-            //
-            // if (err > 1e-5) {
-            //     std::cout << φʼ << "  "
-            //               << out << "  "
-            //               << reference << "  "
-            //               << err << "\n";
-            // }
+#ifdef VALIDATE
+            double reference = std::sin(2.0 * M_PI * φʼ);
+            double err = std::abs(out - reference);
+
+            if (err > 1e-5) {
+                std::cout << φʼ << "  "
+                          << out << "  "
+                          << reference << "  "
+                          << err << "\n";
+            }
+#endif
 
             vco[ch] = 5.0 * out;
             checksum += std::abs(vco[ch]);

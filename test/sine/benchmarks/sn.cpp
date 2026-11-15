@@ -116,15 +116,17 @@ int main(int argc, char *argv[]) {
             const double α = 2.0 * M_PI * φʼ;
             const double out = sn::υ(sn, α);
 
-            // double reference = std::sin(2.0 * M_PI * φʼ);
-            // double err = std::abs(out - reference);
-            //
-            // if (err > 1e-6) {
-            //     std::cout << φʼ << "  "
-            //               << out << "  "
-            //               << reference << "  "
-            //               << err << "\n";
-            // }
+#ifdef VALIDATE
+            double reference = std::sin(2.0 * M_PI * φʼ);
+            double err = std::abs(out - reference);
+
+            if (err > 1e-6) {
+                std::cout << φʼ << "  "
+                          << out << "  "
+                          << reference << "  "
+                          << err << "\n";
+            }
+#endif
 
             vco[ch] = 5.0 * out;
             checksum += std::abs(vco[ch]);

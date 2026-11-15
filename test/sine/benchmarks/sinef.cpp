@@ -29,15 +29,17 @@ int main(int argc, char *argv[]) {
             const double α = 2.0 * M_PI * φʼ;
             float out = std::sinf(static_cast<float>(α));
 
-            // double reference = std::sin(α);
-            // double err = std::abs(out - reference);
-            //
-            // if (err > 1e-7) {
-            //     std::cout << φʼ << "  "
-            //               << out << "  "
-            //               << reference << "  "
-            //               << err << "\n";
-            // }
+#ifdef VALIDATE
+            double reference = std::sin(α);
+            double err = std::abs(out - reference);
+
+            if (err > 1e-7) {
+                std::cout << φʼ << "  "
+                          << out << "  "
+                          << reference << "  "
+                          << err << "\n";
+            }
+#endif
 
             vco[ch] = 5.0f * out;
             checksum += std::abs(vco[ch]);

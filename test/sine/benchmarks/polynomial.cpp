@@ -32,15 +32,17 @@ int main(int argc, char *argv[]) {
             cosα *= 16.0 * (std::abs(cosα) - 0.5);
             cosα += 0.224 * cosα * (std::abs(cosα) - 1.0);
 
-            // double reference = std::cos(2.0 * M_PI * φʼ);
-            // double err = std::abs(cosα - reference);
-            //
-            // if (err > 1e-3) {
-            //     std::cout << φʼ << "  "
-            //               << cosα << "  "
-            //               << reference << "  "
-            //               << err << "\n";
-            // }
+#ifdef VALIDATE
+            double reference = std::cos(2.0 * M_PI * φʼ);
+            double err = std::abs(cosα - reference);
+
+            if (err > 1e-3) {
+                std::cout << φʼ << "  "
+                          << cosα << "  "
+                          << reference << "  "
+                          << err << "\n";
+            }
+#endif
 
             vco[ch] = 5.0 * cosα;
             checksum += std::abs(vco[ch]);

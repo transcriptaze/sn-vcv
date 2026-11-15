@@ -31,3 +31,23 @@ Benchmark 2: ./bin/sn_lookup (10 runs)
                 mean     ±       σ          min     …     max
   Wall Time    1.145 s   ±   0.009 s      1.130 s   …   1.156 s            -68.4%  (3.2x faster)
   Memory         1.7 MiB ±     0.0 MiB      1.7 MiB …     1.7 MiB           +0.9%  
+
+Benchmark 2A: ./bin/sn_lookup+sqrt (10 runs)
+                mean     ±       σ          min     …     max
+  Wall Time    0.865 s   ±   0.002 s      0.863 s   …   0.868 s            -76.7%  (4.3x faster)
+  Memory         1.7 MiB ±     0.0 MiB      1.7 MiB …     1.7 MiB           +0.9%  
+
+
+|                   | Mean Wall Time [ms] | Change   | Factor         |
+|:------------------|--------------------:|---------:|:---------------|
+| baseline          | 167.1 ± 1.1         |          |                |
+| sine              | 2501.8 ± 10.7       | +1397.1% | (15.0x slower) |
+| sinef             | 2730.6 ± 19.8       | +1534.0% | (16.3x slower) |
+| sine4             | 2742.4 ± 6.7        | +1541.1% | (16.4x slower) |
+| polynomial        | 488.5 ± 1.2         | +192.3%  | (2.9x slower)  |
+| lookup            | 475.1 ± 3.1         | +184.3%  | (2.8x slower)  |
+| sn                | 3730.1 ± 3.9        | +2132.1% | (22.3x slower) |
+| sn4               | 2201.8 ± 5.2        | +1217.6% | (13.2x slower) |
+| sn4d              | 1789.6 ± 5.4        | +970.9%  | (10.7x slower) |
+| sn_lookup (+sqrt) | 864.0 ± 2.3         | +417.0%  | (5.2x slower)  |
+

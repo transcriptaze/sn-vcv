@@ -137,15 +137,17 @@ int main(int argc, char *argv[]) {
             const double α = 2.0 * M_PI * φʼ;
             const float_4 out = sn4d::υ4(sn, α, δφ);
 
-            // double reference = std::sin(2.0 * M_PI * φʼ);
-            // double err = std::abs(out[0] - reference);
-            //
-            // if (err > 1e-6) {
-            //     std::cout << φʼ << "  "
-            //               << out[0] << "  "
-            //               << reference << "  "
-            //               << err << "\n";
-            // }
+#ifdef VALIDATE
+            double reference = std::sin(2.0 * M_PI * φʼ);
+            double err = std::abs(out[0] - reference);
+
+            if (err > 1e-6) {
+                std::cout << φʼ << "  "
+                          << out[0] << "  "
+                          << reference << "  "
+                          << err << "\n";
+            }
+#endif
 
             vco[ch] = 5.0 * out[0];
             checksum += std::abs(vco[ch]);

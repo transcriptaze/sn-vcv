@@ -17,35 +17,35 @@ baseline:  format
 	./bin/baseline
 
 sine:  format
-	clang++ $(CXXFLAGS) benchmarks/sine.cpp -o bin/sine
+	clang++ $(CXXFLAGS) -DVALIDATE benchmarks/sine.cpp -o bin/sine
 	./bin/sine
 
 sinef:  format
-	clang++ $(CXXFLAGS) benchmarks/sinef.cpp -o bin/sinef
+	clang++ $(CXXFLAGS) -DVALIDATE benchmarks/sinef.cpp -o bin/sinef
 	./bin/sinef
 
 sine4:  format
-	clang++ $(CXXFLAGS) -I ../sdk -I ../sdk/simd -I ../libs benchmarks/sine4.cpp -o bin/sine4
+	clang++ $(CXXFLAGS) -DVALIDATE -I ../sdk -I ../sdk/simd -I ../libs benchmarks/sine4.cpp -o bin/sine4
 	./bin/sine4
 
 polynomial:  format
-	clang++ $(CXXFLAGS) benchmarks/polynomial.cpp -o bin/polynomial
+	clang++ $(CXXFLAGS) -DVALIDATE benchmarks/polynomial.cpp -o bin/polynomial
 	./bin/polynomial
 
 lookup:  format
-	clang++ $(CXXFLAGS) benchmarks/lookup.cpp -o bin/lookup
+	clang++ $(CXXFLAGS) -DVALIDATE benchmarks/lookup.cpp -o bin/lookup
 	./bin/lookup
 
 sn:  format
-	clang++ $(CXXFLAGS) benchmarks/sn.cpp -o bin/sn
+	clang++ $(CXXFLAGS) -DVALIDATE benchmarks/sn.cpp -o bin/sn
 	./bin/sn
 
 sn4:  format
-	clang++ $(CXXFLAGS) -I ../sdk -I ../sdk/simd -I ../libs benchmarks/sn4.cpp -o bin/sn4
+	clang++ $(CXXFLAGS) -DVALIDATE -I ../sdk -I ../sdk/simd -I ../libs benchmarks/sn4.cpp -o bin/sn4
 	./bin/sn4
 
 sn4d:  format
-	clang++ $(CXXFLAGS) -I ../sdk -I ../sdk/simd -I ../libs benchmarks/sn4d.cpp -o bin/sn4d
+	clang++ $(CXXFLAGS) -DVALIDATE -I ../sdk -I ../sdk/simd -I ../libs benchmarks/sn4d.cpp -o bin/sn4d
 	./bin/sn4d
 
 sn-lookup:  format

@@ -70,18 +70,16 @@ namespace sn_lookup {
     }
 
     float υʼ(const SN &sn, uint32_t φ) {
-        // double α = sn.m * φ - sn.ζ.φʼ;
-        // uint32_t αʼ = static_cast<uint32_t>(static_cast<int64_t>(α * 4294967296.0));
         const uint32_t αʼ = sn.m * φ - sn.ζ.φʼ;
 
         const float x = get_sine32_linear(αʼ + 0x40000000u) * K;
         const float y = get_sine32_linear(αʼ) * K;
-        ;
+
         const float xʼ = sn.ζ.pʼ * x - sn.ζ.qʼ * y + sn.ζ.rʼ;
         const float yʼ = sn.ζ.sʼ * x + sn.ζ.tʼ * y + sn.ζ.uʼ;
-        const float r = std::hypot(xʼ, yʼ);
+        const float r = xʼ * xʼ + yʼ * yʼ + 1e-30f;
 
-        return r > 0.0f ? yʼ / r : 0.0f;
+        return yʼ / std::sqrt(r);
     }
 
     void recompute(SN &sn) {
