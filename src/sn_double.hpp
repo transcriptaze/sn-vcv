@@ -32,13 +32,13 @@ typedef struct SN_DOUBLE {
     double m;
 
     struct Ζ_DOUBLE ζ = {
-        .pʼ = 1.f,
-        .qʼ = 0.f,
-        .rʼ = 0.f,
-        .sʼ = 1.f,
-        .tʼ = 0.f,
-        .uʼ = 0.f,
-        .φ = 0.f,
+        .pʼ = 1.0,
+        .qʼ = 0.0,
+        .rʼ = 0.0,
+        .sʼ = 1.0,
+        .tʼ = 0.0,
+        .uʼ = 0.0,
+        .φ = 0.0,
     };
 
     rack::simd::float_4 P;
