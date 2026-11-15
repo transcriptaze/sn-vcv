@@ -7,85 +7,85 @@ using std::cout;
 
 namespace sn {
 
-typedef struct Ζ {
-    double pʼ;
-    double qʼ;
-    double rʼ;
-    double sʼ;
-    double tʼ;
-    double uʼ;
-    double φ;
-} Ζ;
+    typedef struct Ζ {
+        double pʼ;
+        double qʼ;
+        double rʼ;
+        double sʼ;
+        double tʼ;
+        double uʼ;
+        double φ;
+    } Ζ;
 
-typedef struct SN {
-    SN(double ε, double θ, double A, double δx, double δy, double Φ, double m) {
-        this->ε = ε;
-        this->θ = θ;
-        this->A = A;
-        this->δx = δx;
-        this->δy = δy;
-        this->Φ = Φ;
-        this->m = m;
+    typedef struct SN {
+        SN(double ε, double θ, double A, double δx, double δy, double Φ, double m) {
+            this->ε = ε;
+            this->θ = θ;
+            this->A = A;
+            this->δx = δx;
+            this->δy = δy;
+            this->Φ = Φ;
+            this->m = m;
+        }
+
+        double ε;
+        double θ;
+        double A;
+        double δx;
+        double δy;
+        double Φ;
+        double m;
+
+        struct Ζ ζ = {
+            .pʼ = 1.f,
+            .qʼ = 0.f,
+            .rʼ = 0.f,
+            .sʼ = 1.f,
+            .tʼ = 0.f,
+            .uʼ = 0.f,
+            .φ = 0.f,
+        };
+
+    } SN;
+
+    float υ(const SN &sn, float α) {
+        float αʼ = sn.m * α - sn.ζ.φ;
+
+        float x = std::cos(αʼ);
+        float y = std::sin(αʼ);
+        float xʼ = sn.ζ.pʼ * x - sn.ζ.qʼ * y + sn.ζ.rʼ;
+        float yʼ = sn.ζ.sʼ * x + sn.ζ.tʼ * y + sn.ζ.uʼ;
+        float r = std::hypot(xʼ, yʼ);
+
+        return r > 0.0f ? yʼ / r : 0.0f;
     }
 
-    double ε;
-    double θ;
-    double A;
-    double δx;
-    double δy;
-    double Φ;
-    double m;
+    void recompute(SN &sn) {
+        const double εʼ = std::sqrt(1.0f - sn.ε * sn.ε);
+        const double a = (sn.ε < 0.0f) ? εʼ : 1.0f;
+        const double b = (sn.ε > 0.0f) ? εʼ : 1.0f;
 
-    struct Ζ ζ = {
-        .pʼ = 1.f,
-        .qʼ = 0.f,
-        .rʼ = 0.f,
-        .sʼ = 1.f,
-        .tʼ = 0.f,
-        .uʼ = 0.f,
-        .φ = 0.f,
-    };
+        const double cosθ = std::cos(sn.θ);
+        const double sinθ = std::sin(sn.θ);
+        const double tanθ = std::tan(sn.θ);
 
-} SN;
+        const double u = std::atan2(-b * tanθ, a);
+        const double v = std::atan2(a * b, tanθ);
 
-float υ(const SN &sn, float α) {
-    float αʼ = sn.m * α - sn.ζ.φ;
+        const double tx = a * std::cos(u) * cosθ - b * std::sin(u) * sinθ;
+        const double ty = b * std::sin(v) * cosθ + a * std::cos(v) * sinθ;
+        const double δxʼ = tx * sn.δx;
+        const double δyʼ = ty * sn.δy;
+        const double δθ = sn.Φ - sn.θ;
 
-    float x = std::cos(αʼ);
-    float y = std::sin(αʼ);
-    float xʼ = sn.ζ.pʼ * x - sn.ζ.qʼ * y + sn.ζ.rʼ;
-    float yʼ = sn.ζ.sʼ * x + sn.ζ.tʼ * y + sn.ζ.uʼ;
-    float r = std::hypot(xʼ, yʼ);
-
-    return r > 0.0f ? yʼ / r : 0.0f;
-}
-
-void recompute(SN &sn) {
-    const double εʼ = std::sqrt(1.0f - sn.ε * sn.ε);
-    const double a = (sn.ε < 0.0f) ? εʼ : 1.0f;
-    const double b = (sn.ε > 0.0f) ? εʼ : 1.0f;
-
-    const double cosθ = std::cos(sn.θ);
-    const double sinθ = std::sin(sn.θ);
-    const double tanθ = std::tan(sn.θ);
-
-    const double u = std::atan2(-b * tanθ, a);
-    const double v = std::atan2(a * b, tanθ);
-
-    const double tx = a * std::cos(u) * cosθ - b * std::sin(u) * sinθ;
-    const double ty = b * std::sin(v) * cosθ + a * std::cos(v) * sinθ;
-    const double δxʼ = tx * sn.δx;
-    const double δyʼ = ty * sn.δy;
-    const double δθ = sn.Φ - sn.θ;
-
-    sn.ζ.pʼ = sn.A * a * cosθ;
-    sn.ζ.qʼ = sn.A * b * sinθ;
-    sn.ζ.rʼ = sn.A * δxʼ;
-    sn.ζ.sʼ = sn.A * a * sinθ;
-    sn.ζ.tʼ = sn.A * b * cosθ;
-    sn.ζ.uʼ = sn.A * δyʼ;
-    sn.ζ.φ = std::atan2(-std::sin(δθ) * a, std::cos(δθ) * b);
-}
+        sn.ζ.pʼ = sn.A * a * cosθ;
+        sn.ζ.qʼ = sn.A * b * sinθ;
+        sn.ζ.rʼ = sn.A * δxʼ;
+        sn.ζ.sʼ = sn.A * a * sinθ;
+        sn.ζ.tʼ = sn.A * b * cosθ;
+        sn.ζ.uʼ = sn.A * δyʼ;
+        sn.ζ.φ = std::atan2(-std::sin(δθ) * a, std::cos(δθ) * b);
+    }
 }; // namespace sn
 
 int main(int argc, char *argv[]) {

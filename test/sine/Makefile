@@ -48,6 +48,10 @@ sn4d:  format
 	clang++ $(CXXFLAGS) -I ../sdk -I ../sdk/simd -I ../libs benchmarks/sn4d.cpp -o bin/sn4d
 	./bin/sn4d
 
+sn-lookup:  format
+	clang++ $(CXXFLAGS) -DVALIDATE -I ../sdk -I ../sdk/simd -I ../libs benchmarks/sn_lookup.cpp -o bin/sn_lookup
+	./bin/sn_lookup
+
 benchmark: format
 	clang++ $(CXXFLAGS) benchmarks/baseline.cpp -o bin/baseline
 	clang++ $(CXXFLAGS) benchmarks/sine.cpp -o bin/sine
@@ -58,9 +62,18 @@ benchmark: format
 	clang++ $(CXXFLAGS) benchmarks/sn.cpp -o bin/sn
 	clang++ $(CXXFLAGS) -I ../sdk -I ../sdk/simd -I ../libs benchmarks/sn4.cpp -o bin/sn4
 	clang++ $(CXXFLAGS) -I ../sdk -I ../sdk/simd -I ../libs benchmarks/sn4d.cpp -o bin/sn4d
+	clang++ $(CXXFLAGS) -I ../sdk -I ../sdk/simd -I ../libs benchmarks/sn_lookup.cpp -o bin/sn_lookup
 
 	mkdir -p workdir
 	hyperfine --warmup 2  --export-markdown ./workdir/sine.md \
               ./bin/baseline ./bin/sine ./bin/sinef ./bin/sine4 ./bin/polynomial ./bin/lookup \
-              ./bin/sn ./bin/sn4 ./bin/sn4d
+              ./bin/sn ./bin/sn4 ./bin/sn4d ./bin/sn_lookup
+
+debug: format
+	clang++ $(CXXFLAGS) benchmarks/sn.cpp -o bin/sn
+	clang++ $(CXXFLAGS) -I ../sdk -I ../sdk/simd -I ../libs benchmarks/sn_lookup.cpp -o bin/sn_lookup
+
+	mkdir -p workdir
+	hyperfine --warmup 2  --export-markdown ./workdir/debug.md \
+              ./bin/sn ./bin/sn_lookup
 
