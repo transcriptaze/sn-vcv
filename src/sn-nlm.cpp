@@ -81,6 +81,11 @@ constexpr struct {
     // clang-format on
 };
 
+std::vector<std::pair<sn_nlm::MODE, std::string>> MODES = {
+    {sn_nlm::GROUP_2x4, "2x4"},
+    {sn_nlm::GROUP_4x2, "4x2"},
+};
+
 sn_nlm::sn_nlm() {
     INFO("sn-nlm v0.0.0 %d", N_INPUTS);
 
@@ -164,6 +169,13 @@ json_t *sn_nlm::dataToJson() {
     json_object_set_new(root, "average", json_boolean(average));
     json_object_set_new(root, "k-rate", json_integer(update.krate));
 
+    for (auto ix = MODES.begin(); ix != MODES.end(); ix++) {
+        if (mode == ix->first) {
+            json_object_set_new(root, "mode", json_string(ix->second.c_str()));
+            break;
+        }
+    }
+
     return root;
 }
 
@@ -172,6 +184,7 @@ void sn_nlm::dataFromJson(json_t *root) {
     json_t *gain = json_object_get(root, "gain");
     json_t *average = json_object_get(root, "average");
     json_t *krate = json_object_get(root, "k-rate");
+    json_t *mode = json_object_get(root, "mode");
 
     if (attenuation) {
         float v = json_number_value(attenuation);
@@ -190,11 +203,23 @@ void sn_nlm::dataFromJson(json_t *root) {
     if (average) {
         this->average = json_boolean_value(average);
     }
+
     if (krate) {
         int v = json_integer_value(krate);
 
         if (v >= 0 && v < 4) {
             update.krate = v;
+        }
+    }
+
+    if (mode) {
+        std::string s(json_string_value(mode));
+
+        for (auto ix = MODES.begin(); ix != MODES.end(); ix++) {
+            if (s == ix->second) {
+                this->mode = ix->first;
+                break;
+            }
         }
     }
 }
@@ -204,10 +229,16 @@ void sn_nlm::process(const ProcessArgs &args) {
     gain = std::powf(2.0f, 2.0f * params[GAIN_PARAM].getValue());
 
     recompute(args);
-    mix2x4(mixers[0], IN1_INPUT, IN2_INPUT, OUTA_OUTPUT);
-    mix2x4(mixers[1], IN3_INPUT, IN4_INPUT, OUTB_OUTPUT);
-    mix2x4(mixers[2], IN5_INPUT, IN6_INPUT, OUTC_OUTPUT);
-    mix2x4(mixers[3], IN7_INPUT, IN8_INPUT, OUTD_OUTPUT);
+
+    if (mode == GROUP_2x4) {
+        mix2x4(mixers[0], IN1_INPUT, IN2_INPUT, OUTA_OUTPUT);
+        mix2x4(mixers[1], IN3_INPUT, IN4_INPUT, OUTB_OUTPUT);
+        mix2x4(mixers[2], IN5_INPUT, IN6_INPUT, OUTC_OUTPUT);
+        mix2x4(mixers[3], IN7_INPUT, IN8_INPUT, OUTD_OUTPUT);
+    } else {
+        mix4x2(mixers[0], IN1_INPUT, IN2_INPUT, IN3_INPUT, IN4_INPUT, OUTA_OUTPUT);
+        mix4x2(mixers[2], IN5_INPUT, IN6_INPUT, IN7_INPUT, IN8_INPUT, OUTC_OUTPUT);
+    }
 
     // ... AUX
     processAUX(args);
@@ -215,7 +246,6 @@ void sn_nlm::process(const ProcessArgs &args) {
 
 void sn_nlm::processBypass(const ProcessArgs &args) {
     float k = 1.0f - attenuation;
-    float g = k * (average ? gain / 2.0f : gain);
 
     for (size_t ch = 0; ch < CHANNELS; ch++) {
         float in1 = inputs[IN1_INPUT].getPolyVoltage(ch);
@@ -227,10 +257,20 @@ void sn_nlm::processBypass(const ProcessArgs &args) {
         float in7 = inputs[IN7_INPUT].getPolyVoltage(ch);
         float in8 = inputs[IN8_INPUT].getPolyVoltage(ch);
 
-        outputs[OUTA_OUTPUT].setVoltage(g * (in1 + in2), ch);
-        outputs[OUTB_OUTPUT].setVoltage(g * (in3 + in4), ch);
-        outputs[OUTC_OUTPUT].setVoltage(g * (in5 + in6), ch);
-        outputs[OUTD_OUTPUT].setVoltage(g * (in7 + in8), ch);
+        if (mode == GROUP_2x4) {
+            float g = k * (average ? gain / 2.0f : gain);
+            outputs[OUTA_OUTPUT].setVoltage(g * (in1 + in2), ch);
+            outputs[OUTB_OUTPUT].setVoltage(g * (in3 + in4), ch);
+            outputs[OUTC_OUTPUT].setVoltage(g * (in5 + in6), ch);
+            outputs[OUTD_OUTPUT].setVoltage(g * (in7 + in8), ch);
+        } else {
+            float g = k * (average ? gain / 4.0f : gain);
+
+            outputs[OUTA_OUTPUT].setVoltage(g * (in1 + in2 + in3 + in4), ch);
+            outputs[OUTB_OUTPUT].setVoltage(g * (in1 + in2 + in3 + in4), ch);
+            outputs[OUTC_OUTPUT].setVoltage(g * (in5 + in6 + in7 + in8), ch);
+            outputs[OUTD_OUTPUT].setVoltage(g * (in5 + in6 + in7 + in8), ch);
+        }
     }
 
     processAUX(args);
@@ -323,6 +363,31 @@ void sn_nlm::mix2x4(mixer &m, InputId p, InputId q, OutputId r) {
     }
 }
 
+void sn_nlm::mix4x2(mixer &m, InputId p, InputId q, InputId r, InputId s, OutputId t) {
+    float k = 1.0f - attenuation;
+    float g = k * (average ? gain / 4.0f : gain);
+
+    for (int ch = 0; ch < CHANNELS; ch++) {
+        float in1 = inputs[p].getPolyVoltage(ch);
+        float in2 = inputs[q].getPolyVoltage(ch);
+        float in3 = inputs[r].getPolyVoltage(ch);
+        float in4 = inputs[s].getPolyVoltage(ch);
+        float in = g * (in1 + in2 + in3 + in4);
+        float buffer[4];
+
+        interpolate(m.filter[ch], in, buffer);
+
+        float mixed[4];
+        for (int i = 0; i < 4; i++) {
+            mixed[i] = mix(buffer[i]);
+        }
+
+        float out = decimate(m.filter[ch], mixed);
+
+        outputs[t].setVoltage(out, ch);
+    }
+}
+
 float sn_nlm::mix(float in) {
     float α = clamp(in / 5.0f, -1.0f, +1.0f);
     float αʼ = 0.5f * M_PI * α;
@@ -393,7 +458,6 @@ sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {
     addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_E, module, sn_nlm::ECCENTRICITY_INPUT));
     addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_S, module, sn_nlm::SENSITIVITY_INPUT));
     addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_THETA, module, sn_nlm::ROTATION_INPUT));
-    //  addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_A, module, sn_nlm::AMPLITUDE_INPUT));
     addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_DX, module, sn_nlm::DX_INPUT));
     addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_DY, module, sn_nlm::DY_INPUT));
     addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_PHI, module, sn_nlm::PHI_INPUT));
@@ -411,7 +475,6 @@ sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {
     addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_E, module, sn_nlm::ECCENTRICITY_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_S, module, sn_nlm::SENSITIVITY_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_THETA, module, sn_nlm::ROTATION_PARAM));
-    //  addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_A, module, sn_nlm::AMPLITUDE_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_DX, module, sn_nlm::DX_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_DY, module, sn_nlm::DY_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_PHI, module, sn_nlm::PHI_PARAM));
@@ -427,6 +490,12 @@ sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {
 void sn_nlmWidget::appendContextMenu(Menu *menu) {
     sn_nlm *module = getModule<sn_nlm>();
 
+    std::vector<std::string> modes;
+
+    for (auto ix = MODES.begin(); ix != MODES.end(); ix++) {
+        modes.push_back(ix->second);
+    }
+
     menu->addChild(new MenuSeparator);
     menu->addChild(createMenuLabel("sn-nlm settings"));
 
@@ -434,6 +503,9 @@ void sn_nlmWidget::appendContextMenu(Menu *menu) {
     menu->addChild(createIndexPtrSubmenuItem("k-rate",
                                              KRATES,
                                              &module->update.krate));
+    menu->addChild(createIndexPtrSubmenuItem("mode",
+                                             modes,
+                                             &module->mode));
 }
 
 } // namespace sn_nlm

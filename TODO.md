@@ -43,25 +43,24 @@
 - [x] attenuation
 - [x] bypass
 - [x] average
-- [ ] groups
-    - [x] 2x4
-    - [ ] 4x2
+- [x] groups
 
-- [ ] isConnected
-- (?) attenuation CV
-- (?) gain CV
 - [ ] front panel
      - [ ] line joining input to param
-     - [ ] outputs 1-4
+     - [ ] logo
 
-- [ ] CV mix (unipolar, no filtering)
+- [ ] mixer
+    - [x] sn
+    - [x] interpolation
+    - [x] decimator
+    - [ ] DC blocking
+    - [ ] SIMD
 
-### mixer
-- [x] sn
-- [x] interpolation
-- [x] decimator
-- [ ] DC blocking
-- [ ] SIMD
+- [ ] isConnected
+- [ ] disable 2x4
+- (?) attenuation CV
+- (?) gain CV
+- (?) CV mix (unipolar, no filtering)
 
 - https://www.desmos.com/calculator/qqlexwmbsd
 - https://arxiv.org/pdf/2006.02784

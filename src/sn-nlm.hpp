@@ -19,6 +19,11 @@ struct mixer {
 };
 
 struct sn_nlm : Module {
+    enum MODE {
+        GROUP_2x4,
+        GROUP_4x2,
+    };
+
     enum ParamId {
         ECCENTRICITY_PARAM,
         SENSITIVITY_PARAM,
@@ -83,6 +88,7 @@ struct sn_nlm : Module {
 
     void recompute(const ProcessArgs &args);
     void mix2x4(mixer &m, InputId p, InputId q, OutputId r);
+    void mix4x2(mixer &m, InputId p, InputId q, InputId r, InputId s, OutputId t);
     float mix(float in);
 
     void interpolate(struct polyphase100 &polyphase, float in, float out[4]);
@@ -92,6 +98,7 @@ struct sn_nlm : Module {
     float attenuation = 0.0f;
     float gain = 1.0f;
     bool average = false;
+    MODE mode = GROUP_4x2;
 
     // ... mix groups
     struct mixer mixers[4];
