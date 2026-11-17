@@ -74,8 +74,8 @@ new label 'δy' v2+6.51mm,h5-3.81mm RobotoCondensed-Italic 12pt centre,baseline
 new label 'φ'  v2+6.51mm,h6-3.81mm RobotoCondensed-Italic 12pt centre,baseline
 new label 'm'  v2+6.51mm,h7-3.81mm RobotoCondensed-Italic 12pt centre,baseline
 
-new label 'ATT'  v4+0mm,h1+8.81mm  RobotoBold 8pt centre,baseline
-new label 'GAIN' v4+0mm,h2x+8.81mm RobotoBold 8pt centre,baseline
+new label 'ATT'  v4x+0mm,h1+8.81mm  RobotoBold 8pt centre,baseline
+new label 'GAIN' v4x+0mm,h2x+8.81mm RobotoBold 8pt centre,baseline
 
 new label 'A' v4,h4-5.08mm RobotoBold 8pt centre,baseline #ffffff,#222222
 new label 'B' v4,h5-5.08mm RobotoBold 8pt centre,baseline #ffffff,#222222

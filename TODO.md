@@ -44,10 +44,8 @@
 - [x] bypass
 - [x] average
 - [x] groups
-
-- [ ] front panel
-     - [ ] line joining input to param
-     - [ ] logo
+- [x] line joining input to param
+- [x] logo
 
 - [ ] mixer
     - [x] sn

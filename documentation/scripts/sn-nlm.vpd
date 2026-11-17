@@ -1080,7 +1080,7 @@
         "text": "ATT",
         "xy": {
           "x": {
-            "reference": "v4",
+            "reference": "v4x",
             "offset": 0.0
           },
           "y": {
@@ -1116,7 +1116,7 @@
         "text": "GAIN",
         "xy": {
           "x": {
-            "reference": "v4",
+            "reference": "v4x",
             "offset": 0.0
           },
           "y": {
@@ -1609,37 +1609,13 @@
       "offset": null
     },
     "guides": {
-      "v3": {
-        "id": "v3",
+      "v1": {
+        "id": "v1",
         "x": {
           "reference": "origin",
-          "offset": 38.07
+          "offset": 7.33
         },
         "y": null
-      },
-      "v4x": {
-        "id": "v4x",
-        "x": {
-          "reference": "origin",
-          "offset": 55.85
-        },
-        "y": null
-      },
-      "h6": {
-        "id": "h6",
-        "x": null,
-        "y": {
-          "reference": "origin",
-          "offset": 88.308
-        }
-      },
-      "h5": {
-        "id": "h5",
-        "x": null,
-        "y": {
-          "reference": "origin",
-          "offset": 75.294
-        }
       },
       "h0": {
         "id": "h0",
@@ -1647,6 +1623,14 @@
         "y": {
           "reference": "origin",
           "offset": 7.62
+        }
+      },
+      "h1": {
+        "id": "h1",
+        "x": null,
+        "y": {
+          "reference": "origin",
+          "offset": 23.238
         }
       },
       "h2x": {
@@ -1657,20 +1641,44 @@
           "offset": 42.759
         }
       },
-      "v1": {
-        "id": "v1",
-        "x": {
-          "reference": "origin",
-          "offset": 7.33
-        },
-        "y": null
-      },
-      "h1": {
-        "id": "h1",
+      "h6": {
+        "id": "h6",
         "x": null,
         "y": {
           "reference": "origin",
-          "offset": 23.238
+          "offset": 88.308
+        }
+      },
+      "v4": {
+        "id": "v4",
+        "x": {
+          "reference": "origin",
+          "offset": 57.12
+        },
+        "y": null
+      },
+      "v2": {
+        "id": "v2",
+        "x": {
+          "reference": "origin",
+          "offset": 24.13
+        },
+        "y": null
+      },
+      "h4": {
+        "id": "h4",
+        "x": null,
+        "y": {
+          "reference": "origin",
+          "offset": 62.28
+        }
+      },
+      "h5": {
+        "id": "h5",
+        "x": null,
+        "y": {
+          "reference": "origin",
+          "offset": 75.294
         }
       },
       "h7": {
@@ -1681,37 +1689,21 @@
           "offset": 101.322
         }
       },
-      "h4": {
-        "id": "h4",
-        "x": null,
-        "y": {
-          "reference": "origin",
-          "offset": 62.28
-        }
-      },
-      "h2": {
-        "id": "h2",
-        "x": null,
-        "y": {
-          "reference": "origin",
-          "offset": 36.252
-        }
-      },
-      "v2": {
-        "id": "v2",
+      "v3": {
+        "id": "v3",
         "x": {
           "reference": "origin",
-          "offset": 24.13
+          "offset": 38.07
         },
         "y": null
       },
-      "v4": {
-        "id": "v4",
-        "x": {
+      "h8": {
+        "id": "h8",
+        "x": null,
+        "y": {
           "reference": "origin",
-          "offset": 57.12
-        },
-        "y": null
+          "offset": 114.336
+        }
       },
       "h3": {
         "id": "h3",
@@ -1721,12 +1713,20 @@
           "offset": 49.266
         }
       },
-      "h8": {
-        "id": "h8",
+      "v4x": {
+        "id": "v4x",
+        "x": {
+          "reference": "origin",
+          "offset": 55.85
+        },
+        "y": null
+      },
+      "h2": {
+        "id": "h2",
         "x": null,
         "y": {
           "reference": "origin",
-          "offset": 114.336
+          "offset": 36.252
         }
       }
     }
@@ -1795,8 +1795,8 @@
     "new label 'δy' v2+6.51mm,h5-3.81mm RobotoCondensed-Italic 12pt centre,baseline",
     "new label 'φ'  v2+6.51mm,h6-3.81mm RobotoCondensed-Italic 12pt centre,baseline",
     "new label 'm'  v2+6.51mm,h7-3.81mm RobotoCondensed-Italic 12pt centre,baseline",
-    "new label 'ATT'  v4+0mm,h1+8.81mm  RobotoBold 8pt centre,baseline",
-    "new label 'GAIN' v4+0mm,h2x+8.81mm RobotoBold 8pt centre,baseline",
+    "new label 'ATT'  v4x+0mm,h1+8.81mm  RobotoBold 8pt centre,baseline",
+    "new label 'GAIN' v4x+0mm,h2x+8.81mm RobotoBold 8pt centre,baseline",
     "new label 'A' v4,h4-5.08mm RobotoBold 8pt centre,baseline #ffffff,#222222",
     "new label 'B' v4,h5-5.08mm RobotoBold 8pt centre,baseline #ffffff,#222222",
     "new label 'C' v4,h6-5.08mm RobotoBold 8pt centre,baseline #ffffff,#222222",
