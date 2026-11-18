@@ -46,6 +46,15 @@
 - [x] groups
 - [x] line joining input to param
 - [x] logo
+- [ ] group inputs visually
+- [x] CHANGELOG
+- [ ] README
+- [ ] user manual
+
+- [x] isConnected
+- [x] channels
+- [ ] disable 2x4
+- [ ] disable debug input
 
 - [ ] mixer
     - [x] sn
@@ -54,8 +63,6 @@
     - [ ] DC blocking
     - [ ] SIMD
 
-- [ ] isConnected
-- [ ] disable 2x4
 - (?) attenuation CV
 - (?) gain CV
 - (?) CV mix (unipolar, no filtering)

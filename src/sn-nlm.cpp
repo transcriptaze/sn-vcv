@@ -86,6 +86,9 @@ std::vector<std::pair<sn_nlm::MODE, std::string>> MODES = {
     {sn_nlm::GROUP_4x2, "4x2"},
 };
 
+float mix(const struct SN &sn, float in);
+float bypass(const struct SN &sn, float in);
+
 sn_nlm::sn_nlm() {
     INFO("sn-nlm v0.0.0 %d", N_INPUTS);
 
@@ -231,46 +234,27 @@ void sn_nlm::process(const ProcessArgs &args) {
     recompute(args);
 
     if (mode == GROUP_2x4) {
-        mix2x4(mixers[0], IN1_INPUT, IN2_INPUT, OUTA_OUTPUT);
-        mix2x4(mixers[1], IN3_INPUT, IN4_INPUT, OUTB_OUTPUT);
-        mix2x4(mixers[2], IN5_INPUT, IN6_INPUT, OUTC_OUTPUT);
-        mix2x4(mixers[3], IN7_INPUT, IN8_INPUT, OUTD_OUTPUT);
+        mix2x4(mixers[0], OUTA_OUTPUT, IN1_INPUT, IN2_INPUT, mix);
+        mix2x4(mixers[1], OUTB_OUTPUT, IN3_INPUT, IN4_INPUT, mix);
+        mix2x4(mixers[2], OUTC_OUTPUT, IN5_INPUT, IN6_INPUT, mix);
+        mix2x4(mixers[3], OUTD_OUTPUT, IN7_INPUT, IN8_INPUT, mix);
     } else {
-        mix4x2(mixers[0], IN1_INPUT, IN2_INPUT, IN3_INPUT, IN4_INPUT, OUTA_OUTPUT);
-        mix4x2(mixers[2], IN5_INPUT, IN6_INPUT, IN7_INPUT, IN8_INPUT, OUTC_OUTPUT);
+        mix4x2(mixers[0], OUTA_OUTPUT, IN1_INPUT, IN2_INPUT, IN3_INPUT, IN4_INPUT, mix);
+        mix4x2(mixers[2], OUTC_OUTPUT, IN5_INPUT, IN6_INPUT, IN7_INPUT, IN8_INPUT, mix);
     }
 
-    // ... AUX
     processAUX(args);
 }
 
 void sn_nlm::processBypass(const ProcessArgs &args) {
-    float k = 1.0f - attenuation;
-
-    for (size_t ch = 0; ch < CHANNELS; ch++) {
-        float in1 = inputs[IN1_INPUT].getPolyVoltage(ch);
-        float in2 = inputs[IN2_INPUT].getPolyVoltage(ch);
-        float in3 = inputs[IN3_INPUT].getPolyVoltage(ch);
-        float in4 = inputs[IN4_INPUT].getPolyVoltage(ch);
-        float in5 = inputs[IN5_INPUT].getPolyVoltage(ch);
-        float in6 = inputs[IN6_INPUT].getPolyVoltage(ch);
-        float in7 = inputs[IN7_INPUT].getPolyVoltage(ch);
-        float in8 = inputs[IN8_INPUT].getPolyVoltage(ch);
-
-        if (mode == GROUP_2x4) {
-            float g = k * (average ? gain / 2.0f : gain);
-            outputs[OUTA_OUTPUT].setVoltage(g * (in1 + in2), ch);
-            outputs[OUTB_OUTPUT].setVoltage(g * (in3 + in4), ch);
-            outputs[OUTC_OUTPUT].setVoltage(g * (in5 + in6), ch);
-            outputs[OUTD_OUTPUT].setVoltage(g * (in7 + in8), ch);
-        } else {
-            float g = k * (average ? gain / 4.0f : gain);
-
-            outputs[OUTA_OUTPUT].setVoltage(g * (in1 + in2 + in3 + in4), ch);
-            outputs[OUTB_OUTPUT].setVoltage(g * (in1 + in2 + in3 + in4), ch);
-            outputs[OUTC_OUTPUT].setVoltage(g * (in5 + in6 + in7 + in8), ch);
-            outputs[OUTD_OUTPUT].setVoltage(g * (in5 + in6 + in7 + in8), ch);
-        }
+    if (mode == GROUP_2x4) {
+        mix2x4(mixers[0], OUTA_OUTPUT, IN1_INPUT, IN2_INPUT, bypass);
+        mix2x4(mixers[1], OUTB_OUTPUT, IN3_INPUT, IN4_INPUT, bypass);
+        mix2x4(mixers[2], OUTC_OUTPUT, IN5_INPUT, IN6_INPUT, bypass);
+        mix2x4(mixers[3], OUTD_OUTPUT, IN7_INPUT, IN8_INPUT, bypass);
+    } else {
+        mix4x2(mixers[0], OUTA_OUTPUT, IN1_INPUT, IN2_INPUT, IN3_INPUT, IN4_INPUT, bypass);
+        mix4x2(mixers[2], OUTC_OUTPUT, IN5_INPUT, IN6_INPUT, IN7_INPUT, IN8_INPUT, bypass);
     }
 
     processAUX(args);
@@ -291,7 +275,7 @@ void sn_nlm::processAUX(const ProcessArgs &args) {
 
     double normalized = (static_cast<double>(ramp) / static_cast<double>(MAX_RAMP)) * 2.0 - 1.0;
     float outX = normalized * 5.0f;
-    float outY = mix(g * (outX + outX));
+    float outY = mix(_sn, g * (outX + outX));
 
     outputs[OUTX_OUTPUT].setVoltage(outX, 0);
     outputs[OUTY_OUTPUT].setVoltage(outY, 0);
@@ -340,11 +324,34 @@ void sn_nlm::recompute(const ProcessArgs &args) {
     _sn.recompute();
 }
 
-void sn_nlm::mix2x4(mixer &m, InputId p, InputId q, OutputId r) {
-    float k = 1.0f - attenuation;
-    float g = k * (average ? gain / 2.0f : gain);
+void sn_nlm::mix2x4(mixer &m, OutputId o, InputId p, InputId q, float (*f)(const struct SN &, float)) {
+    int connected = 0;
+    int channels = 1;
 
-    for (int ch = 0; ch < CHANNELS; ch++) {
+    if (!outputs[o].isConnected()) {
+        return;
+    }
+
+    if (inputs[p].isConnected()) {
+        connected++;
+        channels = inputs[p].getChannels() > channels ? inputs[p].getChannels() : channels;
+    }
+
+    if (inputs[q].isConnected()) {
+        connected++;
+        channels = inputs[q].getChannels() > channels ? inputs[q].getChannels() : channels;
+    }
+
+    if (connected == 0) {
+        outputs[o].setChannels(1);
+        outputs[o].setVoltage(0.f);
+        return;
+    }
+
+    float k = 1.0f - attenuation;
+    float g = k * (average ? gain / static_cast<float>(connected) : gain);
+
+    for (int ch = 0; ch < channels; ch++) {
         float in1 = inputs[p].getPolyVoltage(ch);
         float in2 = inputs[q].getPolyVoltage(ch);
         float in = g * (in1 + in2);
@@ -354,20 +361,55 @@ void sn_nlm::mix2x4(mixer &m, InputId p, InputId q, OutputId r) {
 
         float mixed[4];
         for (int i = 0; i < 4; i++) {
-            mixed[i] = mix(buffer[i]);
+            mixed[i] = f(_sn, buffer[i]);
         }
 
         float out = decimate(m.filter[ch], mixed);
 
-        outputs[r].setVoltage(out, ch);
+        outputs[o].setVoltage(out, ch);
     }
+
+    outputs[o].setChannels(channels);
 }
 
-void sn_nlm::mix4x2(mixer &m, InputId p, InputId q, InputId r, InputId s, OutputId t) {
-    float k = 1.0f - attenuation;
-    float g = k * (average ? gain / 4.0f : gain);
+void sn_nlm::mix4x2(mixer &m, OutputId o, InputId p, InputId q, InputId r, InputId s, float (*f)(const struct SN &, float)) {
+    int connected = 0;
+    int channels = 1;
 
-    for (int ch = 0; ch < CHANNELS; ch++) {
+    if (!outputs[o].isConnected()) {
+        return;
+    }
+
+    if (inputs[p].isConnected()) {
+        connected++;
+        channels = inputs[p].getChannels() > channels ? inputs[p].getChannels() : channels;
+    }
+
+    if (inputs[q].isConnected()) {
+        connected++;
+        channels = inputs[q].getChannels() > channels ? inputs[q].getChannels() : channels;
+    }
+
+    if (inputs[r].isConnected()) {
+        connected++;
+        channels = inputs[r].getChannels() > channels ? inputs[r].getChannels() : channels;
+    }
+
+    if (inputs[s].isConnected()) {
+        connected++;
+        channels = inputs[s].getChannels() > channels ? inputs[s].getChannels() : channels;
+    }
+
+    if (connected == 0) {
+        outputs[o].setChannels(1);
+        outputs[o].setVoltage(0.f);
+        return;
+    }
+
+    float k = 1.0f - attenuation;
+    float g = k * (average ? gain / static_cast<float>(connected) : gain);
+
+    for (int ch = 0; ch < channels; ch++) {
         float in1 = inputs[p].getPolyVoltage(ch);
         float in2 = inputs[q].getPolyVoltage(ch);
         float in3 = inputs[r].getPolyVoltage(ch);
@@ -379,21 +421,27 @@ void sn_nlm::mix4x2(mixer &m, InputId p, InputId q, InputId r, InputId s, Output
 
         float mixed[4];
         for (int i = 0; i < 4; i++) {
-            mixed[i] = mix(buffer[i]);
+            mixed[i] = f(_sn, buffer[i]);
         }
 
         float out = decimate(m.filter[ch], mixed);
 
-        outputs[t].setVoltage(out, ch);
+        outputs[o].setVoltage(out, ch);
     }
+
+    outputs[o].setChannels(channels);
 }
 
-float sn_nlm::mix(float in) {
+float mix(const struct SN &sn, float in) {
     float α = clamp(in / 5.0f, -1.0f, +1.0f);
     float αʼ = 0.5f * M_PI * α;
-    float υ = _sn.υ(αʼ);
+    float υ = sn.υ(αʼ);
 
     return 5.0f * υ;
+}
+
+float bypass(const struct SN &sn, float in) {
+    return in;
 }
 
 void sn_nlm::interpolate(struct polyphase100 &filter, float in, float out[4]) {

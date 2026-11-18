@@ -120,7 +120,7 @@ typedef struct SN {
     };
 
     void recompute();
-    float υ(float);
+    float υ(float) const;
     float phi(float, float, float, float);
 } SN;
 

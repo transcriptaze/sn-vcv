@@ -63,7 +63,7 @@ void SN::recompute() {
     ζ.φ = phi(a, b, θ, Φ);
 }
 
-float SN::υ(float α) {
+float SN::υ(float α) const {
     float αʼ = m * α - ζ.φ;
 
     float x = std::cos(αʼ);

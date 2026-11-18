@@ -87,9 +87,8 @@ struct sn_nlm : Module {
     void processAUX(const ProcessArgs &args);
 
     void recompute(const ProcessArgs &args);
-    void mix2x4(mixer &m, InputId p, InputId q, OutputId r);
-    void mix4x2(mixer &m, InputId p, InputId q, InputId r, InputId s, OutputId t);
-    float mix(float in);
+    void mix2x4(mixer &m, OutputId o, InputId p, InputId q, float (*f)(const struct SN &, float));
+    void mix4x2(mixer &m, OutputId o, InputId p, InputId q, InputId r, InputId s, float (*f)(const struct SN &, float));
 
     void interpolate(struct polyphase100 &polyphase, float in, float out[4]);
     float decimate(struct polyphase100 &polyphase, float in[4]);

@@ -5,6 +5,7 @@
 ### Added
 1. Antialiasing filters for _sn-vco_ and _sn-vcox_.
 2. DC blocking filters for _sn-vco_ and _sn-vcox_.
+3. _sn-nlm_ non-linear mixer.
 
 ### Updates
 1. Clamped input range for _sn-vco_ to [C1,C8].
