@@ -50,11 +50,11 @@
 - [x] CHANGELOG
 - [ ] README
 - [ ] user manual
+- [x] remove debug input
 
 - [x] isConnected
 - [x] channels
-- [ ] disable 2x4
-- [ ] disable debug input
+- [ ] hide 2x4
 
 - [ ] mixer
     - [x] sn

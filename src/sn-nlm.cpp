@@ -117,7 +117,6 @@ sn_nlm::sn_nlm() {
     // ... inputs
     configInput(IN1_INPUT, "±5V in");
     configInput(IN2_INPUT, "±5V in");
-    configInput(DEBUG_INPUT, "debug");
 
     // ... outputs
     configOutput(OUTA_OUTPUT, "±5V out");
@@ -530,9 +529,6 @@ sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {
 
     addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_ATTENUATION, module, sn_nlm::ATTENUATION_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(SN_NLM_PARAM_GAIN, module, sn_nlm::GAIN_PARAM));
-
-    // ... debug
-    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_DEBUG, module, sn_nlm::DEBUG_INPUT));
 }
 
 void sn_nlmWidget::appendContextMenu(Menu *menu) {

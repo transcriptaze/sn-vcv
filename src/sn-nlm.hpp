@@ -51,11 +51,12 @@ struct sn_nlm : Module {
         ECCENTRICITY_INPUT,
         SENSITIVITY_INPUT,
         ROTATION_INPUT,
-        AMPLITUDE_INPUT, // NTS: placeholder - not used
+        AMPLITUDE_INPUT,   // NTS: placeholder - not used
         DX_INPUT,
         DY_INPUT,
         PHI_INPUT,
-
+        ATTENUATION_INPUT, // placeholder (future)
+        GAIN_INPUT,        // placeholder (future)
         DEBUG_INPUT,
         INPUTS_LEN
     };
@@ -120,9 +121,6 @@ struct sn_nlm : Module {
 
     // ... sn
     struct SN _sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
-
-    // ... debug
-    dsp::SchmittTrigger debug;
 };
 
 struct sn_nlmWidget : ModuleWidget {
