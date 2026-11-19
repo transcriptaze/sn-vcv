@@ -37,6 +37,9 @@ const std::map<int, std::pair<Beta, double>> BETA_Κ = {
  * Ref. https://kleinembedded.com/quick-and-simple-digital-filters-for-smoothing-and-dc-removal
  * Ref. http://www.digitalsignallabs.com/downloads/dcblock.pdf
  */
+DCF::DCF() : DCF(DCBLOCK_NONE) {
+}
+
 DCF::DCF(DCBLOCK block) {
     recompute(block, 44100.f);
 }
@@ -81,6 +84,19 @@ void DCF::recompute(DCBLOCK block, float fs) {
     }
 
     G = (1.0 + β) / 2.0;
+}
+
+double DCF::process(const double in, size_t ch) {
+    if (_block != DCBLOCK_NONE && α < 1.0) {
+        α += std::min(1.0, κ * (1.0 - α));
+    } else if (_block == DCBLOCK_NONE && α > 0.0) {
+        α -= std::max(0.0, κ * α);
+    }
+
+    y[ch] = G * (in - x[ch]) + β * y[ch];
+    x[ch] = in;
+
+    return α * y[ch] + (1 - α) * in;
 }
 
 // NB: in and out must NOT be the same array (compiler aliases variables)

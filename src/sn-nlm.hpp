@@ -1,3 +1,4 @@
+#include "dc-blocking/DCF.hpp"
 #include "plugin.hpp"
 #include "sn.hpp"
 
@@ -16,6 +17,7 @@ struct polyphase100 {
 
 struct mixer {
     struct polyphase100 filter[16];
+    struct DCF dcf;
 };
 
 struct sn_nlm : Module {
@@ -51,7 +53,7 @@ struct sn_nlm : Module {
         ECCENTRICITY_INPUT,
         SENSITIVITY_INPUT,
         ROTATION_INPUT,
-        AMPLITUDE_INPUT,   // NTS: placeholder - not used
+        AMPLITUDE_INPUT, // NTS: placeholder - not used
         DX_INPUT,
         DY_INPUT,
         PHI_INPUT,
@@ -98,6 +100,7 @@ struct sn_nlm : Module {
     float attenuation = 0.0f;
     float gain = 1.0f;
     bool average = false;
+    int dcBlocking = 1;
     MODE mode = GROUP_4x2;
 
     // ... mix groups

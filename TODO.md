@@ -46,11 +46,11 @@
 - [x] groups
 - [x] line joining input to param
 - [x] logo
+- [x] remove debug input
 - [ ] group inputs visually
 - [x] CHANGELOG
 - [ ] README
 - [ ] user manual
-- [x] remove debug input
 
 - [x] isConnected
 - [x] channels
@@ -60,7 +60,7 @@
     - [x] sn
     - [x] interpolation
     - [x] decimator
-    - [ ] DC blocking
+    - [x] DC blocking
     - [ ] SIMD
 
 - (?) attenuation CV

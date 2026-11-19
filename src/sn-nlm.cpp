@@ -86,6 +86,11 @@ std::vector<std::pair<sn_nlm::MODE, std::string>> MODES = {
     {sn_nlm::GROUP_4x2, "4x2"},
 };
 
+std::vector<std::string> DCBLOCKING = {
+    "Off",
+    "On",
+};
+
 float mix(const struct SN &sn, float in);
 float bypass(const struct SN &sn, float in);
 
@@ -144,6 +149,10 @@ sn_nlm::sn_nlm() {
         }
     }
 
+    for (int i = 0; i < 4; i++) {
+        mixers[i].dcf = DCF(DCBLOCK_MEDIUM);
+    }
+
     // ... sn
     float e = -0.8f;
     float s = 1.0f;
@@ -178,6 +187,16 @@ json_t *sn_nlm::dataToJson() {
         }
     }
 
+    switch (dcBlocking) {
+    case 0:
+        json_object_set_new(root, "DC-blocking", json_string("none"));
+        break;
+
+    case 1:
+        json_object_set_new(root, "DC-blocking", json_string("medium"));
+        break;
+    }
+
     return root;
 }
 
@@ -187,6 +206,7 @@ void sn_nlm::dataFromJson(json_t *root) {
     json_t *average = json_object_get(root, "average");
     json_t *krate = json_object_get(root, "k-rate");
     json_t *mode = json_object_get(root, "mode");
+    json_t *dcBlocking = json_object_get(root, "DC-blocking");
 
     if (attenuation) {
         float v = json_number_value(attenuation);
@@ -222,6 +242,16 @@ void sn_nlm::dataFromJson(json_t *root) {
                 this->mode = ix->first;
                 break;
             }
+        }
+    }
+
+    if (dcBlocking) {
+        std::string s(json_string_value(dcBlocking));
+
+        if (s == "none") {
+            this->dcBlocking = 0;
+        } else {
+            this->dcBlocking = 1;
         }
     }
 }
@@ -365,6 +395,10 @@ void sn_nlm::mix2x4(mixer &m, OutputId o, InputId p, InputId q, float (*f)(const
 
         float out = decimate(m.filter[ch], mixed);
 
+        if (dcBlocking) {
+            out = m.dcf.process(out, ch);
+        }
+
         outputs[o].setVoltage(out, ch);
     }
 
@@ -424,6 +458,10 @@ void sn_nlm::mix4x2(mixer &m, OutputId o, InputId p, InputId q, InputId r, Input
         }
 
         float out = decimate(m.filter[ch], mixed);
+
+        if (dcBlocking) {
+            out = m.dcf.process(out, ch);
+        }
 
         outputs[o].setVoltage(out, ch);
     }
@@ -550,6 +588,9 @@ void sn_nlmWidget::appendContextMenu(Menu *menu) {
     menu->addChild(createIndexPtrSubmenuItem("mode",
                                              modes,
                                              &module->mode));
+    menu->addChild(createIndexPtrSubmenuItem("DC blocking",
+                                             DCBLOCKING,
+                                             &module->dcBlocking));
 }
 
 } // namespace sn_nlm
