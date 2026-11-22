@@ -4,19 +4,20 @@ Working notes for optimising _sn-vco_ infrastructure.
 
 ### benchmarks
 
-| patch         | module   | load                    | configuration                                         |
-|---------------|----------|-------------------------|-------------------------------------------------------|
-| baseline      | sn-debug | 18 modules, 16 channels | -                                                     |
-| vcv           | VCV VCO  | 18 modules, 16 channels | sine, no FM                                           |
-| sn-vco        | sn-vco   | 18 modules, 16 channels | k-rate 1/256, no anti-aliasing, no DC blocking        |
-| sn-vco_4x1    | sn-vco   | 18 modules, 16 channels | k-rate 1/256, 4x oversampling, 1x IIR, no DC blocking |
-| sn-vco_4x2    | sn-vco   | 18 modules, 16 channels | k-rate 1/256, 4x oversampling, 2x IIR, no DC blocking |
+| patch         | module                | load                    | configuration                                         |
+|---------------|-----------------------|-------------------------|-------------------------------------------------------|
+| baseline      | sn-debug              | 18 modules, 16 channels | -                                                     |
+| vcv           | VCV VCO               | 18 modules, 16 channels | sine, no FM                                           |
+| squinkylabs   | SquinkLabs Basic VCO  | 18 modules, 16 channels | sine, no FM                                           |
+| sn-vco        | sn-vco                | 18 modules, 16 channels | k-rate 1/256, no anti-aliasing, no DC blocking        |
+| sn-vco_4x1    | sn-vco                | 18 modules, 16 channels | k-rate 1/256, 4x oversampling, 1x IIR, no DC blocking |
+| sn-vco_4x2    | sn-vco                | 18 modules, 16 channels | k-rate 1/256, 4x oversampling, 2x IIR, no DC blocking |
 
 
-|             | sn-debug | vcv | squinky | sn-vco | sn-vco_4x1 | sn-vco_4x2 |
-|:------------|----------|-----|---------|--------|------------|------------|
-| baseline    | 8%       | 25% |         | 34%    | 48.75%     | 49.5%      |
-| υ4          |          |     |         | 30%    | 45%        | 48.75%     |
+|             | sn-debug | vcv | squinkylabs | sn-vco | sn-vco_4x1 | sn-vco_4x2 |
+|:------------|----------|-----|-------------|--------|------------|------------|
+| baseline    | 8%       | 25% | 12%         | 34%    | 48.75%     | 49.5%      |
+| υ4          |          |     |             | 30%    | 45%        | 48.75%     |
 
 
 ### sn-debug
