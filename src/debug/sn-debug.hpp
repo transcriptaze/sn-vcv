@@ -1,6 +1,6 @@
-#include "plugin.hpp"
-#include "sn.hpp"
-#include "sn_double.hpp"
+#include "../plugin.hpp"
+#include "../sn.hpp"
+#include "../sn_double.hpp"
 
 struct sn_debug : Module {
     static const int CHANNELS;

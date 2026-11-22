@@ -7,8 +7,8 @@ CFLAGS +=
 CXXFLAGS +=
 LDFLAGS +=
 
-SOURCES  += $(wildcard src/*.cpp src/antialias/*.cpp src/dc-blocking/*.cpp src/widgets/*.cpp src/lib/*.cpp)
-INCLUDES += $(wildcard src/*.hpp src/antialias/*.hpp src/dc-blocking/*.hpp src/widgets/*.hpp src/lib/*.hpp)
+SOURCES  += $(wildcard src/*.cpp src/antialias/*.cpp src/dc-blocking/*.cpp src/widgets/*.cpp src/lib/*.cpp src/debug/*.cpp)
+INCLUDES += $(wildcard src/*.hpp src/antialias/*.hpp src/dc-blocking/*.hpp src/widgets/*.hpp src/lib/*.hpp src/debug/*.hpp)
 
 DISTRIBUTABLES += res
 DISTRIBUTABLES += $(wildcard LICENSE*)

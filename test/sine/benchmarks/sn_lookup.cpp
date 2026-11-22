@@ -23,7 +23,7 @@ namespace sn_lookup {
         double tʼ;
         double uʼ;
         double φ;
-        double φʼ;
+        uint32_t φʼ;
     } Ζ;
 
     typedef struct SN {
@@ -57,19 +57,7 @@ namespace sn_lookup {
 
     } SN;
 
-    float υ(const SN &sn, float α) {
-        float αʼ = sn.m * α - sn.ζ.φ;
-
-        float x = std::cos(αʼ);
-        float y = std::sin(αʼ);
-        float xʼ = sn.ζ.pʼ * x - sn.ζ.qʼ * y + sn.ζ.rʼ;
-        float yʼ = sn.ζ.sʼ * x + sn.ζ.tʼ * y + sn.ζ.uʼ;
-        float r = std::hypot(xʼ, yʼ);
-
-        return r > 0.0f ? yʼ / r : 0.0f;
-    }
-
-    float υʼ(const SN &sn, uint32_t φ) {
+    float υ(const SN &sn, uint32_t φ) {
         const uint32_t αʼ = sn.m * φ - sn.ζ.φʼ;
 
         const float x = get_sine32_linear(αʼ + 0x40000000u) * K;
@@ -77,9 +65,9 @@ namespace sn_lookup {
 
         const float xʼ = sn.ζ.pʼ * x - sn.ζ.qʼ * y + sn.ζ.rʼ;
         const float yʼ = sn.ζ.sʼ * x + sn.ζ.tʼ * y + sn.ζ.uʼ;
-        const float r = xʼ * xʼ + yʼ * yʼ + 1e-30f;
+        const float r = std::hypot(xʼ, yʼ);
 
-        return yʼ / std::sqrt(r);
+        return r > 0.0f ? yʼ / r : 0.0f;
     }
 
     void recompute(SN &sn) {
@@ -133,7 +121,7 @@ int main(int argc, char *argv[]) {
             const uint32_t δφ = static_cast<uint32_t>(std::llround(notes[ch] * δt * 4294967296.0));
             φ[ch] += δφ;
 
-            const double out = sn_lookup::υʼ(sn, φ[ch]);
+            const double out = sn_lookup::υ(sn, φ[ch]);
 
 #ifdef VALIDATE
             const double φʼ = φ[ch] / 4294967296.0;
@@ -1194,31 +1182,60 @@ const int32_t sine_approx_1025_0_q1[(1 << SINE_QTABLE_POW) + 1] =
 #define FRACTION_MUL_BIT 10
 
 int32_t get_sine32_linear(uint32_t angle) {
-    int neg = 0;
+    // ... fold quadrants 3 & 4 into quadrants 1 & 2
+    int negative = 0;
     if (angle & 0x80000000) {
-        // переводим из 2-4 квадранта в 1-2.
-        neg = 1;
+        negative = 1;
         angle &= 0x7fffffff;
     }
 
-    // переводим в 1-й квадрант
-    if (angle > 0x40000000)
+    // ... fold into the 1st quadrant
+    if (angle > 0x40000000) {
         angle = 0x80000000 - angle;
-
-    // angle теперь в диапазоне 0 .. 0x40000000 (30 бит)
-
-    int idx = angle >> (30 - SINE_QTABLE_POW); // idx = 0..1024
-    int32_t ret;
-
-    if (idx == (1 << SINE_QTABLE_POW))
-        ret = sine_approx_1025_0_q1[idx]; // строго 90 градусов
-    else {
-        ret = sine_approx_1025_0_q1[idx];
-        uint32_t dy = sine_approx_1025_0_q1[idx + 1] - ret;
-        // dy будет максимум 0x003243F5 при таблице 1025, т.е. 22 младших бита
-        uint32_t mul = angle << (2 + SINE_QTABLE_POW) >> (32 - FRACTION_MUL_BIT); // дробная часть угла 10 бит
-        ret += (dy * mul) >> FRACTION_MUL_BIT;                                    // после умножения нормализуем на эти 10 бит дробной части угла
     }
 
-    return neg ? -ret : ret;
+    // ... angle is now in the range [0,0x40000000] (30 bits, representing 0 to pi/2)
+    int idx = angle >> (30 - SINE_QTABLE_POW); // idx = 0..1024 (with SINE_QTABLE_POW = 10)
+    int32_t rc;
+
+    if (idx == (1 << SINE_QTABLE_POW)) {
+        rc = sine_approx_1025_0_q1[idx]; // exact 90 degrees
+    } else {
+        rc = sine_approx_1025_0_q1[idx];
+        uint32_t dy = sine_approx_1025_0_q1[idx + 1] - rc;                        // dy is at most 0x003243F5 for a 1025-entry table, i.e. fits in the lower 22 bits
+        uint32_t mul = angle << (2 + SINE_QTABLE_POW) >> (32 - FRACTION_MUL_BIT); // fractional part of the angle (10 bits)
+        rc += (dy * mul) >> FRACTION_MUL_BIT;                                     // after multiplying, shift back by those 10 fractional bits
+    }
+
+    return negative ? -rc : rc;
 }
+
+// int32_t get_sine32_linear(uint32_t angle) {
+//     int neg = 0;
+//     if (angle & 0x80000000) {
+//         // переводим из 2-4 квадранта в 1-2.
+//         neg = 1;
+//         angle &= 0x7fffffff;
+//     }
+//
+//     // переводим в 1-й квадрант
+//     if (angle > 0x40000000)
+//         angle = 0x80000000 - angle;
+//
+//     // angle теперь в диапазоне 0 .. 0x40000000 (30 бит)
+//
+//     int idx = angle >> (30 - SINE_QTABLE_POW); // idx = 0..1024
+//     int32_t ret;
+//
+//     if (idx == (1 << SINE_QTABLE_POW))
+//         ret = sine_approx_1025_0_q1[idx]; // строго 90 градусов
+//     else {
+//         ret = sine_approx_1025_0_q1[idx];
+//         uint32_t dy = sine_approx_1025_0_q1[idx + 1] - ret;
+//         // dy будет максимум 0x003243F5 при таблице 1025, т.е. 22 младших бита
+//         uint32_t mul = angle << (2 + SINE_QTABLE_POW) >> (32 - FRACTION_MUL_BIT); // дробная часть угла 10 бит
+//         ret += (dy * mul) >> FRACTION_MUL_BIT;                                    // после умножения нормализуем на эти 10 бит дробной части угла
+//     }
+//
+//     return neg ? -ret : ret;
+// }

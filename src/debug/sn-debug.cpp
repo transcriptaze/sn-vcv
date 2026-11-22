@@ -1,6 +1,6 @@
 #include <string>
 
-#include "lib/sine.hpp"
+#include "../lib/sine.hpp"
 #include "sn-debug.hpp"
 
 using rack::simd::float_4;
