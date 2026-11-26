@@ -3,27 +3,26 @@
 namespace sn_nlm {
 
 const auto SN_NLM_INPUT_IN = mm2px(Vec(7.33, 23.24));
-const auto SN_NLM_INPUT_E = mm2px(Vec(24.13, 23.24));
-const auto SN_NLM_INPUT_S = mm2px(Vec(24.13, 36.25));
-const auto SN_NLM_INPUT_THETA = mm2px(Vec(24.13, 49.27));
-const auto SN_NLM_INPUT_DX = mm2px(Vec(24.13, 62.28));
-const auto SN_NLM_INPUT_DY = mm2px(Vec(24.13, 75.29));
-const auto SN_NLM_INPUT_PHI = mm2px(Vec(24.13, 88.31));
-const auto SN_NLM_INPUT_DEBUG = mm2px(Vec(7.33, 7.62));
+const auto SN_NLM_INPUT_E = mm2px(Vec(7.33, 36.25));
+const auto SN_NLM_INPUT_S = mm2px(Vec(7.33, 49.27));
+const auto SN_NLM_INPUT_THETA = mm2px(Vec(7.33, 62.28));
+const auto SN_NLM_INPUT_DX = mm2px(Vec(7.33, 75.29));
+const auto SN_NLM_INPUT_DY = mm2px(Vec(7.33, 88.31));
+const auto SN_NLM_INPUT_PHI = mm2px(Vec(7.33, 101.32));
 
-const auto SN_NLM_OUTPUT_OUT = mm2px(Vec(57.12, 62.28));
-const auto SN_NLM_OUTPUT_X = mm2px(Vec(44.42, 114.34));
-const auto SN_NLM_OUTPUT_Y = mm2px(Vec(57.12, 114.34));
+const auto SN_NLM_OUTPUT_OUT = mm2px(Vec(38.39, 114.34));
+const auto SN_NLM_OUTPUT_X = mm2px(Vec(38.39, 75.29));
+const auto SN_NLM_OUTPUT_Y = mm2px(Vec(38.39, 88.31));
 
-const auto SN_NLM_PARAM_E = mm2px(Vec(38.07, 23.24));
-const auto SN_NLM_PARAM_S = mm2px(Vec(38.07, 36.25));
-const auto SN_NLM_PARAM_THETA = mm2px(Vec(38.07, 49.27));
-const auto SN_NLM_PARAM_DX = mm2px(Vec(38.07, 62.28));
-const auto SN_NLM_PARAM_DY = mm2px(Vec(38.07, 75.29));
-const auto SN_NLM_PARAM_PHI = mm2px(Vec(38.07, 88.31));
-const auto SN_NLM_PARAM_M = mm2px(Vec(38.07, 101.32));
-const auto SN_NLM_PARAM_ATTENUATION = mm2px(Vec(55.85, 23.24));
-const auto SN_NLM_PARAM_GAIN = mm2px(Vec(55.85, 42.76));
+const auto SN_NLM_PARAM_E = mm2px(Vec(21.27, 36.25));
+const auto SN_NLM_PARAM_S = mm2px(Vec(21.27, 49.27));
+const auto SN_NLM_PARAM_THETA = mm2px(Vec(21.27, 62.28));
+const auto SN_NLM_PARAM_DX = mm2px(Vec(21.27, 75.29));
+const auto SN_NLM_PARAM_DY = mm2px(Vec(21.27, 88.31));
+const auto SN_NLM_PARAM_PHI = mm2px(Vec(21.27, 101.32));
+const auto SN_NLM_PARAM_M = mm2px(Vec(21.27, 114.34));
+const auto SN_NLM_PARAM_ATTENUATION = mm2px(Vec(37.12, 23.24));
+const auto SN_NLM_PARAM_GAIN = mm2px(Vec(37.12, 42.76));
 
 constexpr struct {
     const double taps[4][25];

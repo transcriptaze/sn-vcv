@@ -54,8 +54,7 @@
 - [x] CHANGELOG
 - [ ] README
 - [ ] user manual
-
-- [ ] rework as waveshaper
+- [x] rework as waveshaper
     - [x] process single input only
     - [x] AUX
     - [x] remove bypass
@@ -63,7 +62,7 @@
     - [x] remove average
     - [x] remove extraneous inputs
     - [x] remove extraneous outputs
-    - [ ] rework front panel
+    - [x] rework front panel
 
 - (?) _sn_ inputs as extender
 
@@ -72,6 +71,7 @@
     - [x] interpolation
     - [x] decimator
     - [x] DC blocking
+    - [ ] filter coefficients for different sampling rates
     - [ ] SIMD
 
 - (?) attenuation CV
