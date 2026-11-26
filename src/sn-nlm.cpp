@@ -2,14 +2,7 @@
 
 namespace sn_nlm {
 
-const auto SN_NLM_INPUT_IN1 = mm2px(Vec(7.33, 23.24));
-const auto SN_NLM_INPUT_IN2 = mm2px(Vec(7.33, 36.25));
-const auto SN_NLM_INPUT_IN3 = mm2px(Vec(7.33, 49.27));
-const auto SN_NLM_INPUT_IN4 = mm2px(Vec(7.33, 62.28));
-const auto SN_NLM_INPUT_IN5 = mm2px(Vec(7.33, 75.29));
-const auto SN_NLM_INPUT_IN6 = mm2px(Vec(7.33, 88.31));
-const auto SN_NLM_INPUT_IN7 = mm2px(Vec(7.33, 101.32));
-const auto SN_NLM_INPUT_IN8 = mm2px(Vec(7.33, 114.34));
+const auto SN_NLM_INPUT_IN = mm2px(Vec(7.33, 23.24));
 const auto SN_NLM_INPUT_E = mm2px(Vec(24.13, 23.24));
 const auto SN_NLM_INPUT_S = mm2px(Vec(24.13, 36.25));
 const auto SN_NLM_INPUT_THETA = mm2px(Vec(24.13, 49.27));
@@ -17,12 +10,11 @@ const auto SN_NLM_INPUT_DX = mm2px(Vec(24.13, 62.28));
 const auto SN_NLM_INPUT_DY = mm2px(Vec(24.13, 75.29));
 const auto SN_NLM_INPUT_PHI = mm2px(Vec(24.13, 88.31));
 const auto SN_NLM_INPUT_DEBUG = mm2px(Vec(7.33, 7.62));
-const auto SN_NLM_OUTPUT_A = mm2px(Vec(57.12, 62.28));
-const auto SN_NLM_OUTPUT_B = mm2px(Vec(57.12, 75.29));
-const auto SN_NLM_OUTPUT_C = mm2px(Vec(57.12, 88.31));
-const auto SN_NLM_OUTPUT_D = mm2px(Vec(57.12, 101.32));
+
+const auto SN_NLM_OUTPUT_OUT = mm2px(Vec(57.12, 62.28));
 const auto SN_NLM_OUTPUT_X = mm2px(Vec(44.42, 114.34));
 const auto SN_NLM_OUTPUT_Y = mm2px(Vec(57.12, 114.34));
+
 const auto SN_NLM_PARAM_E = mm2px(Vec(38.07, 23.24));
 const auto SN_NLM_PARAM_S = mm2px(Vec(38.07, 36.25));
 const auto SN_NLM_PARAM_THETA = mm2px(Vec(38.07, 49.27));
@@ -32,9 +24,6 @@ const auto SN_NLM_PARAM_PHI = mm2px(Vec(38.07, 88.31));
 const auto SN_NLM_PARAM_M = mm2px(Vec(38.07, 101.32));
 const auto SN_NLM_PARAM_ATTENUATION = mm2px(Vec(55.85, 23.24));
 const auto SN_NLM_PARAM_GAIN = mm2px(Vec(55.85, 42.76));
-
-constexpr double TWO_TO_32 = 4294967296.0; // 2^32
-constexpr uint32_t MAX_RAMP = 2147483647U;
 
 constexpr struct {
     const double taps[4][25];
@@ -81,21 +70,13 @@ constexpr struct {
     // clang-format on
 };
 
-std::vector<std::pair<sn_nlm::MODE, std::string>> MODES = {
-    {sn_nlm::GROUP_2x4, "2x4"},
-    {sn_nlm::GROUP_4x2, "4x2"},
-};
-
 std::vector<std::string> DCBLOCKING = {
     "Off",
     "On",
 };
 
-float mix(const struct SN &sn, float in);
-float bypass(const struct SN &sn, float in);
-
 sn_nlm::sn_nlm() {
-    INFO("sn-nlm v0.0.0 %d", N_INPUTS);
+    INFO("sn-nlm v0.0.0");
 
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 
@@ -120,38 +101,31 @@ sn_nlm::sn_nlm() {
     getParamQuantity(M_PARAM)->randomizeEnabled = false;
 
     // ... inputs
-    configInput(IN1_INPUT, "±5V in");
-    configInput(IN2_INPUT, "±5V in");
+    configInput(IN_INPUT, "±10V in");
 
     // ... outputs
-    configOutput(OUTA_OUTPUT, "±5V out");
+    configOutput(OUT_OUTPUT, "±5V out");
     configOutput(OUTX_OUTPUT, "x");
     configOutput(OUTY_OUTPUT, "y");
 
     // ... initialise mixers
-    for (int i = 0; i < 4; i++) {
-        for (int ch = 0; ch < CHANNELS; ch++) {
-            for (int j = 0; j < 25; j++) {
-                mixers[i].filter[ch].interpolator[j] = 0.0f;
+    for (int ch = 0; ch < CHANNELS; ch++) {
+        for (int j = 0; j < 25; j++) {
+            mixer.filter[ch].interpolator[j] = 0.0f;
+        }
+    }
+
+    for (int ch = 0; ch < CHANNELS; ch++) {
+        mixer.filter[ch].head = 0;
+
+        for (int j = 0; j < 4; j++) {
+            for (int k = 0; k < 25; k++) {
+                mixer.filter[ch].decimator[j][k] = 0.0f;
             }
         }
     }
 
-    for (int i = 0; i < 4; i++) {
-        for (int ch = 0; ch < CHANNELS; ch++) {
-            mixers[i].filter[ch].head = 0;
-
-            for (int j = 0; j < 4; j++) {
-                for (int k = 0; k < 25; k++) {
-                    mixers[i].filter[ch].decimator[j][k] = 0.0f;
-                }
-            }
-        }
-    }
-
-    for (int i = 0; i < 4; i++) {
-        mixers[i].dcf = DCF(DCBLOCK_MEDIUM);
-    }
+    mixer.dcf = DCF(DCBLOCK_MEDIUM);
 
     // ... sn
     float e = -0.8f;
@@ -162,14 +136,14 @@ sn_nlm::sn_nlm() {
     float δy = 0.f;
     float m = 1.0f;
 
-    _sn.ε = std::tanh(s * e);
-    _sn.θ = θ * M_PI / 180.0f;
-    _sn.A = clamp(a, 0.0f, +1.0f);
-    _sn.δx = clamp(δx, -1.0f, +1.0f);
-    _sn.δy = clamp(δy, -1.0f, +1.0f);
-    _sn.m = m;
+    sn.ε = std::tanh(s * e);
+    sn.θ = θ * M_PI / 180.0f;
+    sn.A = clamp(a, 0.0f, +1.0f);
+    sn.δx = clamp(δx, -1.0f, +1.0f);
+    sn.δy = clamp(δy, -1.0f, +1.0f);
+    sn.m = m;
 
-    _sn.recompute();
+    sn.recompute();
 }
 
 json_t *sn_nlm::dataToJson() {
@@ -177,15 +151,7 @@ json_t *sn_nlm::dataToJson() {
 
     json_object_set_new(root, "attenuation", json_real(attenuation));
     json_object_set_new(root, "gain", json_real(gain));
-    json_object_set_new(root, "average", json_boolean(average));
     json_object_set_new(root, "k-rate", json_integer(update.krate));
-
-    for (auto ix = MODES.begin(); ix != MODES.end(); ix++) {
-        if (mode == ix->first) {
-            json_object_set_new(root, "mode", json_string(ix->second.c_str()));
-            break;
-        }
-    }
 
     switch (dcBlocking) {
     case 0:
@@ -203,9 +169,7 @@ json_t *sn_nlm::dataToJson() {
 void sn_nlm::dataFromJson(json_t *root) {
     json_t *attenuation = json_object_get(root, "attenuation");
     json_t *gain = json_object_get(root, "gain");
-    json_t *average = json_object_get(root, "average");
     json_t *krate = json_object_get(root, "k-rate");
-    json_t *mode = json_object_get(root, "mode");
     json_t *dcBlocking = json_object_get(root, "DC-blocking");
 
     if (attenuation) {
@@ -222,26 +186,11 @@ void sn_nlm::dataFromJson(json_t *root) {
         }
     }
 
-    if (average) {
-        this->average = json_boolean_value(average);
-    }
-
     if (krate) {
         int v = json_integer_value(krate);
 
         if (v >= 0 && v < 4) {
             update.krate = v;
-        }
-    }
-
-    if (mode) {
-        std::string s(json_string_value(mode));
-
-        for (auto ix = MODES.begin(); ix != MODES.end(); ix++) {
-            if (s == ix->second) {
-                this->mode = ix->first;
-                break;
-            }
         }
     }
 
@@ -260,33 +209,47 @@ void sn_nlm::process(const ProcessArgs &args) {
     attenuation = params[ATTENUATION_PARAM].getValue();
     gain = std::powf(2.0f, 2.0f * params[GAIN_PARAM].getValue());
 
-    recompute(args);
-
-    if (mode == GROUP_2x4) {
-        mix2x4(mixers[0], OUTA_OUTPUT, IN1_INPUT, IN2_INPUT, mix);
-        mix2x4(mixers[1], OUTB_OUTPUT, IN3_INPUT, IN4_INPUT, mix);
-        mix2x4(mixers[2], OUTC_OUTPUT, IN5_INPUT, IN6_INPUT, mix);
-        mix2x4(mixers[3], OUTD_OUTPUT, IN7_INPUT, IN8_INPUT, mix);
-    } else {
-        mix4x2(mixers[0], OUTA_OUTPUT, IN1_INPUT, IN2_INPUT, IN3_INPUT, IN4_INPUT, mix);
-        mix4x2(mixers[2], OUTC_OUTPUT, IN5_INPUT, IN6_INPUT, IN7_INPUT, IN8_INPUT, mix);
-    }
-
+    recompute();
+    processIn(args);
     processAUX(args);
 }
 
-void sn_nlm::processBypass(const ProcessArgs &args) {
-    if (mode == GROUP_2x4) {
-        mix2x4(mixers[0], OUTA_OUTPUT, IN1_INPUT, IN2_INPUT, bypass);
-        mix2x4(mixers[1], OUTB_OUTPUT, IN3_INPUT, IN4_INPUT, bypass);
-        mix2x4(mixers[2], OUTC_OUTPUT, IN5_INPUT, IN6_INPUT, bypass);
-        mix2x4(mixers[3], OUTD_OUTPUT, IN7_INPUT, IN8_INPUT, bypass);
-    } else {
-        mix4x2(mixers[0], OUTA_OUTPUT, IN1_INPUT, IN2_INPUT, IN3_INPUT, IN4_INPUT, bypass);
-        mix4x2(mixers[2], OUTC_OUTPUT, IN5_INPUT, IN6_INPUT, IN7_INPUT, IN8_INPUT, bypass);
+void sn_nlm::processIn(const ProcessArgs &args) {
+    if (!outputs[OUT_OUTPUT].isConnected()) {
+        return;
     }
 
-    processAUX(args);
+    if (!inputs[IN_INPUT].isConnected()) {
+        outputs[OUT_OUTPUT].setChannels(1);
+        outputs[OUT_OUTPUT].setVoltage(0.f);
+        return;
+    }
+
+    int channels = inputs[IN_INPUT].getChannels() > 0 ? inputs[IN_INPUT].getChannels() : 1;
+    float k = 1.0f - attenuation;
+    float g = k * gain;
+
+    for (int ch = 0; ch < channels; ch++) {
+        float in = inputs[IN_INPUT].getPolyVoltage(ch);
+        float buffer[4];
+
+        interpolate(mixer.filter[ch], g * in, buffer);
+
+        float mixed[4];
+        for (int i = 0; i < 4; i++) {
+            mixed[i] = mix(buffer[i]);
+        }
+
+        float out = decimate(mixer.filter[ch], mixed);
+
+        if (dcBlocking) {
+            out = mixer.dcf.process(out, ch);
+        }
+
+        outputs[OUT_OUTPUT].setVoltage(out, ch);
+    }
+
+    outputs[OUT_OUTPUT].setChannels(channels);
 }
 
 void sn_nlm::processAUX(const ProcessArgs &args) {
@@ -300,185 +263,22 @@ void sn_nlm::processAUX(const ProcessArgs &args) {
     }
 
     float k = 1.0f - attenuation;
-    float g = k * (average ? gain / 2.0f : gain);
+    float g = k * gain;
 
     double normalized = (static_cast<double>(ramp) / static_cast<double>(MAX_RAMP)) * 2.0 - 1.0;
     float outX = normalized * 5.0f;
-    float outY = mix(_sn, g * (outX + outX));
+    float outY = mix(g * (outX + outX));
 
     outputs[OUTX_OUTPUT].setVoltage(outX, 0);
     outputs[OUTY_OUTPUT].setVoltage(outY, 0);
 }
 
-void sn_nlm::recompute(const ProcessArgs &args) {
-    // ... update parameters?
-    if (--update.count > 0) {
-        return;
-    }
-
-    update.count = KRATE[update.krate];
-
-    // ... param values
-    float e = params[ECCENTRICITY_PARAM].getValue();
-    float s = params[SENSITIVITY_PARAM].getValue();
-    float θ = params[ROTATION_PARAM].getValue();
-    float δx = params[DX_PARAM].getValue();
-    float δy = params[DY_PARAM].getValue();
-    float φ = params[PHI_PARAM].getValue();
-    float m = params[M_PARAM].getValue();
-
-    // ... modulate with inputs
-    e += clamp(inputs[ECCENTRICITY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
-    s += 5.0f * clamp(inputs[SENSITIVITY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
-    θ += 90.0f * clamp(inputs[ROTATION_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
-    δx += clamp(inputs[DX_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
-    δy += clamp(inputs[DY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
-    φ += 90.0f * clamp(inputs[PHI_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
-
-    // ... preconditioning
-    e = clamp(e, -1.0f, +1.0f);
-    s = clamp(s, 0.0f, +5.0f);
-    θ = clamp(θ, -89.95f, +89.95f);
-    φ = clamp(φ, -89.95f, +89.95f);
-
-    // ... recalculate SN parameters
-    _sn.ε = std::tanh(s * e);
-    _sn.θ = θ * M_PI / 180.0f;
-    _sn.A = 1.0f;
-    _sn.δx = clamp(δx, -0.99f, +0.99f);
-    _sn.δy = clamp(δy, -0.99f, +0.99f);
-    _sn.Φ = φ * M_PI / 180.0f;
-    _sn.m = m;
-
-    _sn.recompute();
-}
-
-void sn_nlm::mix2x4(mixer &m, OutputId o, InputId p, InputId q, float (*f)(const struct SN &, float)) {
-    int connected = 0;
-    int channels = 1;
-
-    if (!outputs[o].isConnected()) {
-        return;
-    }
-
-    if (inputs[p].isConnected()) {
-        connected++;
-        channels = inputs[p].getChannels() > channels ? inputs[p].getChannels() : channels;
-    }
-
-    if (inputs[q].isConnected()) {
-        connected++;
-        channels = inputs[q].getChannels() > channels ? inputs[q].getChannels() : channels;
-    }
-
-    if (connected == 0) {
-        outputs[o].setChannels(1);
-        outputs[o].setVoltage(0.f);
-        return;
-    }
-
-    float k = 1.0f - attenuation;
-    float g = k * (average ? gain / static_cast<float>(connected) : gain);
-
-    for (int ch = 0; ch < channels; ch++) {
-        float in1 = inputs[p].getPolyVoltage(ch);
-        float in2 = inputs[q].getPolyVoltage(ch);
-        float in = g * (in1 + in2);
-        float buffer[4];
-
-        interpolate(m.filter[ch], in, buffer);
-
-        float mixed[4];
-        for (int i = 0; i < 4; i++) {
-            mixed[i] = f(_sn, buffer[i]);
-        }
-
-        float out = decimate(m.filter[ch], mixed);
-
-        if (dcBlocking) {
-            out = m.dcf.process(out, ch);
-        }
-
-        outputs[o].setVoltage(out, ch);
-    }
-
-    outputs[o].setChannels(channels);
-}
-
-void sn_nlm::mix4x2(mixer &m, OutputId o, InputId p, InputId q, InputId r, InputId s, float (*f)(const struct SN &, float)) {
-    int connected = 0;
-    int channels = 1;
-
-    if (!outputs[o].isConnected()) {
-        return;
-    }
-
-    if (inputs[p].isConnected()) {
-        connected++;
-        channels = inputs[p].getChannels() > channels ? inputs[p].getChannels() : channels;
-    }
-
-    if (inputs[q].isConnected()) {
-        connected++;
-        channels = inputs[q].getChannels() > channels ? inputs[q].getChannels() : channels;
-    }
-
-    if (inputs[r].isConnected()) {
-        connected++;
-        channels = inputs[r].getChannels() > channels ? inputs[r].getChannels() : channels;
-    }
-
-    if (inputs[s].isConnected()) {
-        connected++;
-        channels = inputs[s].getChannels() > channels ? inputs[s].getChannels() : channels;
-    }
-
-    if (connected == 0) {
-        outputs[o].setChannels(1);
-        outputs[o].setVoltage(0.f);
-        return;
-    }
-
-    float k = 1.0f - attenuation;
-    float g = k * (average ? gain / static_cast<float>(connected) : gain);
-
-    for (int ch = 0; ch < channels; ch++) {
-        float in1 = inputs[p].getPolyVoltage(ch);
-        float in2 = inputs[q].getPolyVoltage(ch);
-        float in3 = inputs[r].getPolyVoltage(ch);
-        float in4 = inputs[s].getPolyVoltage(ch);
-        float in = g * (in1 + in2 + in3 + in4);
-        float buffer[4];
-
-        interpolate(m.filter[ch], in, buffer);
-
-        float mixed[4];
-        for (int i = 0; i < 4; i++) {
-            mixed[i] = f(_sn, buffer[i]);
-        }
-
-        float out = decimate(m.filter[ch], mixed);
-
-        if (dcBlocking) {
-            out = m.dcf.process(out, ch);
-        }
-
-        outputs[o].setVoltage(out, ch);
-    }
-
-    outputs[o].setChannels(channels);
-}
-
-float mix(const struct SN &sn, float in) {
+float sn_nlm::mix(float in) {
     float α = clamp(in / 5.0f, -1.0f, +1.0f);
     float αʼ = 0.5f * M_PI * α;
     float υ = sn.υ(αʼ);
 
     return 5.0f * υ;
-}
-
-float bypass(const struct SN &sn, float in) {
-    return in;
 }
 
 void sn_nlm::interpolate(struct polyphase100 &filter, float in, float out[4]) {
@@ -520,6 +320,49 @@ float sn_nlm::decimate(struct polyphase100 &filter, float in[4]) {
     return out[0] + out[1] + out[2] + out[3];
 }
 
+void sn_nlm::recompute() {
+    // ... update parameters?
+    if (--update.count > 0) {
+        return;
+    }
+
+    update.count = KRATE[update.krate];
+
+    // ... param values
+    float e = params[ECCENTRICITY_PARAM].getValue();
+    float s = params[SENSITIVITY_PARAM].getValue();
+    float θ = params[ROTATION_PARAM].getValue();
+    float δx = params[DX_PARAM].getValue();
+    float δy = params[DY_PARAM].getValue();
+    float φ = params[PHI_PARAM].getValue();
+    float m = params[M_PARAM].getValue();
+
+    // ... modulate with inputs
+    e += clamp(inputs[ECCENTRICITY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    s += 5.0f * clamp(inputs[SENSITIVITY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    θ += 90.0f * clamp(inputs[ROTATION_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    δx += clamp(inputs[DX_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    δy += clamp(inputs[DY_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+    φ += 90.0f * clamp(inputs[PHI_INPUT].getVoltage() / 5.0f, -1.0f, +1.0f);
+
+    // ... preconditioning
+    e = clamp(e, -1.0f, +1.0f);
+    s = clamp(s, 0.0f, +5.0f);
+    θ = clamp(θ, -89.95f, +89.95f);
+    φ = clamp(φ, -89.95f, +89.95f);
+
+    // ... recalculate SN parameters
+    sn.ε = std::tanh(s * e);
+    sn.θ = θ * M_PI / 180.0f;
+    sn.A = 1.0f;
+    sn.δx = clamp(δx, -0.99f, +0.99f);
+    sn.δy = clamp(δy, -0.99f, +0.99f);
+    sn.Φ = φ * M_PI / 180.0f;
+    sn.m = m;
+
+    sn.recompute();
+}
+
 sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {
     setModule(module);
     setPanel(createPanel(asset::plugin(pluginInstance, "res/sn-nlm.svg"),
@@ -531,14 +374,7 @@ sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {
     addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     // ... inputs
-    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_IN1, module, sn_nlm::IN1_INPUT));
-    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_IN2, module, sn_nlm::IN2_INPUT));
-    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_IN3, module, sn_nlm::IN3_INPUT));
-    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_IN4, module, sn_nlm::IN4_INPUT));
-    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_IN5, module, sn_nlm::IN5_INPUT));
-    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_IN6, module, sn_nlm::IN6_INPUT));
-    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_IN7, module, sn_nlm::IN7_INPUT));
-    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_IN8, module, sn_nlm::IN8_INPUT));
+    addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_IN, module, sn_nlm::IN_INPUT));
 
     addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_E, module, sn_nlm::ECCENTRICITY_INPUT));
     addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_S, module, sn_nlm::SENSITIVITY_INPUT));
@@ -548,11 +384,7 @@ sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {
     addInput(createInputCentered<ThemedPJ301MPort>(SN_NLM_INPUT_PHI, module, sn_nlm::PHI_INPUT));
 
     // ... outputs
-    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTPUT_A, module, sn_nlm::OUTA_OUTPUT));
-    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTPUT_B, module, sn_nlm::OUTB_OUTPUT));
-    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTPUT_C, module, sn_nlm::OUTC_OUTPUT));
-    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTPUT_D, module, sn_nlm::OUTD_OUTPUT));
-
+    addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTPUT_OUT, module, sn_nlm::OUT_OUTPUT));
     addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTPUT_X, module, sn_nlm::OUTX_OUTPUT));
     addOutput(createOutputCentered<ThemedPJ301MPort>(SN_NLM_OUTPUT_Y, module, sn_nlm::OUTY_OUTPUT));
 
@@ -572,25 +404,10 @@ sn_nlmWidget::sn_nlmWidget(sn_nlm *module) {
 void sn_nlmWidget::appendContextMenu(Menu *menu) {
     sn_nlm *module = getModule<sn_nlm>();
 
-    std::vector<std::string> modes;
-
-    for (auto ix = MODES.begin(); ix != MODES.end(); ix++) {
-        modes.push_back(ix->second);
-    }
-
     menu->addChild(new MenuSeparator);
     menu->addChild(createMenuLabel("sn-nlm settings"));
-
-    menu->addChild(createBoolPtrMenuItem("Average", "", &module->average));
-    menu->addChild(createIndexPtrSubmenuItem("k-rate",
-                                             KRATES,
-                                             &module->update.krate));
-    menu->addChild(createIndexPtrSubmenuItem("mode",
-                                             modes,
-                                             &module->mode));
-    menu->addChild(createIndexPtrSubmenuItem("DC blocking",
-                                             DCBLOCKING,
-                                             &module->dcBlocking));
+    menu->addChild(createIndexPtrSubmenuItem("k-rate", KRATES, &module->update.krate));
+    menu->addChild(createIndexPtrSubmenuItem("DC blocking", DCBLOCKING, &module->dcBlocking));
 }
 
 } // namespace sn_nlm

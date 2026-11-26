@@ -47,14 +47,25 @@
 - [x] line joining input to param
 - [x] logo
 - [x] remove debug input
-- [ ] group inputs visually
+- [x] ~~group inputs visually~~
+- [x] ~~hide 2x4~~
+- [x] isConnected
+- [x] channels
 - [x] CHANGELOG
 - [ ] README
 - [ ] user manual
 
-- [x] isConnected
-- [x] channels
-- [ ] hide 2x4
+- [ ] rework as waveshaper
+    - [x] process single input only
+    - [x] AUX
+    - [x] remove bypass
+    - [x] remove mode
+    - [x] remove average
+    - [x] remove extraneous inputs
+    - [x] remove extraneous outputs
+    - [ ] rework front panel
+
+- (?) _sn_ inputs as extender
 
 - [ ] mixer
     - [x] sn

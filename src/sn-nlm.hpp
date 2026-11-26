@@ -4,27 +4,16 @@
 
 namespace sn_nlm {
 
-struct iir4 {
-    double x[4];
-    double y[4];
-};
-
 struct polyphase100 {
     float interpolator[25];
     float decimator[4][25];
     int head = 0;
 };
 
-struct mixer {
-    struct polyphase100 filter[16];
-    struct DCF dcf;
-};
-
 struct sn_nlm : Module {
-    enum MODE {
-        GROUP_2x4,
-        GROUP_4x2,
-    };
+    constexpr static int CHANNELS = 16;
+    constexpr static double TWO_TO_32 = 4294967296.0; // 2^32
+    constexpr static uint32_t MAX_RAMP = 2147483647U;
 
     enum ParamId {
         ECCENTRICITY_PARAM,
@@ -41,14 +30,7 @@ struct sn_nlm : Module {
     };
 
     enum InputId {
-        IN1_INPUT,
-        IN2_INPUT,
-        IN3_INPUT,
-        IN4_INPUT,
-        IN5_INPUT,
-        IN6_INPUT,
-        IN7_INPUT,
-        IN8_INPUT,
+        IN_INPUT,
 
         ECCENTRICITY_INPUT,
         SENSITIVITY_INPUT,
@@ -64,10 +46,7 @@ struct sn_nlm : Module {
     };
 
     enum OutputId {
-        OUTA_OUTPUT,
-        OUTB_OUTPUT,
-        OUTC_OUTPUT,
-        OUTD_OUTPUT,
+        OUT_OUTPUT,
         OUTX_OUTPUT,
         OUTY_OUTPUT,
         OUTPUTS_LEN
@@ -77,36 +56,33 @@ struct sn_nlm : Module {
         LIGHTS_LEN
     };
 
-    constexpr static int INPUTS[] = {IN1_INPUT, IN2_INPUT};
-    constexpr static int N_INPUTS = sizeof(INPUTS) / sizeof(int);
-    constexpr static int CHANNELS = 1;
-
     sn_nlm();
 
     json_t *dataToJson() override;
     void dataFromJson(json_t *) override;
     void process(const ProcessArgs &args) override;
-    void processBypass(const ProcessArgs &args) override;
+    void processIn(const ProcessArgs &args);
     void processAUX(const ProcessArgs &args);
-
-    void recompute(const ProcessArgs &args);
-    void mix2x4(mixer &m, OutputId o, InputId p, InputId q, float (*f)(const struct SN &, float));
-    void mix4x2(mixer &m, OutputId o, InputId p, InputId q, InputId r, InputId s, float (*f)(const struct SN &, float));
 
     void interpolate(struct polyphase100 &polyphase, float in, float out[4]);
     float decimate(struct polyphase100 &polyphase, float in[4]);
+    float mix(float in);
+    void recompute();
 
     // ... parameters
     float attenuation = 0.0f;
     float gain = 1.0f;
-    bool average = false;
     int dcBlocking = 1;
-    MODE mode = GROUP_4x2;
 
-    // ... mix groups
-    struct mixer mixers[4];
+    // ... mixer
+    struct {
+        struct polyphase100 filter[CHANNELS];
+        struct DCF dcf;
+    } mixer;
 
-    // ... recompute
+    // ... sn
+    struct SN sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
+
     struct {
         int krate;
         int count;
@@ -121,9 +97,6 @@ struct sn_nlm : Module {
     } AUX{
         .phase = 0,
     };
-
-    // ... sn
-    struct SN _sn = SN(0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 };
 
 struct sn_nlmWidget : ModuleWidget {
