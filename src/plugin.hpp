@@ -11,4 +11,5 @@ extern Model *model_sn_vcox;
 extern Model *model_sn_lfo;
 extern Model *model_sn_lfox;
 extern Model *model_sn_nlm;
+extern Model *model_sn_nlmx;
 extern Model *model_sn_debug;

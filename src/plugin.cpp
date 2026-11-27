@@ -10,5 +10,6 @@ void init(Plugin *p) {
     p->addModel(model_sn_lfo);
     p->addModel(model_sn_lfox);
     p->addModel(model_sn_nlm);
+    p->addModel(model_sn_nlmx);
     p->addModel(model_sn_debug);
 }

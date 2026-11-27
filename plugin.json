@@ -59,7 +59,16 @@
       "description": "Non-linear mixer.",
       "manualUrl": "https://github.com/transcriptaze/sn-vcv/blob/main/documentation/MANUAL.md#sn-nlm",
       "tags": [
-        "Mixer"
+        "Waveshaper"
+      ]
+    },
+    {
+      "slug": "sn-nlmx",
+      "name": "sn-nlmx",
+      "description": "Non-linear mixer extender.",
+      "manualUrl": "https://github.com/transcriptaze/sn-vcv/blob/main/documentation/MANUAL.md#sn-nlmx",
+      "tags": [
+        "Expander"
       ]
     },
     {
